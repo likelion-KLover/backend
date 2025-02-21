@@ -39,20 +39,30 @@ public class ApisScheduler {
         if(useSchedule == true) {
             log.info("Apis스케쥴러 실행");
 
-            int numOfRows = 100;
-            int maxPage = 15;
+            int numOfRows = 30000;
+            int maxPage = 1;
             String mobileOS = "ETC";   //OS구분
             String mobileApp = "LOCAL";//서비스명
             String arrange = "O";     // (A=제목순, C=수정일순, D=생성일순), 대표이미지가 반드시 있음(O=제목순, Q=수정일순, R=생성일순)
             int contentTypeId = 12;   // 관광지(12) 문화시설(14) 축제/공연/행사(15)
-            List<String> cat1List = Arrays.asList("A01", "A02");  // 대분류(A01, A02): 관광지(12) 문화시설(14) 축제/공연/행사(15) 모두 포함
+            List<String> cat1List = Arrays.asList("C01");  // 대분류(A01, A02): 관광지(12) 문화시설(14) 축제/공연/행사(15) 모두 포함
+//            List<String> cat3List = Arrays.asList("A01010100", "A01010500", "A01010600", "A02010100", "A02010200", "A02010300", // 소분류(분별한 데이터)
+//                    "A02010600", "A02010800", "A02011000", "A02020200", "A02020300", "A02020400", "A02020600", "A02030100",
+//                    "A02030200", "A02030300", "A02030400", "A02030600", "A02040600", "A02050200", "A02050600", "A02060100",
+//                    "A02060200", "A02060700", "A02060800", "A02061100", "A02061300", "A02070100", "A02070200", "A02080100",
+//                    "A02080200", "A02080300", "A02080500", "A02080600", "A02080800", "A02081000", "A02081200", "C01120001",
+//                    "C01130001", "C01140001", "C01150001", "C01160001", "C01170001", "A03010200", "A03020600", "A03021300",
+//                    "A03021400", "A03021700", "A03022000", "A03022100", "A03022200", "A03022300", "A03022700", "A03030100",
+//                    "A03030400", "A03040300", "A03040400", "B02010100", "B02011200", "B02011600", "A04010100", "A04010400",
+//                    "A04010700", "A04010900", "A05020100", "A05020700", "A05020900");
+            List<String> cat3List = Arrays.asList("A01010100");
 
             for (int pageNo = 1; pageNo <= maxPage; pageNo++) {
-                for (String cat1 : cat1List) {
+                for (String cat3 : cat3List) {
                     try {
                         String apiUrl = String.format(
-                                "https://apis.data.go.kr/B551011/KorService1/areaBasedList1?pageNo=%d&numOfRows=%d&MobileOS=%s&MobileApp=%s&arrange=%s&contentTypeId=%d&cat1=%s&serviceKey=%s&_type=json",
-                                pageNo, numOfRows, mobileOS, mobileApp, arrange, contentTypeId, cat1, serviceKeyForApis
+                                "https://apis.data.go.kr/B551011/KorService1/areaBasedList1?pageNo=%d&numOfRows=%d&MobileOS=%s&MobileApp=%s&arrange=%s&cat3=%s&serviceKey=%s&_type=json",
+                                pageNo, numOfRows, mobileOS, mobileApp, arrange, cat3, serviceKeyForApis
                         );
 
                         URL url = new URL(apiUrl);

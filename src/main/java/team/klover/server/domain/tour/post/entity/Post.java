@@ -13,11 +13,13 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 public class Post {
     @Id
-    private String tourPlaceId;
-    private String tourPlaceName;
-    private String tourPlaceArea;
-    private String tourPhotoUrl;
-    private String tourType;
+    private String tourContentId;
+    private String tourTitle;
+    private String tourAreaCode;
+    private String tourAddr1;
+    private String tourFirstImage;
+    private String tourContentTypeId;
     private String map_x;
     private String map_y;
+    private String 
 }

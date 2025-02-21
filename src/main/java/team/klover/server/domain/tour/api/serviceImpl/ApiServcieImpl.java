@@ -32,11 +32,12 @@ public class ApiServcieImpl implements ApiService {
 
             for (JsonNode item : items) {
                 Post entity = Post.builder()
-                        .tourPlaceId(item.path("contentid").asText())
-                        .tourPlaceName(item.path("addr1").asText())
-                        .tourPlaceArea(item.path("areacode").asText())
-                        .tourPhotoUrl(item.path("firstimage").asText())
-                        .tourType(item.path("contenttypeid").asText())
+                        .tourContentId(item.path("contentid").asText())
+                        .tourTitle(item.path("title").asText())
+                        .tourAreaCode(item.path("areacode").asText())
+                        .tourAddr1(item.path("addr1").asText())
+                        .tourFirstImage(item.path("firstimage").asText())
+                        .tourContentTypeId(item.path("contenttypeid").asText())
                         .map_x(item.path("mapx").asText())
                         .map_y(item.path("mapy").asText())
                         .build();
