@@ -1,4 +1,4 @@
-package team.klover.server.domain.tour.api.scheduler;
+package team.klover.server.domain.tour.tourApi.scheduler;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import team.klover.server.domain.tour.api.service.ApiService;
+import team.klover.server.domain.tour.tourApi.service.TourApiService;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -22,7 +22,7 @@ import java.util.List;
 @EnableScheduling
 @Configuration
 public class ApisScheduler {
-    private final ApiService apiService;
+    private final TourApiService tourApiService;
 
     @Value("${schedule.use}")
     private boolean useSchedule;
@@ -44,7 +44,7 @@ public class ApisScheduler {
             int contentTypeId = 12;    // 관광지(12) 문화시설(14) 축제/공연/행사(15) 여행코스(25) 레포츠(28) 숙박(32) 쇼핑(38) 음식(39)
             List<String> areaCodeList = Arrays.asList("1", "2", "6", "39");   // 서울(1) 인천(2) 부산(6) 제주(39)
             List<String> languageList = Arrays.asList("KorService1", "EngService1", "JpnService1", "ChsService1"); // 언어 선택
-            List<String> contentIdList = apiService.getAllContentIds();   // 관광지별 개요 데이터 추가를 위해 관광지별 고유 ID 가져오기
+            List<String> contentIdList = tourApiService.getAllContentIds();   // 관광지별 개요 데이터 추가를 위해 관광지별 고유 ID 가져오기
 
             // 개요 제외 기본 관광지 데이터 선별 및 저장
             for(String language : languageList) {
@@ -77,12 +77,12 @@ public class ApisScheduler {
 
                         if (response.startsWith("{")) {
                             try {
-                                apiService.saveApis(response, language);
+                                tourApiService.saveApis(response, language);
                             } catch (Exception e) {
                                 log.error("Apis 기본 데이터 저장 중 에러 발생", e);
                             }
                             try {
-                                apiService.sortApis();
+                                tourApiService.sortApis();
                             } catch (Exception e) {
                                 log.error("Apis 기본 데이터 선별 중 에러 발생", e);
                             }

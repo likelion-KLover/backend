@@ -1,8 +1,8 @@
-package team.klover.server.domain.tour.api.service;
+package team.klover.server.domain.tour.tourApi.service;
 
 import java.util.List;
 
-public interface ApiService {
+public interface TourApiService {
     // Apis의 데이터를 Post에 저장
     void saveApis(String jsonResponse, String language);
 

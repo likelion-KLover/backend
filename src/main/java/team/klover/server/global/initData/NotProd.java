@@ -6,9 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.transaction.annotation.Transactional;
-import team.klover.server.domain.tour.api.scheduler.ApisScheduler;
-
-import java.util.List;
+import team.klover.server.domain.tour.tourApi.scheduler.ApisScheduler;
 
 @Configuration
 @Profile("!prod")
@@ -25,7 +23,7 @@ public class NotProd {
                 //
                 //
                 //
-                apisScheduler.getApisApiData();
+//                apisScheduler.getApisApiData();
             }
         };
     }

@@ -1,4 +1,4 @@
-package team.klover.server.domain.tour.api.serviceImpl;
+package team.klover.server.domain.tour.tourApi.serviceImpl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -6,9 +6,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import team.klover.server.domain.tour.api.service.ApiService;
-import team.klover.server.domain.tour.post.entity.Post;
-import team.klover.server.domain.tour.post.repository.PostRepository;
+import team.klover.server.domain.tour.tourApi.service.TourApiService;
+import team.klover.server.domain.tour.tourPost.entity.TourPost;
+import team.klover.server.domain.tour.tourPost.repository.TourPostRepository;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,8 +18,8 @@ import java.util.Optional;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ApiServcieImpl implements ApiService {
-    private final PostRepository postRepository;
+public class TourApiServcieImpl implements TourApiService {
+    private final TourPostRepository tourPostRepository;
 
     // Apis의 데이터를 Post에 저장
     @Override
@@ -30,10 +30,10 @@ public class ApiServcieImpl implements ApiService {
             JsonNode root = objectMapper.readTree(jsonResponse);
             JsonNode items = root.path("response").path("body").path("items").path("item");
 
-            List<Post> tourList = new ArrayList<>();
+            List<TourPost> tourList = new ArrayList<>();
 
             for (JsonNode item : items) {
-                Post entity = Post.builder()
+                TourPost entity = TourPost.builder()
                         .contentId(item.path("contentid").asText())
                         .title(item.path("title").asText())
                         .areaCode(item.path("areacode").asText())
@@ -51,7 +51,7 @@ public class ApiServcieImpl implements ApiService {
                         .build();
                 tourList.add(entity);
             }
-            postRepository.saveAll(tourList);
+            tourPostRepository.saveAll(tourList);
             log.info(tourList.toString());
         } catch (Exception e) {
             log.error("saveApis 처리 중 오류 발생", e);
@@ -77,14 +77,14 @@ public class ApiServcieImpl implements ApiService {
                 "B02011600", "A04010100", "A04010400", "A04010700", "A04010900", "A05020100",
                 "A05020700", "A05020900"
         );
-        postRepository.deleteByCat3NotIn(cat3List);
+        tourPostRepository.deleteByCat3NotIn(cat3List);
     }
 
     // 관광지별 개요 데이터 추가를 위해 관광지별 고유 ID 가져오기
     @Override
     @Transactional
     public List<String> getAllContentIds() {
-        return postRepository.findAllContentIds();
+        return tourPostRepository.findAllContentIds();
     }
 
     // 관광지별 개요 데이터 추가 및 저장
@@ -101,13 +101,13 @@ public class ApiServcieImpl implements ApiService {
             String overview = item.path("overview").asText();
 
             // 해당 contentId를 가진 Post 엔터티 조회
-            Optional<Post> optionalPost = postRepository.findByContentId(contentId);
+            Optional<TourPost> optionalPost = tourPostRepository.findByContentId(contentId);
             if (optionalPost.isPresent()) {
-                Post post = optionalPost.get();
+                TourPost tourPost = optionalPost.get();
                 // overview 필드 업데이트
-                post.setOverview(overview);
+                tourPost.setOverview(overview);
                 // 변경 사항 저장
-                postRepository.save(post);
+                tourPostRepository.save(tourPost);
                 log.info("contentId = {} 개요를 업데이트했습니다. 개요: {}", contentId, overview);
             } else {
                 log.warn("contentId = {} 에 해당하는 게시물을 찾을 수 없습니다.", contentId);
@@ -117,5 +117,4 @@ public class ApiServcieImpl implements ApiService {
             throw new RuntimeException("addOverview 처리 중 오류 발생", e);
         }
     }
-
 }

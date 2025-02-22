@@ -1,4 +1,4 @@
-package team.klover.server.domain.tour.post.entity;
+package team.klover.server.domain.tour.tourPost.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -11,7 +11,7 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-public class Post {
+public class TourPost {
     @Id
     private String contentId;
     private String title;
