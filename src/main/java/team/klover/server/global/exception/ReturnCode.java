@@ -15,6 +15,7 @@ public enum ReturnCode {
     NOT_AUTHORIZED("4004", "Not authorized"),
     EXPIRED_TOKEN("4005", "Expired token"),
     INVALID_REQUEST("4006", "Invalid Request"),
+    FORGED_TOKEN("4007","Forged token"),
 
     INTERNAL_ERROR("5000", "Unexpected internal error");
 

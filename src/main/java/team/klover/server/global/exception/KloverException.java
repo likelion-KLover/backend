@@ -9,6 +9,7 @@ public class KloverException extends RuntimeException {
   private String returnMessage;
 
   public KloverException(ReturnCode returnCode) {
+    super(returnCode.getReturnMessage());
     this.returnCode = returnCode;
     this.returnMessage = returnCode.getReturnMessage();
   }
