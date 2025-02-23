@@ -1,5 +1,6 @@
 package team.klover.server.domain.member.v1.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,6 +9,7 @@ import team.klover.server.domain.member.v1.entity.Member;
 @Getter
 @Setter
 @Builder
+@AllArgsConstructor
 public class MemberInfo {
     private Long memberId;
     private String email;
