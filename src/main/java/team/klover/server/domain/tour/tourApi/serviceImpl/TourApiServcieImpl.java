@@ -82,7 +82,7 @@ public class TourApiServcieImpl implements TourApiService {
 
     // 관광지별 개요 데이터 추가를 위해 관광지별 고유 ID 가져오기
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public List<String> getAllContentIds() {
         return tourPostRepository.findAllContentIds();
     }
@@ -96,16 +96,18 @@ public class TourApiServcieImpl implements TourApiService {
             JsonNode root = objectMapper.readTree(jsonResponse);
             JsonNode item = root.path("response").path("body").path("items").path("item");
 
-            // JSON 응답에서 contentId와 overview 추출
+            // JSON 응답에서 contentId, overview, homepage 추출
             String contentId = item.path("contentid").asText();
             String overview = item.path("overview").asText();
+            String homepage = item.path("homepage").asText();
 
             // 해당 contentId를 가진 Post 엔터티 조회
             Optional<TourPost> optionalPost = tourPostRepository.findByContentId(contentId);
             if (optionalPost.isPresent()) {
                 TourPost tourPost = optionalPost.get();
-                // overview 필드 업데이트
+                // overview, homepage 필드 업데이트
                 tourPost.setOverview(overview);
+                tourPost.setHomepage(homepage);
                 // 변경 사항 저장
                 tourPostRepository.save(tourPost);
                 log.info("contentId = {} 개요를 업데이트했습니다. 개요: {}", contentId, overview);

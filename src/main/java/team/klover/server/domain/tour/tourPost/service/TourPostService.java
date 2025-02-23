@@ -7,8 +7,11 @@ import team.klover.server.domain.tour.tourPost.dto.res.TourPostDto;
 
 public interface TourPostService {
     // 사용자 언어 & 지역기반 관광지 데이터 조회
-    Page<TourPostDto> findByLanguageAndAreaCode(String areaCode, Pageable pageable);
+    Page<TourPostDto> findByLanguageAndAreaCode(String language, String areaCode, Pageable pageable);
 
     // 사용자 언어 & 관광지 상세 정보 조회
-    DetailTourPostDto findByContentId(String contentId);
+    DetailTourPostDto findByLanguageAndContentId(String language, String contentId);
+
+    // 사용자 언어 & 관광지명/지역명 검색
+    Page<TourPostDto> searchByLanguageAndKeyword(String language, String keyword, Pageable pageable);
 }

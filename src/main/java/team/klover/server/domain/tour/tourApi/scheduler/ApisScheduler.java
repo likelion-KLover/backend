@@ -102,7 +102,7 @@ public class ApisScheduler {
 //                    try {
 //                        String apiUrl = String.format(
 //                                "https://apis.data.go.kr/B551011/%s/detailCommon1?pageNo=%d&numOfRows=%d&MobileOS=%s" +
-//                                        "&MobileApp=%s&contentId=%s&serviceKey=%s&_type=json&defaultYN=N&firstImageYN=N" +
+//                                        "&MobileApp=%s&contentId=%s&serviceKey=%s&_type=json&defaultYN=Y&firstImageYN=N" +
 //                                        "&areacodeYN=N&catcodeYN=N&addrinfoYN=N&mapinfoYN=N&overviewYN=Y&transGuideYN=N",
 //                                language, pageNo, numOfRows, mobileOS, mobileApp, contentId, serviceKeyForApis
 //                        );

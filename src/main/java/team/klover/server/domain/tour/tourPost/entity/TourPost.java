@@ -19,6 +19,7 @@ public class TourPost {
     private String sigungucode;
     private String addr1;
     private String firstImage;
+    private String homepage;
     private String contentTypeId;
     private String map_x;
     private String map_y;
