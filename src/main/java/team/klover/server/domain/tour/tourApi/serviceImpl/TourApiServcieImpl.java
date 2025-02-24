@@ -10,10 +10,8 @@ import team.klover.server.domain.tour.tourApi.service.TourApiService;
 import team.klover.server.domain.tour.tourPost.entity.TourPost;
 import team.klover.server.domain.tour.tourPost.repository.TourPostRepository;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -116,6 +114,33 @@ public class TourApiServcieImpl implements TourApiService {
         } catch (Exception e) {
             log.error("addOverview 처리 중 오류 발생", e);
             throw new RuntimeException("addOverview 처리 중 오류 발생", e);
+        }
+    }
+
+    // 관광지의 X, Y 좌표가 모든 언어에 공통으로 있는 관광지 선별
+    @Override
+    @Transactional
+    public void getCommonPlace() {
+        List<TourPost> allPosts = tourPostRepository.findAllPosts(); // 모든 데이터 가져오기
+
+        // mapX, mapY 기준으로 그룹핑하여 개수 확인
+        Map<String, List<TourPost>> groupedByCoordinates = allPosts.stream()
+                .collect(Collectors.groupingBy(t -> t.getMapX() + "," + t.getMapY()));
+        int commonPlaceId = 1; // commonPlaceId 초기값 설정
+
+        for (Map.Entry<String, List<TourPost>> entry : groupedByCoordinates.entrySet()) {
+            List<TourPost> posts = entry.getValue();
+            if (posts.size() == 4) { // 4개인 경우 commonPlaceId 부여
+                for (TourPost post : posts) {
+                    post.setCommonPlaceId(String.valueOf(commonPlaceId));
+                }
+                commonPlaceId++; // 다음 그룹을 위해 증가
+            } else { // 4개가 아닌 경우 삭제
+                String[] coordinates = entry.getKey().split(",");
+                String mapX = coordinates[0];
+                String mapY = coordinates[1];
+                tourPostRepository.deleteByMapCoordinates(mapX, mapY);
+            }
         }
     }
 }

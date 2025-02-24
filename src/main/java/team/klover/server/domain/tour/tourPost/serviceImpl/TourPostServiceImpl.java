@@ -78,6 +78,19 @@ public class TourPostServiceImpl implements TourPostService {
         tourPost.getSavedMembers().add(tourPostSave);
     }
 
+    // 해당 관광지 저장 취소
+    @Override
+    @Transactional
+    public void deleteCollectionTourPost(String contentId){
+        TourPost tourPost = tourPostRepository.findByContentId(contentId);
+        TourPostSave tourPostSave = tourPost.getSavedMembers()
+                .stream()
+                .filter(m -> m.getTestMember().getId().equals(1L))
+                .findFirst()
+                .orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
+        tourPost.getSavedMembers().remove(tourPostSave);
+    }
+
     // 요청 페이지 수 제한
     public void checkPageSize(int pageSize) {
         int maxPageSize = TourPostPage.getMaxPageSize();
@@ -90,6 +103,7 @@ public class TourPostServiceImpl implements TourPostService {
     private TourPostDto convertToTourPostDto(TourPost tourPost) {
         return TourPostDto.builder()
                 .contentId(tourPost.getContentId())
+                .commonPlaceId(tourPost.getCommonPlaceId())
                 .title(tourPost.getTitle())
                 .addr1(tourPost.getAddr1())
                 .firstImage(tourPost.getFirstImage())
@@ -102,6 +116,7 @@ public class TourPostServiceImpl implements TourPostService {
     private DetailTourPostDto convertToDetailTourPostDto(TourPost tourPost) {
         return DetailTourPostDto.builder()
                 .contentId(tourPost.getContentId())
+                .commonPlaceId(tourPost.getCommonPlaceId())
                 .title(tourPost.getTitle())
                 .addr1(tourPost.getAddr1())
                 .firstImage(tourPost.getFirstImage())

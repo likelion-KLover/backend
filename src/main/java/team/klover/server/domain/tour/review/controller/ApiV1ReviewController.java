@@ -20,15 +20,15 @@ public class ApiV1ReviewController {
     private final ReviewService reviewService;
 
     // 해당 관광지 게시글에 작성된 모든 리뷰 조회
-    // http://localhost:8090/api/v1/tour-post/review/2542774?page=0&size=10
-    @GetMapping("/{contentId}")
-    public ApiResponse<ReviewDto> getReview(@ModelAttribute ReviewPage request, @PathVariable("contentId") String contentId) {
+    // http://localhost:8090/api/v1/tour-post/review/7?page=0&size=10
+    @GetMapping("/{commonPlaceId}")
+    public ApiResponse<ReviewDto> getReview(@ModelAttribute ReviewPage request, @PathVariable("commonPlaceId") String commonPlaceId) {
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
-        return ApiResponse.of(KloverPage.of(reviewService.findByContentId(contentId, pageable)));
+        return ApiResponse.of(KloverPage.of(reviewService.findByCommonPlaceId(commonPlaceId, pageable)));
     }
 
     // 해당 관광지 게시글에 리뷰 생성
-    // http://localhost:8090/api/v1/tour-post/review/2542774
+    // http://localhost:8090/api/v1/tour-post/review/2701680
     @PostMapping("/{contentId}")
     public ApiResponse<String> addReview(@PathVariable("contentId") String contentId, @RequestBody @Valid ReviewForm reviewForm) {
         reviewService.addReview(contentId, reviewForm);
@@ -38,7 +38,7 @@ public class ApiV1ReviewController {
     // 해당 리뷰 수정
     // http://localhost:8090/api/v1/tour-post/review/1
     @PutMapping("/{id}")
-    public ApiResponse<String> updateReview(@PathVariable("id") String id, @RequestBody @Valid ReviewForm reviewForm) {
+    public ApiResponse<String> updateReview(@PathVariable("id") Long id, @RequestBody @Valid ReviewForm reviewForm) {
         reviewService.updateReview(id, reviewForm);
         return ApiResponse.of(ReturnCode.SUCCESS);
     }
@@ -46,7 +46,7 @@ public class ApiV1ReviewController {
     // 해당 리뷰 삭제
     // http://localhost:8090/api/v1/tour-post/review/1
     @DeleteMapping("/{id}")
-    public ApiResponse<String> deleteReview(@PathVariable("id") String id) {
+    public ApiResponse<String> deleteReview(@PathVariable("id") Long id) {
         reviewService.deleteReview(id);
         return ApiResponse.of(ReturnCode.SUCCESS);
     }

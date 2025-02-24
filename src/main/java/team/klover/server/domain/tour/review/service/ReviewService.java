@@ -8,14 +8,14 @@ import team.klover.server.domain.tour.review.dto.res.ReviewDto;
 
 public interface ReviewService {
     // 해당 관광지 게시글에 작성된 모든 리뷰 조회
-    Page<ReviewDto> findByContentId(String contentId, Pageable pageable);
+    Page<ReviewDto> findByCommonPlaceId(String commonPlaceId, Pageable pageable);
 
     // 해당 관광지 게시글에 리뷰 생성
     void addReview(String contentId, @Valid ReviewForm reviewForm);
 
     // 해당 리뷰 수정
-    void updateReview(String id, @Valid ReviewForm reviewForm);
+    void updateReview(Long id, @Valid ReviewForm reviewForm);
 
     // 해당 리뷰 삭제
-    void deleteReview(String id);
+    void deleteReview(Long id);
 }

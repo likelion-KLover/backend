@@ -27,12 +27,14 @@ public class CommPost extends BaseEntity {
     @OneToMany(mappedBy = "commPost", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CommPostLike> likedMembers = new ArrayList<>();
 
-    private Float mapX;
-    private Float mapY;
+    @OneToMany(mappedBy = "commPost", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CommPostSave> savedMembers = new ArrayList<>();
 
     @Column(length = 3000)
     @Size(max = 3000)
     private String content;
 
+    private Float mapX;
+    private Float mapY;
     private String imageUrl;
 }

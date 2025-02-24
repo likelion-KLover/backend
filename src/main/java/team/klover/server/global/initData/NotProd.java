@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import team.klover.server.domain.member.test.entity.TestMember;
 import team.klover.server.domain.member.test.repository.TestMemberRepository;
 import team.klover.server.domain.tour.tourApi.scheduler.ApisScheduler;
+import team.klover.server.domain.tour.tourApi.service.TourApiService;
 
 @Configuration
 @Profile("!prod")
@@ -21,7 +22,8 @@ public class NotProd {
 
     @Bean
     public ApplicationRunner applicationRunner(
-            ApisScheduler apisScheduler
+            ApisScheduler apisScheduler,
+            TourApiService tourApiService
     ) {
         return new ApplicationRunner() {
             @Transactional

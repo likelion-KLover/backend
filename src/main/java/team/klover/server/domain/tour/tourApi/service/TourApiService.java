@@ -14,4 +14,7 @@ public interface TourApiService {
 
     // 관광지별 개요 데이터 추가 및 저장
     void addOverview(String jsonResponse);
+
+    // 관광지의 X, Y 좌표가 모든 언어에 공통으로 있는 관광지 선별
+    void getCommonPlace();
 }

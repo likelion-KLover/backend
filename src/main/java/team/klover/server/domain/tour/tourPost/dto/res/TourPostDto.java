@@ -7,6 +7,7 @@ import lombok.Data;
 @Builder
 public class TourPostDto {
     private String contentId;
+    private String commonPlaceId;
     private String title;
     private String addr1;
     private String firstImage;

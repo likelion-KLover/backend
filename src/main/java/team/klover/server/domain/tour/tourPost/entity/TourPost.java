@@ -19,6 +19,7 @@ import java.util.List;
 public class TourPost {
     @Id
     private String contentId;
+    private String commonPlaceId;
     private String title;
     private String areaCode;
     private String sigungucode;

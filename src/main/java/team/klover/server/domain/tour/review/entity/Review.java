@@ -20,7 +20,7 @@ public class Review extends BaseEntity {
     private TestMember testMember;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tour_post_contentid", nullable = false)
+    @JoinColumn(name = "tour_post_content_id", nullable = false)
     private TourPost tourPost;
 
     @Column(length = 1000)
@@ -30,4 +30,6 @@ public class Review extends BaseEntity {
     @Column(length = 1)
     @Size(max = 1)
     private int rating;
+
+    private String commonPlaceId;
 }

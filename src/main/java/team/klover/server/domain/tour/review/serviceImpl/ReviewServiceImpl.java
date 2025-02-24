@@ -31,9 +31,9 @@ public class ReviewServiceImpl implements ReviewService {
     // 해당 관광지 게시글에 작성된 모든 리뷰 조회
     @Override
     @Transactional(readOnly = true)
-    public Page<ReviewDto> findByContentId(String contentId, Pageable pageable) {
+    public Page<ReviewDto> findByCommonPlaceId(String commonPlaceId, Pageable pageable) {
         checkPageSize(pageable.getPageSize());
-        Page<Review> reviews = reviewRepository.findByTourPostContentId(contentId, pageable);
+        Page<Review> reviews = reviewRepository.findByCommonPlaceId(commonPlaceId, pageable);
         return reviews.map(this::convertToReviewDto);
     }
 
@@ -54,6 +54,7 @@ public class ReviewServiceImpl implements ReviewService {
                 .tourPost(tourPost)
                 .content(reviewForm.getContent())
                 .rating(reviewForm.getRating())
+                .commonPlaceId(tourPost.getCommonPlaceId())
                 .build();
         reviewRepository.save(review);
     }
@@ -61,8 +62,8 @@ public class ReviewServiceImpl implements ReviewService {
     // 해당 리뷰 수정
     @Override
     @Transactional
-    public void updateReview(String id, @Valid ReviewForm reviewForm){
-        Review review = reviewRepository.findById(Long.valueOf(id))
+    public void updateReview(Long id, @Valid ReviewForm reviewForm){
+        Review review = reviewRepository.findById(id)
                 .orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
 
         // 작성자 검증 - 현재 로그인한 사용자의 ID를 가져와서 검증
@@ -83,8 +84,8 @@ public class ReviewServiceImpl implements ReviewService {
     // 해당 리뷰 삭제
     @Override
     @Transactional
-    public void deleteReview(String id){
-        Review review = reviewRepository.findById(Long.valueOf(id))
+    public void deleteReview(Long id){
+        Review review = reviewRepository.findById(id)
                 .orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
 
         // 작성자 검증 - 현재 로그인한 사용자의 ID를 가져와서 검증

@@ -8,6 +8,6 @@ import team.klover.server.domain.tour.review.entity.Review;
 
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Long> {
-    // 해당 관광지 게시글에 작성된 모든 리뷰 조회
-    Page<Review> findByTourPostContentId(String contentId, Pageable pageable);
+    // 해당 관광지에 작성된 모든 리뷰 조회
+    Page<Review> findByCommonPlaceId(String commonPlaceId, Pageable pageable);
 }

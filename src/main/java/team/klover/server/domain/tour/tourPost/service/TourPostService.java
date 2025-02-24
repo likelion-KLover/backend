@@ -20,4 +20,7 @@ public interface TourPostService {
 
     // 해당 관광지 저장
     void addCollectionTourPost(String contentId);
+
+    // 해당 관광지 저장 취소
+    void deleteCollectionTourPost(String contentId);
 }
