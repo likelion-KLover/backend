@@ -126,15 +126,9 @@ public class AuthV1Controller {
     }
 
     @GetMapping("/authinfo")
-    public ApiResponse<MemberDto> authorize(HttpServletRequest request) {
-        String accessToken = jwtTokenProvider.getJwtFromHeader(request);
-        if (accessToken == null)  throw new KloverRequestException(ReturnCode.INVALID_REQUEST);
-
-        if (!jwtTokenProvider.isTokenValid(accessToken))  throw new KloverRequestException(ReturnCode.EXPIRED_TOKEN);
-
-        MemberDto member = jwtTokenProvider.getUserInfoFromToken(accessToken);
-
-        return ApiResponse.of(member);
+    public ApiResponse<MemberDto> authorize() {
+        MemberDto realMember = new MemberDto(memberService.getMemberById(AuthUtil.getCurrentMemberId()));
+        return ApiResponse.of(realMember);
     }
 
     @PostMapping("/refresh")
@@ -164,7 +158,7 @@ public class AuthV1Controller {
         );
 
         String newAccessToken = jwtTokenProvider.generateAccessToken(memberDto);
-        return ApiResponse.of(new JwtResponse(newAccessToken, savedRefreshToken));
+        return ApiResponse.of(new RefreshResponse(newAccessToken));
 
     }
 

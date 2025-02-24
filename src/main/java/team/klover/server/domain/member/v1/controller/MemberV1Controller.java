@@ -28,11 +28,11 @@ public class MemberV1Controller {
     public ApiResponse modifyUserInfo(@RequestPart("request") MemberUpdateParam param,
                                       @RequestPart(value = "imageFile", required = false) MultipartFile imageFile // 이미지 파일 (선택 사항)
     ) {
-
+        System.out.println(param);
+        System.out.println(imageFile);
         Long memberId = AuthUtil.getCurrentMemberId();
-
         memberService.updateMember(memberId, param
-                //        , imageFile
+                        , imageFile
         );
 
         return ApiResponse.of(ReturnCode.SUCCESS);

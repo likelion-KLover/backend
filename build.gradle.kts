@@ -43,6 +43,10 @@ dependencies {
 	implementation("com.google.api-client:google-api-client:2.2.0")
 
 	implementation("org.springframework.boot:spring-boot-starter-data-redis")
+
+	// aws s3
+	implementation(platform("software.amazon.awssdk:bom:2.24.0"))
+	implementation("software.amazon.awssdk:s3")
 }
 
 tasks.withType<Test> {

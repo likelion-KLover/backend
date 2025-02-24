@@ -1,14 +1,12 @@
 package team.klover.server.domain.member.v1.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Getter
 @AllArgsConstructor
 @Builder
 @NoArgsConstructor
+@ToString
 public class MemberUpdateParam {
     private String nickname; //new nickname
     private String profileUrl; //oldProfileUrl
