@@ -41,8 +41,8 @@ public class TourApiServcieImpl implements TourApiService {
                         .addr1(item.path("addr1").asText())
                         .firstImage(item.path("firstimage").asText())
                         .contentTypeId(item.path("contenttypeid").asText())
-                        .map_x(item.path("mapx").asText())
-                        .map_y(item.path("mapy").asText())
+                        .mapX(item.path("mapx").asText())
+                        .mapY(item.path("mapy").asText())
                         .cat1(item.path("cat1").asText())
                         .cat2(item.path("cat2").asText())
                         .cat3(item.path("cat3").asText())
@@ -102,9 +102,8 @@ public class TourApiServcieImpl implements TourApiService {
             String homepage = item.path("homepage").asText();
 
             // 해당 contentId를 가진 Post 엔터티 조회
-            Optional<TourPost> optionalPost = tourPostRepository.findByContentId(contentId);
-            if (optionalPost.isPresent()) {
-                TourPost tourPost = optionalPost.get();
+            TourPost tourPost = tourPostRepository.findByContentId(contentId);
+            if (tourPost != null) {
                 // overview, homepage 필드 업데이트
                 tourPost.setOverview(overview);
                 tourPost.setHomepage(homepage);

@@ -10,5 +10,4 @@ import java.util.Optional;
 public interface TestMemberRepository extends JpaRepository<TestMember, Long> {
     // 이메일로 회원 찾기
     Optional<TestMember> findByEmail(String email);
-
 }

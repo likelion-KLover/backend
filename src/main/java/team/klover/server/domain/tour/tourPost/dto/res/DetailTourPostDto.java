@@ -11,7 +11,7 @@ public class DetailTourPostDto {
     private String addr1;
     private String firstImage;
     private String homepage;
-    private String map_x;
-    private String map_y;
+    private String mapX;
+    private String mapY;
     private String overview;
 }

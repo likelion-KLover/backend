@@ -10,6 +10,7 @@ import team.klover.server.domain.tour.tourPost.entity.TourPostPage;
 import team.klover.server.domain.tour.tourPost.service.TourPostService;
 import team.klover.server.global.common.response.ApiResponse;
 import team.klover.server.global.common.response.KloverPage;
+import team.klover.server.global.exception.ReturnCode;
 
 @RestController
 @RequestMapping("/api/v1/tour-post")
@@ -20,24 +21,43 @@ public class ApiV1TourPostController {
     // language: KorService1(한국어) EngService1(영어) JpnService1(일본어) ChsService1(중국어간체)
 
     // 사용자 언어 & 지역기반 관광지 데이터 조회
-    @GetMapping("{language}/{areaCode}")
+    // http://localhost:8090/api/v1/tour-post/EngService1/1?page=0&size=15
+    @GetMapping("/{language}/{areaCode}")
     public ApiResponse<TourPostDto> getAreaPost(@ModelAttribute TourPostPage request, @PathVariable("language") String language,
                                                 @PathVariable("areaCode") String areaCode) {
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
         return ApiResponse.of(KloverPage.of(tourPostService.findByLanguageAndAreaCode(language, areaCode, pageable)));
     }
 
-    // 사용자 언어 & 관광지 상세 정보 조회
-    @GetMapping("{language}/detail/{contentId}")
-    public ApiResponse<DetailTourPostDto> getDetailTourPost(@PathVariable("language") String language, @PathVariable("contentId") String contentId) {
-        return ApiResponse.of(tourPostService.findByLanguageAndContentId(language, contentId));
+    // 해당 관광지 상세 정보 조회
+    // http://localhost:8090/api/v1/tour-post/detail/2542774
+    @GetMapping("/detail/{contentId}")
+    public ApiResponse<DetailTourPostDto> getDetailTourPost(@PathVariable("contentId") String contentId) {
+        return ApiResponse.of(tourPostService.findByContentId(contentId));
+    }
+
+    // 사용자가 저장한 관광지 조회
+    // http://localhost:8090/api/v1/tour-post/collection
+    @GetMapping("/collection")
+    public ApiResponse<TourPostDto> getSavedTourPostByTestMember(@ModelAttribute TourPostPage request) {
+        Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
+        return ApiResponse.of(KloverPage.of(tourPostService.getSavedTourPostByTestMember(pageable)));
     }
 
     // 사용자 언어 & 관광지명/지역명 검색
-    @GetMapping("{language}")
+    // http://localhost:8090/api/v1/tour-post/EngService1?keyword=동대문&page=0&size=15
+    @GetMapping("/{language}")
     public ApiResponse<TourPostDto> searchTourPost(@ModelAttribute TourPostPage request, @PathVariable("language") String language,
                                                    @RequestParam("keyword") String keyword) {
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
         return ApiResponse.of(KloverPage.of(tourPostService.searchByLanguageAndKeyword(language, keyword, pageable)));
+    }
+
+    // 해당 관광지 저장
+    // http://localhost:8090/api/v1/tour-post/collection/2542774
+    @PostMapping("/collection/{contentId}")
+    public ApiResponse<String> addCollectionTourPost(@PathVariable("contentId") String contentId){
+        tourPostService.addCollectionTourPost(contentId);
+        return ApiResponse.of(ReturnCode.SUCCESS);
     }
 }
