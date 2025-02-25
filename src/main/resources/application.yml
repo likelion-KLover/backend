@@ -4,3 +4,5 @@ spring:
   profiles:
     active: dev
     include: secret
+aws:
+  bucket_name: klover-bucket-lshkw0315-1

@@ -6,6 +6,7 @@ import team.klover.server.global.common.response.ApiResponse;
 import team.klover.server.global.exception.KloverException;
 
 @RestControllerAdvice
+//@Hidden
 public class GlobalControllerAdvice {
     @ExceptionHandler(KloverException.class)
     public ApiResponse<?> handleKloverException(KloverException e) {
