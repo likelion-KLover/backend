@@ -26,10 +26,8 @@ repositories {
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-data-redis")
-	implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-web")
-	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2")
 	compileOnly("org.projectlombok:lombok")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	runtimeOnly("org.postgresql:postgresql")
@@ -38,9 +36,17 @@ dependencies {
 	testImplementation("org.springframework.security:spring-security-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
-	implementation("io.jsonwebtoken:jjwt-api:0.11.5") // jjwt-api 모듈 추가
-	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")   // jjwt-impl 모듈 추가
-	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5") // JSON 처리용 모듈 추가
+	implementation("io.jsonwebtoken:jjwt-api:0.12.5")								// jjwt
+	implementation("io.jsonwebtoken:jjwt-impl:0.12.5")
+	implementation("io.jsonwebtoken:jjwt-jackson:0.12.5")
+	implementation("org.springframework.boot:spring-boot-starter-webflux")
+	implementation("com.google.api-client:google-api-client:2.2.0")
+
+	implementation("org.springframework.boot:spring-boot-starter-data-redis")
+
+	// aws s3
+	implementation(platform("software.amazon.awssdk:bom:2.24.0"))
+	implementation("software.amazon.awssdk:s3")
 }
 
 tasks.withType<Test> {

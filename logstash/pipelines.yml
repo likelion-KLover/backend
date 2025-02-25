@@ -1,0 +1,27 @@
+- pipeline.id: log_pipeline
+  path.config: "/usr/share/logstash/pipeline/logpipeline.conf"
+
+- pipeline.id: commpost_pipeline
+  path.config: "/usr/share/logstash/pipeline/CommPostPipeline.conf"
+- pipeline.id: commpost_update_pipeline
+  path.config: "/usr/share/logstash/pipeline/CommPostUpdatePipeline.conf"
+
+- pipeline.id: tourpost_korean_pipeline
+  path.config: "/usr/share/logstash/pipeline/TourPostKoreanPipeline.conf"
+- pipeline.id: tourpost_korean_update_pipeline
+  path.config: "/usr/share/logstash/pipeline/TourPostKoreanUpdatePipeline.conf"
+
+- pipeline.id: tourpost_chinese_pipeline
+  path.config: "/usr/share/logstash/pipeline/TourPostChinesePipeline.conf"
+- pipeline.id: tourpost_chinese_update_pipeline
+  path.config: "/usr/share/logstash/pipeline/TourPostChineseUpdatePipeline.conf"
+
+- pipeline.id: tourpost_japanese_pipeline
+  path.config: "/usr/share/logstash/pipeline/TourPostJapanesePipeline.conf"
+- pipeline.id: tourpost_japanese_update_pipeline
+  path.config: "/usr/share/logstash/pipeline/TourPostJapaneseUpdatePipeline.conf"
+
+- pipeline.id: tourpost_english_pipeline
+  path.config: "/usr/share/logstash/pipeline/TourPostEnglishUpdatePipeline.conf"
+- pipeline.id: tourpost_english_update_pipeline
+  path.config: "/usr/share/logstash/pipeline/TourPostEnglishUpdatePipeline.conf"
