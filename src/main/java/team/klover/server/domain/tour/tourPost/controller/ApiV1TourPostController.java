@@ -21,7 +21,7 @@ public class ApiV1TourPostController {
     // language: KorService1(한국어) EngService1(영어) JpnService1(일본어) ChsService1(중국어간체)
 
     // 사용자 언어 & 지역기반 관광지 데이터 조회
-    // http://localhost:8090/api/v1/tour-post/EngService1/1?page=0&size=15
+    // http://localhost:8080/api/v1/tour-post/EngService1/1?page=0&size=15
     @GetMapping("/{language}/{areaCode}")
     public ApiResponse<TourPostDto> getAreaPost(@ModelAttribute TourPostPage request, @PathVariable("language") String language,
                                                 @PathVariable("areaCode") String areaCode) {
@@ -30,14 +30,14 @@ public class ApiV1TourPostController {
     }
 
     // 해당 관광지 상세 조회
-    // http://localhost:8090/api/v1/tour-post/detail/3407946
+    // http://localhost:8080/api/v1/tour-post/detail/3407946
     @GetMapping("/detail/{contentId}")
     public ApiResponse<DetailTourPostDto> getDetailTourPost(@PathVariable("contentId") Long contentId) {
         return ApiResponse.of(tourPostService.findByContentId(contentId));
     }
 
     // 사용자가 저장한 관광지 조회
-    // http://localhost:8090/api/v1/tour-post/collection
+    // http://localhost:8080/api/v1/tour-post/collection
     @GetMapping("/collection")
     public ApiResponse<TourPostDto> getCollectionTourPost(@ModelAttribute TourPostPage request) {
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
@@ -45,7 +45,7 @@ public class ApiV1TourPostController {
     }
 
     // 사용자 언어 & 관광지명/지역명 검색
-    // http://localhost:8090/api/v1/tour-post/EngService1?keyword=동대문&page=0&size=15
+    // http://localhost:8080/api/v1/tour-post/EngService1?keyword=동대문&page=0&size=15
     @GetMapping("/{language}")
     public ApiResponse<TourPostDto> searchTourPost(@ModelAttribute TourPostPage request, @PathVariable("language") String language,
                                                    @RequestParam("keyword") String keyword) {
@@ -54,7 +54,7 @@ public class ApiV1TourPostController {
     }
 
     // 해당 관광지 저장
-    // http://localhost:8090/api/v1/tour-post/collection/3407946
+    // http://localhost:8080/api/v1/tour-post/collection/3407946
     @PostMapping("/collection/{contentId}")
     public ApiResponse<String> addCollectionTourPost(@PathVariable("contentId") Long contentId){
         tourPostService.addCollectionTourPost(contentId);
@@ -62,7 +62,7 @@ public class ApiV1TourPostController {
     }
 
     // 해당 관광지 저장 취소
-    // http://localhost:8090/api/v1/tour-post/collection/3407946
+    // http://localhost:8080/api/v1/tour-post/collection/3407946
     @DeleteMapping("/collection/{contentId}")
     public ApiResponse<String> deleteCollectionTourPost(@PathVariable("contentId") Long contentId){
         tourPostService.deleteCollectionTourPost(contentId);
