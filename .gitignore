@@ -37,3 +37,16 @@ out/
 .vscode/
 
 application-secret.yml
+
+
+# Terraform 상태 파일
+*.tfstate
+*.tfstate.*
+
+# Terraform 변수 파일
+*.tfvars
+*.tfvars.json
+
+# 로컬 Terraform 디렉토리
+**/.terraform/*
+.terraform.*

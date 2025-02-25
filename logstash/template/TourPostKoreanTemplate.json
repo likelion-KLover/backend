@@ -1,0 +1,79 @@
+{
+  "index_patterns": ["repost*"],
+  "template": {
+    "settings": {
+      "analysis": {
+        "tokenizer": {
+          "nori_mixed": {
+            "type": "nori_tokenizer",
+            "decompound_mode": "mixed"
+          }
+        },
+        "analyzer": {
+          "korean_mixed": {
+            "type": "custom",
+            "tokenizer": "nori_mixed",
+            "filter": [
+              "lowercase",
+              "nori_part_of_speech",
+              "nori_posfilter",
+              "nori_readingform"
+            ]
+          },
+          "korean_word": {
+            "type": "custom",
+            "tokenizer": "nori_mixed",
+            "filter": [
+              "lowercase",
+              "english_stemmer",
+              "stop",
+              "nori_part_of_speech",
+              "nori_posfilter",
+              "nori_readingform",
+              "ngram_filter"
+            ]
+          }
+        },
+        "filter": {
+          "nori_posfilter": {
+            "type": "nori_part_of_speech",
+            "stoptags": [
+              "E", "IC", "J", "MAG", "MAJ", "MM", "SP",
+              "SSC", "SSO", "SC", "SE", "XPN", "XSA",
+              "XSN", "XSV", "UNA", "NA", "VSV"
+            ]
+          }
+        }
+      },
+      "index": {
+        "max_ngram_diff": 5
+      }
+    },
+    "mappings": {
+      "properties": {
+        "content_id": {
+          "type": "keyword"
+        },
+        "common_place_id": {
+          "type": "keyword"
+        },
+        "sigungucode":{
+          "type": "keyword"
+        },
+        "addr1": {
+          "type": "keyword"
+        },
+        "firstImage": {
+          "type": "keyword"
+        },
+        "title": {
+          "type": "text",
+          "analyzer": "korean_word"
+        },
+        "location": {
+          "type": "geo_point"
+        }
+      }
+    }
+  }
+}
