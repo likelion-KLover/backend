@@ -6,8 +6,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import team.klover.server.domain.member.test.entity.TestMember;
-import team.klover.server.domain.member.test.repository.TestMemberRepository;
+import team.klover.server.domain.member.v1.entity.Member;
+import team.klover.server.domain.member.v1.repository.MemberV1Repository;
 import team.klover.server.domain.tour.review.repository.ReviewRepository;
 import team.klover.server.domain.tour.tourPost.dto.res.DetailTourPostDto;
 import team.klover.server.domain.tour.tourPost.dto.res.TourPostDto;
@@ -24,7 +24,7 @@ import team.klover.server.global.exception.ReturnCode;
 @RequiredArgsConstructor
 public class TourPostServiceImpl implements TourPostService {
     private final TourPostRepository tourPostRepository;
-    private final TestMemberRepository testMemberRepository;
+    private final MemberV1Repository memberV1Repository;
     private final ReviewRepository reviewRepository;
 
     // 사용자 언어 & 지역기반 관광지 데이터 조회
@@ -67,7 +67,7 @@ public class TourPostServiceImpl implements TourPostService {
     @Override
     @Transactional
     public void addCollectionTourPost(String contentId){
-        TestMember testMember = testMemberRepository.findById(1L).orElse(null); // 임시 - 변경 필요
+        Member member = memberV1Repository.findById(1L).orElse(null); // 임시 - 변경 필요
         TourPost tourPost = tourPostRepository.findByContentId(contentId);
 
         boolean alreadySaved = tourPost.getSavedMembers()
@@ -76,7 +76,7 @@ public class TourPostServiceImpl implements TourPostService {
         if (alreadySaved) {
             throw new KloverRequestException(ReturnCode.ALREADY_EXIST);
         }
-        TourPostSave tourPostSave = new TourPostSave(testMember, tourPost);
+        TourPostSave tourPostSave = new TourPostSave(member, tourPost);
         tourPost.getSavedMembers().add(tourPostSave);
     }
 
@@ -87,7 +87,7 @@ public class TourPostServiceImpl implements TourPostService {
         TourPost tourPost = tourPostRepository.findByContentId(contentId);
         TourPostSave tourPostSave = tourPost.getSavedMembers()
                 .stream()
-                .filter(m -> m.getTestMember().getId().equals(1L))
+                .filter(m -> m.getMember().getId().equals(1L))
                 .findFirst()
                 .orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
         tourPost.getSavedMembers().remove(tourPostSave);

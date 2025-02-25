@@ -6,18 +6,18 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.transaction.annotation.Transactional;
-import team.klover.server.domain.member.test.entity.TestMember;
-import team.klover.server.domain.member.test.repository.TestMemberRepository;
+import team.klover.server.domain.member.v1.entity.Member;
+import team.klover.server.domain.member.v1.repository.MemberV1Repository;
 import team.klover.server.domain.tour.tourApi.scheduler.ApisScheduler;
 import team.klover.server.domain.tour.tourApi.service.TourApiService;
 
 @Configuration
 @Profile("!prod")
 public class NotProd {
-    private final TestMemberRepository testMemberRepository;
+    private final MemberV1Repository memberV1Repository;
 
-    public NotProd(TestMemberRepository testMemberRepository) {
-        this.testMemberRepository = testMemberRepository;
+    public NotProd(MemberV1Repository memberV1Repository) {
+        this.memberV1Repository = memberV1Repository;
     }
 
     @Bean
@@ -38,24 +38,24 @@ public class NotProd {
 
 
                 // TestMember 1,2,3 생성
-                TestMember testMember1 = TestMember.builder()
+                Member testMember1 = Member.builder()
                         .email("test1@test.com")
                         .password("1234")
                         .nickname("test1")
                         .build();
-                testMemberRepository.save(testMember1);
-                TestMember testMember2 = TestMember.builder()
+                memberV1Repository.save(testMember1);
+                Member testMember2 = Member.builder()
                         .email("test2@test.com")
                         .password("1234")
                         .nickname("test2")
                         .build();
-                testMemberRepository.save(testMember2);
-                TestMember testMember3 = TestMember.builder()
+                memberV1Repository.save(testMember2);
+                Member testMember3 = Member.builder()
                         .email("test3@test.com")
                         .password("1234")
                         .nickname("test3")
                         .build();
-                testMemberRepository.save(testMember3);
+                memberV1Repository.save(testMember3);
             }
         };
     }
