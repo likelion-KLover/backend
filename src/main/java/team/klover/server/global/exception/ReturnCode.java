@@ -6,19 +6,17 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum ReturnCode {
-    SUCCESS("0000", "Success"),
+    SUCCESS("0000", "SUCCESS_MESSAGE"),
 
-    WRONG_PARAMETER("4000", "Wrong parameter"),
-    NOT_FOUND_ENTITY("4001", "Not found entity"),
-    ALREADY_EXIST("4002", "Already exist"),
-    WRONG_PASSWORD("4003", "Wrong password"),
-    NOT_AUTHORIZED("4004", "Not authorized"),
-    EXPIRED_TOKEN("4005", "Expired token"),
-    INVALID_REQUEST("4006", "Invalid Request"),
-    FORGED_TOKEN("4007","Forged token"),
+    WRONG_PARAMETER("4000", "WRONG_PARAMETER_MESSAGE"),
+    NOT_FOUND_ENTITY("4001", "NOT_FOUND_ENTITY_MESSAGE"),
+    ALREADY_EXIST("4002", "ALREADY_EXIST_MESSAGE"),
+    WRONG_PASSWORD("4003", "WRONG_PASSWORD_MESSAGE"),
+    NOT_AUTHORIZED("4004", "NOT_AUTHORIZED_MESSAGE"),
+    EXPIRED_TOKEN("4005", "EXPIRED_TOKEN_MESSAGE"),
+    INVALID_REQUEST("4006", "INVALID_REQUEST_MESSAGE"),
 
-    INTERNAL_ERROR("5000", "Unexpected internal error");
-
+    INTERNAL_ERROR("5000", "INTERNAL_ERROR_MESSAGE");
     private String returnCode;
     private String returnMessage;
 }
