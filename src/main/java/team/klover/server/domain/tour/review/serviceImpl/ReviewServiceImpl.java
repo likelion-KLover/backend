@@ -28,7 +28,7 @@ public class ReviewServiceImpl implements ReviewService {
     private final TourPostRepository tourPostRepository;
     private final TestMemberRepository testMemberRepository;
 
-    // 해당 관광지 게시글에 작성된 모든 리뷰 조회
+    // 해당 관광지 게시글에 작성된 리뷰 조회
     @Override
     @Transactional(readOnly = true)
     public Page<ReviewDto> findByCommonPlaceId(String commonPlaceId, Pageable pageable) {
@@ -98,7 +98,7 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     // 요청 페이지 수 제한
-    public void checkPageSize(int pageSize) {
+    private void checkPageSize(int pageSize) {
         int maxPageSize = ReviewPage.getMaxPageSize();
         if (pageSize > maxPageSize) {
             throw new KloverRequestException(ReturnCode.WRONG_PARAMETER);

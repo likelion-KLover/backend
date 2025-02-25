@@ -19,10 +19,10 @@ import team.klover.server.global.exception.ReturnCode;
 public class ApiV1ReviewController {
     private final ReviewService reviewService;
 
-    // 해당 관광지 게시글에 작성된 모든 리뷰 조회
+    // 해당 관광지 게시글에 작성된 리뷰 조회
     // http://localhost:8090/api/v1/tour-post/review/7?page=0&size=10
     @GetMapping("/{commonPlaceId}")
-    public ApiResponse<ReviewDto> getReview(@ModelAttribute ReviewPage request, @PathVariable("commonPlaceId") String commonPlaceId) {
+    public ApiResponse<ReviewDto> findByCommonPlaceId(@ModelAttribute ReviewPage request, @PathVariable("commonPlaceId") String commonPlaceId) {
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
         return ApiResponse.of(KloverPage.of(reviewService.findByCommonPlaceId(commonPlaceId, pageable)));
     }

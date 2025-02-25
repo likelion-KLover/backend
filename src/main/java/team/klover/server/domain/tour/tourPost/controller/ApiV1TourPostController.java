@@ -29,7 +29,7 @@ public class ApiV1TourPostController {
         return ApiResponse.of(KloverPage.of(tourPostService.findByLanguageAndAreaCode(language, areaCode, pageable)));
     }
 
-    // 해당 관광지 상세 정보 조회
+    // 해당 관광지 상세 조회
     // http://localhost:8090/api/v1/tour-post/detail/3407946
     @GetMapping("/detail/{contentId}")
     public ApiResponse<DetailTourPostDto> getDetailTourPost(@PathVariable("contentId") String contentId) {

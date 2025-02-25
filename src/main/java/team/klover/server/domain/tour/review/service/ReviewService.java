@@ -7,7 +7,7 @@ import team.klover.server.domain.tour.review.dto.req.ReviewForm;
 import team.klover.server.domain.tour.review.dto.res.ReviewDto;
 
 public interface ReviewService {
-    // 해당 관광지 게시글에 작성된 모든 리뷰 조회
+    // 해당 관광지 게시글에 작성된 리뷰 조회
     Page<ReviewDto> findByCommonPlaceId(String commonPlaceId, Pageable pageable);
 
     // 해당 관광지 게시글에 리뷰 생성

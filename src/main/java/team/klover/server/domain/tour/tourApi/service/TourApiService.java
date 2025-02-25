@@ -17,4 +17,7 @@ public interface TourApiService {
 
     // 관광지의 X, Y 좌표가 모든 언어에 공통으로 있는 관광지 선별
     void getCommonPlace();
+
+    // contentId 기준으로 오름차순 정렬
+    void sortAsc();
 }

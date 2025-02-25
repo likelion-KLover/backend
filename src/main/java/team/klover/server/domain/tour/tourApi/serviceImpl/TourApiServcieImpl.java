@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import team.klover.server.domain.tour.tourApi.service.TourApiService;
@@ -142,5 +143,15 @@ public class TourApiServcieImpl implements TourApiService {
                 tourPostRepository.deleteByMapCoordinates(mapX, mapY);
             }
         }
+    }
+
+    // contentId 기준으로 오름차순 정렬
+    @Override
+    @Transactional
+    public void sortAsc() {
+        // 1. 모든 데이터를 contentId 기준으로 정렬하여 가져옴
+        List<TourPost> sortedPosts = tourPostRepository.findAll(Sort.by(Sort.Direction.ASC, "contentId"));
+        tourPostRepository.deleteAll(); // 기존 데이터 삭제
+        tourPostRepository.saveAll(sortedPosts); // 정렬된 데이터 다시 저장
     }
 }

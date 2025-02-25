@@ -34,7 +34,8 @@ public class CommPost extends BaseEntity {
     @Size(max = 3000)
     private String content;
 
-    private Float mapX;
-    private Float mapY;
+    private String nickname;
+    private Double mapX;
+    private Double mapY;
     private String imageUrl;
 }

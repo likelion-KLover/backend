@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CommPostForm {
-    private Float mapX;
-    private Float mapY;
+    private Double mapX;
+    private Double mapY;
     private String content;
     private String imageUrl;
 }

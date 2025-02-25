@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import team.klover.server.domain.member.test.entity.TestMember;
 import team.klover.server.domain.member.test.repository.TestMemberRepository;
+import team.klover.server.domain.tour.review.repository.ReviewRepository;
 import team.klover.server.domain.tour.tourPost.dto.res.DetailTourPostDto;
 import team.klover.server.domain.tour.tourPost.dto.res.TourPostDto;
 import team.klover.server.domain.tour.tourPost.entity.TourPostSave;
@@ -24,6 +25,7 @@ import team.klover.server.global.exception.ReturnCode;
 public class TourPostServiceImpl implements TourPostService {
     private final TourPostRepository tourPostRepository;
     private final TestMemberRepository testMemberRepository;
+    private final ReviewRepository reviewRepository;
 
     // 사용자 언어 & 지역기반 관광지 데이터 조회
     @Override
@@ -34,7 +36,7 @@ public class TourPostServiceImpl implements TourPostService {
         return tourPosts.map(this::convertToTourPostDto);
     }
 
-    // 해당 관광지 상세 정보 조회
+    // 해당 관광지 상세 조회
     @Override
     @Transactional(readOnly = true)
     public DetailTourPostDto findByContentId(String contentId) {
@@ -92,7 +94,7 @@ public class TourPostServiceImpl implements TourPostService {
     }
 
     // 요청 페이지 수 제한
-    public void checkPageSize(int pageSize) {
+    private void checkPageSize(int pageSize) {
         int maxPageSize = TourPostPage.getMaxPageSize();
         if (pageSize > maxPageSize) {
             throw new KloverRequestException(ReturnCode.WRONG_PARAMETER);
@@ -101,9 +103,11 @@ public class TourPostServiceImpl implements TourPostService {
 
     // TourPost를 TourPostDto로 변환
     private TourPostDto convertToTourPostDto(TourPost tourPost) {
+        Double avgRating = reviewRepository.findAverageRatingByTourPostId(tourPost.getContentId());
         return TourPostDto.builder()
                 .contentId(tourPost.getContentId())
                 .commonPlaceId(tourPost.getCommonPlaceId())
+                .avgRating(avgRating != null ? Math.round(avgRating * 10.0) / 10.0 : 0.0) // 소수점 1자리 반올림
                 .title(tourPost.getTitle())
                 .addr1(tourPost.getAddr1())
                 .firstImage(tourPost.getFirstImage())
@@ -114,9 +118,11 @@ public class TourPostServiceImpl implements TourPostService {
 
     // TourPost를 DetailTourPostDto로 변환
     private DetailTourPostDto convertToDetailTourPostDto(TourPost tourPost) {
+        Double avgRating = reviewRepository.findAverageRatingByTourPostId(tourPost.getContentId());
         return DetailTourPostDto.builder()
                 .contentId(tourPost.getContentId())
                 .commonPlaceId(tourPost.getCommonPlaceId())
+                .avgRating(avgRating != null ? Math.round(avgRating * 10.0) / 10.0 : 0.0) // 소수점 1자리 반올림
                 .title(tourPost.getTitle())
                 .addr1(tourPost.getAddr1())
                 .firstImage(tourPost.getFirstImage())

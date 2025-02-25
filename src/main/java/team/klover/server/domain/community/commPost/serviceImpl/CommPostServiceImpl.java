@@ -8,7 +8,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import team.klover.server.domain.community.commPost.dto.req.CommPostForm;
+import team.klover.server.domain.community.commPost.dto.req.XYForm;
 import team.klover.server.domain.community.commPost.dto.res.CommPostDto;
+import team.klover.server.domain.community.commPost.dto.res.DetailCommPostDto;
 import team.klover.server.domain.community.commPost.entity.CommPost;
 import team.klover.server.domain.community.commPost.entity.CommPostLike;
 import team.klover.server.domain.community.commPost.entity.CommPostPage;
@@ -17,6 +19,7 @@ import team.klover.server.domain.community.commPost.repository.CommPostRepositor
 import team.klover.server.domain.community.commPost.service.CommPostService;
 import team.klover.server.domain.member.test.entity.TestMember;
 import team.klover.server.domain.member.test.repository.TestMemberRepository;
+import team.klover.server.global.common.response.ApiResponse;
 import team.klover.server.global.exception.KloverRequestException;
 import team.klover.server.global.exception.ReturnCode;
 
@@ -27,6 +30,13 @@ public class CommPostServiceImpl implements CommPostService {
     private final CommPostRepository commPostRepository;
     private final TestMemberRepository testMemberRepository;
 
+    // 사용자 위치 주변 게시글 조회
+    public Page<CommPostDto> findPostsWithinRadius(@Valid XYForm xyForm, Pageable pageable){
+        checkPageSize(pageable.getPageSize());
+        Page<CommPost> commPosts = commPostRepository.findPostsWithinRadius(xyForm.getMapX(), xyForm.getMapY(), xyForm.getRadius(), pageable);
+        return commPosts.map(this::convertToCommPostDto);
+    }
+
     // 본인 게시글 조회
     @Override
     @Transactional(readOnly = true)
@@ -36,6 +46,14 @@ public class CommPostServiceImpl implements CommPostService {
         return commPosts.map(this::convertToCommPostDto);
     }
 
+    // 해당 게시글 상세 조회
+    @Override
+    @Transactional(readOnly = true)
+    public DetailCommPostDto findById(Long id){
+        CommPost commPost = commPostRepository.findById(id).orElse(null);
+        return convertToDetailCommPostDto(commPost);
+    }
+
     // 사용자가 저장한 게시글 조회
     @Override
     @Transactional(readOnly = true)
@@ -43,6 +61,15 @@ public class CommPostServiceImpl implements CommPostService {
         checkPageSize(pageable.getPageSize());
         Long testMemberId = 1L;   // 임시 - 변경 필요
         Page<CommPost> commPosts = commPostRepository.findSavedCommPostByTestMemberId(testMemberId, pageable);
+        return commPosts.map(this::convertToCommPostDto);
+    }
+
+    // 사용자 닉네임 & 게시글 내용 검색
+    @Override
+    @Transactional(readOnly = true)
+    public Page<CommPostDto> searchByNicknameAndContent(String keyword, Pageable pageable){
+        checkPageSize(pageable.getPageSize());
+        Page<CommPost> commPosts = commPostRepository.searchByKeyword(keyword, pageable);
         return commPosts.map(this::convertToCommPostDto);
     }
 
@@ -79,7 +106,7 @@ public class CommPostServiceImpl implements CommPostService {
     // 게시글 좋아요
     @Override
     @Transactional
-    public void addlikeCommPost(Long id){
+    public void addCommPostLike(Long id){
         TestMember testMember = testMemberRepository.findById(1L).orElse(null); // 임시 - 변경 필요
         CommPost commPost = commPostRepository.findById(id).orElse(null);
 
@@ -96,7 +123,7 @@ public class CommPostServiceImpl implements CommPostService {
     // 게시글 좋아요 취소
     @Override
     @Transactional
-    public void deletelikeCommPost(Long id){
+    public void deleteCommPostLike(Long id){
         CommPost commPost = commPostRepository.findById(id).orElse(null);
         CommPostLike commPostLike = commPost.getLikedMembers()
                 .stream()
@@ -115,6 +142,7 @@ public class CommPostServiceImpl implements CommPostService {
         CommPost commPost = CommPost.builder()
                 .testMember(testMember)
                 .content(commPostForm.getContent())
+                .nickname(testMember.getNickname())
                 .mapX(commPostForm.getMapX())
                 .mapY(commPostForm.getMapY())
                 .imageUrl(commPostForm.getImageUrl())
@@ -170,10 +198,25 @@ public class CommPostServiceImpl implements CommPostService {
     private CommPostDto convertToCommPostDto(CommPost commPost) {
         return CommPostDto.builder()
                 .testMemberId(commPost.getTestMember().getId())
-                .testMemberNickname(commPost.getTestMember().getNickname())
+                .nickname(commPost.getNickname())
                 .mapX(commPost.getMapX())
                 .mapY(commPost.getMapY())
                 .imageUrl(commPost.getImageUrl())
+                .createDate(commPost.getCreateDate())
+                .build();
+    }
+
+    // CommPost를 DetailCommPostDto로 변환
+    private DetailCommPostDto convertToDetailCommPostDto(CommPost commPost) {
+        return DetailCommPostDto.builder()
+                .testMemberId(commPost.getTestMember().getId())
+                .nickname(commPost.getNickname())
+                .likeCount(commPost.getLikedMembers().size())
+                .mapX(commPost.getMapX())
+                .mapY(commPost.getMapY())
+                .content(commPost.getContent())
+                .imageUrl(commPost.getImageUrl())
+                .createDate(commPost.getCreateDate())
                 .build();
     }
 }

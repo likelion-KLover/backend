@@ -1,12 +1,12 @@
 package team.klover.server.domain.tour.tourPost.entity;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
+@EntityListeners(AuditingEntityListener.class)
 public class TourPost {
     @Id
     private String contentId;
@@ -38,4 +39,8 @@ public class TourPost {
 
     @OneToMany(mappedBy = "tourPost", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TourPostSave> savedMembers = new ArrayList<>();
+
+    @CreatedDate
+    @Column(updatable = false)
+    private LocalDateTime createDate;
 }

@@ -99,6 +99,12 @@ public class ApisScheduler {
                 log.error("Apis 모든 언어에 공통으로 있는 관광지 선별 중 에러 발생", e);
             }
             log.info("기본 관광지 데이터 선별 및 저장 완료");
+            try {
+                tourApiService.sortApis();
+            } catch (Exception e) {
+                log.error("Apis 관광지 ASC 정렬 중 에러 발생", e);
+            }
+            log.info("기본 관광지 데이터 정렬 완료");
 
             // 관광지별 개요 데이터 추가를 위해 관광지별 고유 ID 가져오기
             List<String> contentIdList = tourApiService.getAllContentIds();

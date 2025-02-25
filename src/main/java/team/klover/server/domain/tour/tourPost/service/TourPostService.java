@@ -9,7 +9,7 @@ public interface TourPostService {
     // 사용자 언어 & 지역기반 관광지 데이터 조회
     Page<TourPostDto> findByLanguageAndAreaCode(String language, String areaCode, Pageable pageable);
 
-    // 해당 관광지 상세 정보 조회
+    // 해당 관광지 상세 조회
     DetailTourPostDto findByContentId(String contentId);
 
     // 사용자가 저장한 관광지 조회
