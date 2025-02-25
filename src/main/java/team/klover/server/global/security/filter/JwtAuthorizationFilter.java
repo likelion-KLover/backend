@@ -42,7 +42,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 || path.startsWith("/api/v1/auth/google")
                 || path.startsWith("/api/v1/auth/line")
                 || path.startsWith("/api/v1/auth/logout")
-                || path.startsWith("/api/v1/auth/refresh");
+                || path.startsWith("/api/v1/auth/refresh")
+                || path.startsWith("/api/v1/tour-post")
+                || path.startsWith("/api/v1/comm-post");
     }
 
     @Override
