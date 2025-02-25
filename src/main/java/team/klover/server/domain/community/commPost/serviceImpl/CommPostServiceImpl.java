@@ -17,11 +17,8 @@ import team.klover.server.domain.community.commPost.entity.CommPostPage;
 import team.klover.server.domain.community.commPost.entity.CommPostSave;
 import team.klover.server.domain.community.commPost.repository.CommPostRepository;
 import team.klover.server.domain.community.commPost.service.CommPostService;
-import team.klover.server.domain.member.test.entity.TestMember;
-import team.klover.server.domain.member.test.repository.TestMemberRepository;
 import team.klover.server.domain.member.v1.entity.Member;
 import team.klover.server.domain.member.v1.repository.MemberV1Repository;
-import team.klover.server.global.common.response.ApiResponse;
 import team.klover.server.global.exception.KloverRequestException;
 import team.klover.server.global.exception.ReturnCode;
 import team.klover.server.global.util.AuthUtil;
@@ -43,7 +40,7 @@ public class CommPostServiceImpl implements CommPostService {
     // 본인 게시글 조회
     @Override
     @Transactional(readOnly = true)
-    public Page<CommPostDto> findByTestMemberId(Pageable pageable){
+    public Page<CommPostDto> findByMemberId(Pageable pageable){
         checkPageSize(pageable.getPageSize());
         Page<CommPost> commPosts = commPostRepository.findByMemberId(1L, pageable);
         return commPosts.map(this::convertToCommPostDto);
@@ -60,10 +57,9 @@ public class CommPostServiceImpl implements CommPostService {
     // 사용자가 저장한 게시글 조회
     @Override
     @Transactional(readOnly = true)
-    public Page<CommPostDto> getSavedCommPostByTestMember(Pageable pageable){
+    public Page<CommPostDto> getSavedCommPostByMember(Pageable pageable){
         checkPageSize(pageable.getPageSize());
-        Long testMemberId = 1L;   // 임시 - 변경 필요
-        Page<CommPost> commPosts = commPostRepository.findSavedCommPostByTestMemberId(testMemberId, pageable);
+        Page<CommPost> commPosts = commPostRepository.findSavedCommPostByMemberId(AuthUtil.getCurrentMemberId(), pageable);
         return commPosts.map(this::convertToCommPostDto);
     }
 

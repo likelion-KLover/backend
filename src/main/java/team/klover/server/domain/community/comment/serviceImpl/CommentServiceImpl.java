@@ -16,8 +16,6 @@ import team.klover.server.domain.community.comment.entity.CommentLike;
 import team.klover.server.domain.community.comment.entity.CommentPage;
 import team.klover.server.domain.community.comment.repository.CommentRepository;
 import team.klover.server.domain.community.comment.service.CommentService;
-import team.klover.server.domain.member.test.entity.TestMember;
-import team.klover.server.domain.member.test.repository.TestMemberRepository;
 import team.klover.server.domain.member.v1.entity.Member;
 import team.klover.server.domain.member.v1.repository.MemberV1Repository;
 import team.klover.server.global.exception.KloverRequestException;

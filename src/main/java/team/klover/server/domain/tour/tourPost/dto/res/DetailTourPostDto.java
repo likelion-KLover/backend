@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 @Builder
 public class DetailTourPostDto {
-    private String contentId;
+    private Long contentId;
     private String commonPlaceId;
     private Double avgRating;
     private String title;
