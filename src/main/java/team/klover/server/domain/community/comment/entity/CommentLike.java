@@ -9,7 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import team.klover.server.domain.member.test.entity.TestMember;
+import team.klover.server.domain.member.v1.entity.Member;
 import team.klover.server.global.jpa.BaseEntity;
 
 @Entity
@@ -20,8 +20,8 @@ import team.klover.server.global.jpa.BaseEntity;
 @SuperBuilder
 public class CommentLike extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "test_member_id", nullable = false)
-    private TestMember testMember;
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "comment_id", nullable = false)

@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 public class CommPostDto {
-    private Long testMemberId;
+    private Long memberId;
     private String nickname;
     private Double mapX;
     private Double mapY;

@@ -7,8 +7,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import team.klover.server.domain.member.test.entity.TestMember;
-import team.klover.server.domain.member.test.repository.TestMemberRepository;
+import team.klover.server.domain.member.v1.entity.Member;
+import team.klover.server.domain.member.v1.repository.MemberV1Repository;
 import team.klover.server.domain.tour.review.dto.req.ReviewForm;
 import team.klover.server.domain.tour.review.dto.res.ReviewDto;
 import team.klover.server.domain.tour.review.entity.Review;
@@ -19,6 +19,7 @@ import team.klover.server.domain.tour.tourPost.entity.TourPost;
 import team.klover.server.domain.tour.tourPost.repository.TourPostRepository;
 import team.klover.server.global.exception.KloverRequestException;
 import team.klover.server.global.exception.ReturnCode;
+import team.klover.server.global.util.AuthUtil;
 
 @Slf4j
 @Service
@@ -26,7 +27,7 @@ import team.klover.server.global.exception.ReturnCode;
 public class ReviewServiceImpl implements ReviewService {
     private final ReviewRepository reviewRepository;
     private final TourPostRepository tourPostRepository;
-    private final TestMemberRepository testMemberRepository;
+    private final MemberV1Repository memberV1Repository;
 
     // 해당 관광지 게시글에 작성된 리뷰 조회
     @Override
@@ -42,7 +43,7 @@ public class ReviewServiceImpl implements ReviewService {
     @Transactional
     public void addReview(String contentId, @Valid ReviewForm reviewForm){
         // 현재 로그인한 사용자의 member 객체를 가져오는 메서드
-        TestMember testMember = testMemberRepository.findById(1L).orElse(null); // 임시 - 변경 필요
+        Member member = memberV1Repository.findById(AuthUtil.getCurrentMemberId()).orElse(null);
         TourPost tourPost = tourPostRepository.findByContentId(contentId);
 
         // 평점은(1,2,3,4,5)만 가능
@@ -50,7 +51,7 @@ public class ReviewServiceImpl implements ReviewService {
             throw new KloverRequestException(ReturnCode.WRONG_PARAMETER);
         }
         Review review = Review.builder()
-                .testMember(testMember)
+                .member(member)
                 .tourPost(tourPost)
                 .content(reviewForm.getContent())
                 .rating(reviewForm.getRating())
@@ -67,9 +68,9 @@ public class ReviewServiceImpl implements ReviewService {
                 .orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
 
         // 작성자 검증 - 현재 로그인한 사용자의 ID를 가져와서 검증
-        TestMember testMember = testMemberRepository.findById(1L).orElse(null); // 임시 - 변경 필요
-        Long currentUserId = testMember.getId();
-        if (!review.getTestMember().getId().equals(currentUserId)) {
+        Member member = memberV1Repository.findById(AuthUtil.getCurrentMemberId()).orElse(null);
+        Long currentUserId = member.getId();
+        if (!review.getMember().getId().equals(currentUserId)) {
             throw new KloverRequestException(ReturnCode.NOT_AUTHORIZED);
         }
         // 평점은(1,2,3,4,5)만 가능
@@ -89,9 +90,9 @@ public class ReviewServiceImpl implements ReviewService {
                 .orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
 
         // 작성자 검증 - 현재 로그인한 사용자의 ID를 가져와서 검증
-        TestMember testMember = testMemberRepository.findById(1L).orElse(null); // 임시 - 변경 필요
-        Long currentUserId = testMember.getId();
-        if (!review.getTestMember().getId().equals(currentUserId)) {
+        Member member = memberV1Repository.findById(AuthUtil.getCurrentMemberId()).orElse(null);
+        Long currentUserId = member.getId();
+        if (!review.getMember().getId().equals(currentUserId)) {
             throw new KloverRequestException(ReturnCode.NOT_AUTHORIZED);
         }
         reviewRepository.delete(review);
@@ -108,8 +109,8 @@ public class ReviewServiceImpl implements ReviewService {
     // Review를 ReviewDto로 변환
     private ReviewDto convertToReviewDto(Review review) {
         return ReviewDto.builder()
-                .testMemberId(review.getTestMember().getId())
-                .testMemberNickname(review.getTestMember().getNickname())
+                .memberId(review.getMember().getId())
+                .nickname(review.getMember().getNickname())
                 .content(review.getContent())
                 .rating(review.getRating())
                 .createDate(review.getCreateDate())

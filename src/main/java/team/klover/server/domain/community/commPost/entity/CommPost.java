@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import team.klover.server.domain.member.test.entity.TestMember;
+import team.klover.server.domain.member.v1.entity.Member;
 import team.klover.server.global.jpa.BaseEntity;
 
 import java.util.ArrayList;
@@ -21,8 +21,8 @@ import java.util.List;
 @SuperBuilder
 public class CommPost extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "test_member_id", nullable = false)
-    private TestMember testMember;
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
 
     @OneToMany(mappedBy = "commPost", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CommPostLike> likedMembers = new ArrayList<>();

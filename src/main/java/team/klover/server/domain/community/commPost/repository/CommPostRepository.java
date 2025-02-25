@@ -19,10 +19,10 @@ public interface CommPostRepository extends JpaRepository<CommPost, Long> {
     Page<CommPost> findPostsWithinRadius(@Param("mapX") Double mapX, @Param("mapY") Double mapY, @Param("radius") Integer radius, Pageable pageable);
 
     // 본인 게시글 조회
-    Page<CommPost> findByTestMemberId(Long id, Pageable pageable);
+    Page<CommPost> findByMemberId(Long id, Pageable pageable);
 
     // 사용자가 저장한 게시글 조회
-    @Query("SELECT p FROM CommPost p JOIN p.savedMembers sm WHERE sm.testMember.id = :testMemberId")
+    @Query("SELECT p FROM CommPost p JOIN p.savedMembers sm WHERE sm.member.id = :testMemberId")
     Page<CommPost> findSavedCommPostByTestMemberId(@Param("testMemberId") Long testMemberId, Pageable pageable);
 
     // 사용자 닉네임 & 게시글 내용 검색

@@ -8,8 +8,8 @@ import java.time.LocalDateTime;
 @Data
 @Builder
 public class ReviewDto {
-    private Long testMemberId;
-    private String testMemberNickname;
+    private Long memberId;
+    private String nickname;
     private String content;
     private int rating;
     private LocalDateTime createDate;

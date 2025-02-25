@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Builder
 public class CommentDto {
     private Long id;
-    private Long testMemberId;
+    private Long memberId;
     private String nickname;
     private int likeCount;
     private String content;

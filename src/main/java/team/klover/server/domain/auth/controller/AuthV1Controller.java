@@ -113,7 +113,7 @@ public class AuthV1Controller {
 
         //어쨌든 변조된 걸 지운 후에 이상하다고 오류를 내야하기 때문
         if(!redisToken.equals(refreshToken)) {
-            throw new KloverRequestException(ReturnCode.FORGED_TOKEN);
+            throw new KloverRequestException(ReturnCode.INVALID_REQUEST);
         }
 
 
@@ -143,7 +143,7 @@ public class AuthV1Controller {
 
         if (savedRefreshToken == null || !savedRefreshToken.equals(refreshToken)) {
             redisService.deleteRefreshToken(email);
-            throw new KloverRequestException(ReturnCode.FORGED_TOKEN);
+            throw new KloverRequestException(ReturnCode.INVALID_REQUEST);
         }
 
         Member member = memberService.findByEmail(email);

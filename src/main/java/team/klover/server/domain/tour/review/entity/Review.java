@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import team.klover.server.domain.member.test.entity.TestMember;
+import team.klover.server.domain.member.v1.entity.Member;
 import team.klover.server.domain.tour.tourPost.entity.TourPost;
 import team.klover.server.global.jpa.BaseEntity;
 
@@ -16,8 +16,8 @@ import team.klover.server.global.jpa.BaseEntity;
 @SuperBuilder
 public class Review extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "test_member_id", nullable = false)
-    private TestMember testMember;
+    @JoinColumn(name = "member_id", nullable = false)
+    private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tour_post_content_id", nullable = false)

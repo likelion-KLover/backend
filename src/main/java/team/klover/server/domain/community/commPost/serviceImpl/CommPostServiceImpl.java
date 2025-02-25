@@ -19,16 +19,19 @@ import team.klover.server.domain.community.commPost.repository.CommPostRepositor
 import team.klover.server.domain.community.commPost.service.CommPostService;
 import team.klover.server.domain.member.test.entity.TestMember;
 import team.klover.server.domain.member.test.repository.TestMemberRepository;
+import team.klover.server.domain.member.v1.entity.Member;
+import team.klover.server.domain.member.v1.repository.MemberV1Repository;
 import team.klover.server.global.common.response.ApiResponse;
 import team.klover.server.global.exception.KloverRequestException;
 import team.klover.server.global.exception.ReturnCode;
+import team.klover.server.global.util.AuthUtil;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class CommPostServiceImpl implements CommPostService {
     private final CommPostRepository commPostRepository;
-    private final TestMemberRepository testMemberRepository;
+    private final MemberV1Repository memberV1Repository;
 
     // 사용자 위치 주변 게시글 조회
     public Page<CommPostDto> findPostsWithinRadius(@Valid XYForm xyForm, Pageable pageable){
@@ -42,7 +45,7 @@ public class CommPostServiceImpl implements CommPostService {
     @Transactional(readOnly = true)
     public Page<CommPostDto> findByTestMemberId(Pageable pageable){
         checkPageSize(pageable.getPageSize());
-        Page<CommPost> commPosts = commPostRepository.findByTestMemberId(1L, pageable);
+        Page<CommPost> commPosts = commPostRepository.findByMemberId(1L, pageable);
         return commPosts.map(this::convertToCommPostDto);
     }
 
@@ -77,16 +80,16 @@ public class CommPostServiceImpl implements CommPostService {
     @Override
     @Transactional
     public void addCollectionCommPost(Long id){
-        TestMember testMember = testMemberRepository.findById(1L).orElse(null); // 임시 - 변경 필요
+        Member member = memberV1Repository.findById(AuthUtil.getCurrentMemberId()).orElse(null);
         CommPost commPost = commPostRepository.findById(id).orElse(null);
 
         boolean alreadySaved = commPost.getSavedMembers()
                 .stream()
-                .anyMatch(savedMember -> savedMember.getId().equals(1L));
+                .anyMatch(savedMember -> savedMember.getId().equals(AuthUtil.getCurrentMemberId()));
         if (alreadySaved) {
             throw new KloverRequestException(ReturnCode.ALREADY_EXIST);
         }
-        CommPostSave commPostSave = new CommPostSave(testMember, commPost);
+        CommPostSave commPostSave = new CommPostSave(member, commPost);
         commPost.getSavedMembers().add(commPostSave);
     }
 
@@ -97,7 +100,7 @@ public class CommPostServiceImpl implements CommPostService {
         CommPost commPost = commPostRepository.findById(id).orElse(null);
         CommPostSave commPostSave = commPost.getSavedMembers()
                 .stream()
-                .filter(m -> m.getTestMember().getId().equals(1L))
+                .filter(m -> m.getMember().getId().equals(AuthUtil.getCurrentMemberId()))
                 .findFirst()
                 .orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
         commPost.getSavedMembers().remove(commPostSave);
@@ -107,16 +110,16 @@ public class CommPostServiceImpl implements CommPostService {
     @Override
     @Transactional
     public void addCommPostLike(Long id){
-        TestMember testMember = testMemberRepository.findById(1L).orElse(null); // 임시 - 변경 필요
+        Member member = memberV1Repository.findById(AuthUtil.getCurrentMemberId()).orElse(null);
         CommPost commPost = commPostRepository.findById(id).orElse(null);
 
         boolean alreadySaved = commPost.getLikedMembers()
                 .stream()
-                .anyMatch(savedMember -> savedMember.getId().equals(1L));
+                .anyMatch(savedMember -> savedMember.getId().equals(AuthUtil.getCurrentMemberId()));
         if (alreadySaved) {
             throw new KloverRequestException(ReturnCode.ALREADY_EXIST);
         }
-        CommPostLike commPostLike = new CommPostLike(testMember, commPost);
+        CommPostLike commPostLike = new CommPostLike(member, commPost);
         commPost.getLikedMembers().add(commPostLike);
     }
 
@@ -127,7 +130,7 @@ public class CommPostServiceImpl implements CommPostService {
         CommPost commPost = commPostRepository.findById(id).orElse(null);
         CommPostLike commPostLike = commPost.getLikedMembers()
                 .stream()
-                .filter(m -> m.getTestMember().getId().equals(1L))
+                .filter(m -> m.getMember().getId().equals(AuthUtil.getCurrentMemberId()))
                 .findFirst()
                 .orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
         commPost.getLikedMembers().remove(commPostLike);
@@ -138,11 +141,11 @@ public class CommPostServiceImpl implements CommPostService {
     @Transactional
     public void addCommPost(@Valid CommPostForm commPostForm){
         // 현재 로그인한 사용자의 member 객체를 가져오는 메서드
-        TestMember testMember = testMemberRepository.findById(1L).orElse(null); // 임시 - 변경 필요
+        Member member = memberV1Repository.findById(AuthUtil.getCurrentMemberId()).orElse(null);
         CommPost commPost = CommPost.builder()
-                .testMember(testMember)
+                .member(member)
                 .content(commPostForm.getContent())
-                .nickname(testMember.getNickname())
+                .nickname(member.getNickname())
                 .mapX(commPostForm.getMapX())
                 .mapY(commPostForm.getMapY())
                 .imageUrl(commPostForm.getImageUrl())
@@ -158,9 +161,8 @@ public class CommPostServiceImpl implements CommPostService {
                 .orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
 
         // 작성자 검증 - 현재 로그인한 사용자의 ID를 가져와서 검증
-        TestMember testMember = testMemberRepository.findById(1L).orElse(null); // 임시 - 변경 필요
-        Long currentUserId = testMember.getId();
-        if (!commPost.getTestMember().getId().equals(currentUserId)) {
+        Member member = memberV1Repository.findById(AuthUtil.getCurrentMemberId()).orElse(null);
+        if (!commPost.getMember().getId().equals(AuthUtil.getCurrentMemberId())) {
             throw new KloverRequestException(ReturnCode.NOT_AUTHORIZED);
         }
         commPost.setMapX(commPostForm.getMapX());
@@ -178,9 +180,8 @@ public class CommPostServiceImpl implements CommPostService {
                 .orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
 
         // 작성자 검증 - 현재 로그인한 사용자의 ID를 가져와서 검증
-        TestMember testMember = testMemberRepository.findById(1L).orElse(null); // 임시 - 변경 필요
-        Long currentUserId = testMember.getId();
-        if (!commPost.getTestMember().getId().equals(currentUserId)) {
+        Member member = memberV1Repository.findById(AuthUtil.getCurrentMemberId()).orElse(null);
+        if (!commPost.getMember().getId().equals(AuthUtil.getCurrentMemberId())) {
             throw new KloverRequestException(ReturnCode.NOT_AUTHORIZED);
         }
         commPostRepository.delete(commPost);
@@ -197,7 +198,7 @@ public class CommPostServiceImpl implements CommPostService {
     // CommPost를 CommPostDto로 변환
     private CommPostDto convertToCommPostDto(CommPost commPost) {
         return CommPostDto.builder()
-                .testMemberId(commPost.getTestMember().getId())
+                .memberId(commPost.getMember().getId())
                 .nickname(commPost.getNickname())
                 .mapX(commPost.getMapX())
                 .mapY(commPost.getMapY())
@@ -209,7 +210,7 @@ public class CommPostServiceImpl implements CommPostService {
     // CommPost를 DetailCommPostDto로 변환
     private DetailCommPostDto convertToDetailCommPostDto(CommPost commPost) {
         return DetailCommPostDto.builder()
-                .testMemberId(commPost.getTestMember().getId())
+                .memberId(commPost.getMember().getId())
                 .nickname(commPost.getNickname())
                 .likeCount(commPost.getLikedMembers().size())
                 .mapX(commPost.getMapX())

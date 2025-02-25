@@ -18,8 +18,11 @@ import team.klover.server.domain.community.comment.repository.CommentRepository;
 import team.klover.server.domain.community.comment.service.CommentService;
 import team.klover.server.domain.member.test.entity.TestMember;
 import team.klover.server.domain.member.test.repository.TestMemberRepository;
+import team.klover.server.domain.member.v1.entity.Member;
+import team.klover.server.domain.member.v1.repository.MemberV1Repository;
 import team.klover.server.global.exception.KloverRequestException;
 import team.klover.server.global.exception.ReturnCode;
+import team.klover.server.global.util.AuthUtil;
 
 import java.util.List;
 
@@ -29,7 +32,7 @@ import java.util.List;
 public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
     private final CommPostRepository commPostRepository;
-    private final TestMemberRepository testMemberRepository;
+    private final MemberV1Repository memberV1Repository;
 
     // 해당 게시글에 작성된 모든 댓글 조회
     @Override
@@ -44,16 +47,16 @@ public class CommentServiceImpl implements CommentService {
     @Override
     @Transactional
     public void addCommentLike(Long id){
-        TestMember testMember = testMemberRepository.findById(1L).orElse(null); // 임시 - 변경 필요
+        Member member = memberV1Repository.findById(AuthUtil.getCurrentMemberId()).orElse(null);
         Comment comment = commentRepository.findById(id).orElse(null);
 
         boolean alreadySaved = comment.getLikedMembers()
                 .stream()
-                .anyMatch(savedMember -> savedMember.getId().equals(1L));
+                .anyMatch(savedMember -> savedMember.getId().equals(AuthUtil.getCurrentMemberId()));
         if (alreadySaved) {
             throw new KloverRequestException(ReturnCode.ALREADY_EXIST);
         }
-        CommentLike commentLike = new CommentLike(testMember, comment);
+        CommentLike commentLike = new CommentLike(member, comment);
         comment.getLikedMembers().add(commentLike);
     }
 
@@ -64,7 +67,7 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = commentRepository.findById(id).orElse(null);
         CommentLike commentLike = comment.getLikedMembers()
                 .stream()
-                .filter(m -> m.getTestMember().getId().equals(1L))
+                .filter(m -> m.getMember().getId().equals(1L))
                 .findFirst()
                 .orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
         comment.getLikedMembers().remove(commentLike);
@@ -75,13 +78,13 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     public void addComment(Long commPostId, @Valid CommentForm commentForm){
         // 현재 로그인한 사용자의 member 객체를 가져오는 메서드
-        TestMember testMember = testMemberRepository.findById(1L).orElse(null); // 임시 - 변경 필요
+        Member member = memberV1Repository.findById(AuthUtil.getCurrentMemberId()).orElse(null);
         CommPost commPost = commPostRepository.findById(commPostId).orElse(null);
 
         Comment comment = Comment.builder()
-                .testMember(testMember)
+                .member(member)
                 .commPost(commPost)
-                .nickname(testMember.getNickname())
+                .nickname(member.getNickname())
                 .content(commentForm.getContent())
                 .superCommentId(commentForm.getSuperCommentId())
                 .build();
@@ -95,9 +98,8 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = commentRepository.findById(id).orElse(null);
 
         // 작성자 검증 - 현재 로그인한 사용자의 ID를 가져와서 검증
-        TestMember testMember = testMemberRepository.findById(1L).orElse(null); // 임시 - 변경 필요
-        Long currentUserId = testMember.getId();
-        if (!comment.getTestMember().getId().equals(currentUserId)) {
+        Member member = memberV1Repository.findById(AuthUtil.getCurrentMemberId()).orElse(null);
+        if (!comment.getMember().getId().equals(AuthUtil.getCurrentMemberId())) {
             throw new KloverRequestException(ReturnCode.NOT_AUTHORIZED);
         }
         comment.setContent(commentForm.getContent());
@@ -114,9 +116,9 @@ public class CommentServiceImpl implements CommentService {
         }
 
         // 작성자 검증 - 현재 로그인한 사용자의 ID를 가져와서 검증
-        TestMember testMember = testMemberRepository.findById(1L).orElse(null); // 임시 - 변경 필요
-        Long currentUserId = testMember.getId();
-        if (!comment.getTestMember().getId().equals(currentUserId)) {
+        Member member = memberV1Repository.findById(AuthUtil.getCurrentMemberId()).orElse(null);
+        Long currentUserId = member.getId();
+        if (!comment.getMember().getId().equals(currentUserId)) {
             throw new KloverRequestException(ReturnCode.NOT_AUTHORIZED);
         }
         deleteChildComments(id);
@@ -144,7 +146,7 @@ public class CommentServiceImpl implements CommentService {
     private CommentDto convertToCommentDto(Comment comment) {
         return CommentDto.builder()
                 .id(comment.getId())
-                .testMemberId(comment.getTestMember().getId())
+                .memberId(comment.getMember().getId())
                 .nickname(comment.getNickname())
                 .likeCount(comment.getLikedMembers().size())
                 .content(comment.getContent())
