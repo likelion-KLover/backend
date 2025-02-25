@@ -4,9 +4,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.antlr.v4.runtime.misc.NotNull;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,7 +12,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
@@ -26,7 +23,6 @@ import team.klover.server.domain.member.v1.enums.SocialProvider;
 import team.klover.server.domain.auth.service.AuthV1Service;
 import team.klover.server.domain.member.v1.service.MemberV1Service;
 import team.klover.server.global.common.response.ApiResponse;
-import team.klover.server.global.exception.KloverException;
 import team.klover.server.global.exception.KloverRequestException;
 import team.klover.server.global.exception.ReturnCode;
 import team.klover.server.global.redis.RedisService;
@@ -34,7 +30,6 @@ import team.klover.server.global.security.custom.CustomUserDetailsService;
 import team.klover.server.global.security.provider.JwtTokenProvider;
 import team.klover.server.global.util.AuthUtil;
 
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @RestController
@@ -58,14 +53,14 @@ public class AuthV1Controller {
 
 
     @PostMapping("/signup")
-    public ApiResponse signup(@RequestBody SignupRequestDto requestDto) {
-        authService.signup(requestDto);
+    public ApiResponse<LoginResponse> signup(@RequestBody SignupRequestDto requestDto) {
+        Member member = authService.signup(requestDto);
         return ApiResponse.of(ReturnCode.SUCCESS);
 
     }
 
     @PostMapping("/login")
-    public ApiResponse<JwtResponse> login(@RequestBody LoginRequestDto requestDto) {
+    public ApiResponse<LoginResponse> login(@RequestBody LoginRequestDto requestDto) {
         Member member = memberService.findServerMember(requestDto.getEmail());
 
         if (member == null || !passwordEncoder.matches(requestDto.getPassword(), member.getPassword())) {
@@ -84,7 +79,7 @@ public class AuthV1Controller {
         Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        return ApiResponse.of(new JwtResponse(accessToken, refreshToken));
+        return ApiResponse.of(new LoginResponse(memberDto, accessToken, refreshToken));
 
     }
 
@@ -172,7 +167,7 @@ public class AuthV1Controller {
     }
 
     @PostMapping("/google")
-    public ApiResponse<JwtResponse> googleNativeLogin(@RequestBody Map<String,String> request){
+    public ApiResponse<LoginResponse> googleNativeLogin(@RequestBody Map<String,String> request){
         GoogleIdToken.Payload payload = verifyGoogleIdToken(request.get("idToken")).block();
         if (payload != null) {
             payload.forEach((k,v)-> System.out.println("key:"+k+", value:"+v));
@@ -192,7 +187,7 @@ public class AuthV1Controller {
                 .provider(SocialProvider.GOOGLE)
                 .build();
 
-        return generateJwtToken(param);
+        return generateLoginResponse(param);
 
     }
 
@@ -221,7 +216,7 @@ public class AuthV1Controller {
     }
 
     @PostMapping("/line")
-    public ApiResponse<JwtResponse> lineLogin(@RequestBody Map<String,String> request){
+    public ApiResponse<LoginResponse> lineLogin(@RequestBody Map<String,String> request){
         Map payload = verifyLineIdToken(request.get("idToken")).block();
         if (payload == null || payload.isEmpty()) {
             throw new KloverRequestException(ReturnCode.INVALID_REQUEST);
@@ -241,21 +236,16 @@ public class AuthV1Controller {
                 .provider(SocialProvider.LINE)
                 .build();
 
-        return generateJwtToken(param);
+        return generateLoginResponse(param);
 
     }
 
-    private ApiResponse<JwtResponse> generateJwtToken(MobileSocialLoginParam param) {
+    private ApiResponse<LoginResponse> generateLoginResponse(MobileSocialLoginParam param) {
         MemberDto memberDto = authService.processMobileSocialLogin(param);
 
         String accessToken = jwtTokenProvider.generateAccessToken(memberDto);
         String refreshToken = jwtTokenProvider.generateRefreshToken(memberDto.getEmail());
 
-
-        JwtResponse authResponse =  JwtResponse.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
 
         redisService.saveRefreshToken(memberDto.getEmail(), refreshToken);
 
@@ -263,7 +253,7 @@ public class AuthV1Controller {
         Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        return ApiResponse.of(authResponse);
+        return ApiResponse.of(new LoginResponse(memberDto, accessToken, refreshToken));
     }
 
     private Mono<Map> verifyLineIdToken(String idToken) {

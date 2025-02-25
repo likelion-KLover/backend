@@ -1,7 +1,6 @@
 package team.klover.server.global.security.filter;
 
 
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -16,9 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
-import team.klover.server.domain.member.v1.dto.MemberDto;
 import team.klover.server.global.redis.RedisService;
-import team.klover.server.global.security.custom.CustomUserDetails;
 import team.klover.server.global.security.custom.CustomUserDetailsService;
 import team.klover.server.global.security.provider.JwtTokenProvider;
 

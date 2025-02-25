@@ -15,6 +15,7 @@ public class MemberDto {
     private String role;
     private Long id;
     private String country;
+    private String provider;
 
     public MemberDto(Member member) {
         id = member.getId();
@@ -23,5 +24,6 @@ public class MemberDto {
         role = member.getRole().name();
         email = member.getEmail();
         country = member.getCountry();
+        provider = member.getSocialProvider().name().toLowerCase();
     }
 }

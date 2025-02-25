@@ -1,27 +1,21 @@
 package team.klover.server.domain.auth.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import team.klover.server.domain.auth.dto.SignupRequestDto;
 import team.klover.server.domain.member.v1.dto.MemberDto;
-import team.klover.server.domain.member.v1.dto.MemberUpdateParam;
 import team.klover.server.domain.auth.dto.MobileSocialLoginParam;
 import team.klover.server.domain.member.v1.entity.Member;
 import team.klover.server.domain.member.v1.enums.MemberRole;
 import team.klover.server.domain.member.v1.enums.SocialProvider;
 import team.klover.server.domain.member.v1.repository.MemberV1Repository;
-import team.klover.server.global.exception.KloverException;
 import team.klover.server.global.exception.KloverLogicException;
 import team.klover.server.global.exception.KloverRequestException;
 import team.klover.server.global.exception.ReturnCode;
-import team.klover.server.global.util.AuthUtil;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -34,8 +28,7 @@ public class AuthV1Service {
 
     @Transactional
     public Member signup(SignupRequestDto requestDto) {
-        //같은 이메일이 존재하는 경우인데 Social Provider가 Server가 아닌 친구라면?
-        if (memberRepository.existsByEmail(requestDto.getEmail())) {
+        if (memberRepository.existsByEmail(requestDto.getEmail()) || memberRepository.existsByNickname(requestDto.getNickname())) {
             throw new KloverRequestException(ReturnCode.ALREADY_EXIST);
         }
 
@@ -49,7 +42,7 @@ public class AuthV1Service {
 
         try {
             memberRepository.save(member);
-        } catch (Exception e) {
+        } catch (Exception e){
             throw new KloverLogicException(ReturnCode.INTERNAL_ERROR);
         }
 
@@ -80,18 +73,26 @@ public class AuthV1Service {
     @Transactional
     public MemberDto processMobileSocialLogin(MobileSocialLoginParam param) {
         Optional<Member> target = memberRepository.findMemberByEmailAndSocialProvider(param.getEmail(),param.getProvider());
-        Optional<Member> sameEmail = memberRepository.findMemberByEmail(param.getEmail());
+        Optional<Member> sameEmailInServerUser = memberRepository.findMemberByEmailAndSocialProvider(param.getEmail(),SocialProvider.SERVER);
+
+
 
         //존재하지 않으면 회원 가입 처리
-        if(target.isEmpty() && sameEmail.isEmpty()){
+        if(target.isEmpty() && sameEmailInServerUser.isEmpty()){
             String password = passwordEncoder.encode(UUID.randomUUID().toString());
+
+            boolean isDuplicateNickname = memberRepository.existsByNickname(param.getNickname());
+
+            String nickname = param.getNickname();
+            if(isDuplicateNickname) nickname += UUID.randomUUID().toString().substring(0,8);
+
             Member member = Member.builder()
                     .email(param.getEmail())
                     .providerId(param.getProviderId())
                     .password(password)
                     .role(MemberRole.USER)
                     .socialProvider(param.getProvider())
-                    .nickname(param.getNickname())
+                    .nickname(nickname)
                     .build();
 
             memberRepository.save(member);
@@ -99,8 +100,16 @@ public class AuthV1Service {
             return new MemberDto(member);
         }
 
-        //소셜 로그인을 했을 때 같은 이메일을 가진 사람에 대해 어떻게 할지는 논의가 필요.
-        return target.map(MemberDto::new).orElseGet(() -> new MemberDto(sameEmail.get()));
+        //소셜 로그인을 했을 때 같은 이메일을 가진 서버 사람에 대해서는 그냥 소셜 로그인으로 강제 통합
+        return target.map(MemberDto::new).orElseGet(() -> {
+            String password = passwordEncoder.encode(UUID.randomUUID().toString());
+            Member severUser = sameEmailInServerUser.get();
+            severUser.setSocialProvider(param.getProvider());
+            severUser.setProviderId(param.getProviderId());
+            severUser.setPassword(password);
+            return new MemberDto(severUser);
+        }
+        );
 
     }
 }

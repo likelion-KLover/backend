@@ -4,9 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -89,10 +87,11 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .subject(memberDto.getEmail())
                 .claim(AUTHORIZATION_KEY, memberDto.getRole())
-                .claim("nickname",memberDto.getNickname())
-                .claim("id",memberDto.getId())
-                .claim("profileUrl",memberDto.getProfileUrl())
-                .claim("country",memberDto.getCountry())
+                .claim("nickname", memberDto.getNickname())
+                .claim("id", memberDto.getId())
+                .claim("profileUrl", memberDto.getProfileUrl())
+                .claim("country", memberDto.getCountry())
+                .claim("provider",memberDto.getProvider().toLowerCase())
                 .issuedAt(now)
                 .expiration(expiryDate)
                 .signWith(key, Jwts.SIG.HS256)
@@ -137,7 +136,8 @@ public class JwtTokenProvider {
                 claims.get("profileUrl", String.class),             // 프로필 이미지
                 claims.get(AUTHORIZATION_KEY, String.class),         // 권한
                 claims.get("id", Long.class),
-                claims.get("country",String.class)
+                claims.get("country",String.class),
+                claims.get("provider",String.class)
         );
     }
 }
