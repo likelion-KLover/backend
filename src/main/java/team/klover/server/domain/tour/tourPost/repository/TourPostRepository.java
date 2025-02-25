@@ -32,7 +32,7 @@ public interface TourPostRepository extends JpaRepository<TourPost, Long> {
     Page<TourPost> searchByLanguageAndKeyword(@Param("language") String language, @Param("keyword") String keyword, Pageable pageable);
 
     // 사용자가 저장한 관광지 조회
-    @Query("SELECT p FROM TourPost p JOIN p.savedMembers sm WHERE sm.testMember.id = :testMemberId")
+    @Query("SELECT p FROM TourPost p JOIN p.savedMembers sm WHERE sm.Member.id = :testMemberId")
     Page<TourPost> findSavedTourPostsByTestMemberId(@Param("testMemberId") Long testMemberId, Pageable pageable);
 
     // 모든 관광지 데이터 가져오기
