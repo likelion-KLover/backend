@@ -30,7 +30,7 @@ public class ApiV1ReviewController {
     // 해당 관광지 게시글에 리뷰 생성
     // http://localhost:8090/api/v1/tour-post/review/2701680
     @PostMapping("/{contentId}")
-    public ApiResponse<String> addReview(@PathVariable("contentId") String contentId, @RequestBody @Valid ReviewForm reviewForm) {
+    public ApiResponse<String> addReview(@PathVariable("contentId") Long contentId, @RequestBody @Valid ReviewForm reviewForm) {
         reviewService.addReview(contentId, reviewForm);
         return ApiResponse.of(ReturnCode.SUCCESS);
     }

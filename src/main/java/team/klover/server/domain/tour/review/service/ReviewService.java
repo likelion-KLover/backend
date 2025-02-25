@@ -11,7 +11,7 @@ public interface ReviewService {
     Page<ReviewDto> findByCommonPlaceId(String commonPlaceId, Pageable pageable);
 
     // 해당 관광지 게시글에 리뷰 생성
-    void addReview(String contentId, @Valid ReviewForm reviewForm);
+    void addReview(Long contentId, @Valid ReviewForm reviewForm);
 
     // 해당 리뷰 수정
     void updateReview(Long id, @Valid ReviewForm reviewForm);

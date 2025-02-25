@@ -34,7 +34,7 @@ public class ApiV1CommPostController {
     @GetMapping("/me")
     public ApiResponse<CommPostDto> getMyCommPost(@ModelAttribute CommPostPage request) {
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
-        return ApiResponse.of(KloverPage.of(commPostService.findByTestMemberId(pageable)));
+        return ApiResponse.of(KloverPage.of(commPostService.findByMemberId(pageable)));
     }
 
     // 해당 게시글 상세 조회
@@ -49,7 +49,7 @@ public class ApiV1CommPostController {
     @GetMapping("/collection")
     public ApiResponse<CommPostDto> getCollectionCommPost(@ModelAttribute CommPostPage request) {
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
-        return ApiResponse.of(KloverPage.of(commPostService.getSavedCommPostByTestMember(pageable)));
+        return ApiResponse.of(KloverPage.of(commPostService.getSavedCommPostByMember(pageable)));
     }
 
     // 사용자 닉네임 & 게시글 내용 검색

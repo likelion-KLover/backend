@@ -13,13 +13,13 @@ public interface CommPostService {
     Page<CommPostDto> findPostsWithinRadius(@Valid XYForm xyForm, Pageable pageable);
 
     // 본인 게시글 조회
-    Page<CommPostDto> findByTestMemberId(Pageable pageable);
+    Page<CommPostDto> findByMemberId(Pageable pageable);
 
     // 해당 게시글 상세 조회
     DetailCommPostDto findById(Long id);
 
     // 사용자가 저장한 게시글 조회
-    Page<CommPostDto> getSavedCommPostByTestMember(Pageable pageable);
+    Page<CommPostDto> getSavedCommPostByMember(Pageable pageable);
 
     // 사용자 닉네임 & 게시글 내용 검색
     Page<CommPostDto> searchByNicknameAndContent(String keyword, Pageable pageable);

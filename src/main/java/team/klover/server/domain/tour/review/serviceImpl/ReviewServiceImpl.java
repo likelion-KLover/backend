@@ -41,7 +41,7 @@ public class ReviewServiceImpl implements ReviewService {
     // 해당 관광지 게시글에 리뷰 생성
     @Override
     @Transactional
-    public void addReview(String contentId, @Valid ReviewForm reviewForm){
+    public void addReview(Long contentId, @Valid ReviewForm reviewForm){
         // 현재 로그인한 사용자의 member 객체를 가져오는 메서드
         Member member = memberV1Repository.findById(AuthUtil.getCurrentMemberId()).orElse(null);
         TourPost tourPost = tourPostRepository.findByContentId(contentId);

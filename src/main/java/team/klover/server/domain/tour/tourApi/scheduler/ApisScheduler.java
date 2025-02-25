@@ -80,11 +80,6 @@ public class ApisScheduler {
                             } catch (Exception e) {
                                 log.error("Apis 기본 데이터 저장 중 에러 발생", e);
                             }
-                            try {
-                                tourApiService.sortApis();
-                            } catch (Exception e) {
-                                log.error("Apis 기본 데이터 선별 중 에러 발생", e);
-                            }
                         } else {
                             log.error("예상치 못한 응답 형식(기본 데이터): {}", response);
                         }
@@ -94,23 +89,28 @@ public class ApisScheduler {
                 }
             }
             try {
+                tourApiService.sortApis();
+            } catch (Exception e) {
+                log.error("Apis 기본 데이터 선별 중 에러 발생", e);
+            }
+            try {
                 tourApiService.getCommonPlace();
             } catch (Exception e) {
                 log.error("Apis 모든 언어에 공통으로 있는 관광지 선별 중 에러 발생", e);
             }
             log.info("기본 관광지 데이터 선별 및 저장 완료");
             try {
-                tourApiService.sortApis();
+                tourApiService.sortAsc();
             } catch (Exception e) {
                 log.error("Apis 관광지 ASC 정렬 중 에러 발생", e);
             }
             log.info("기본 관광지 데이터 정렬 완료");
 
-            // 관광지별 개요 데이터 추가를 위해 관광지별 고유 ID 가져오기
-            List<String> contentIdList = tourApiService.getAllContentIds();
-
+//            // 관광지별 개요 데이터 추가를 위해 관광지별 고유 ID 가져오기
+//            List<Long> contentIdList = tourApiService.getAllContentIds();
+//
 //            // 관광지별 개요&홈페이지 데이터 추가 및 저장
-//            for(String contentId : contentIdList) {
+//            for(Long contentId : contentIdList) {
 //                for(String language : languageList) {
 //                    try {
 //                        String apiUrl = String.format(

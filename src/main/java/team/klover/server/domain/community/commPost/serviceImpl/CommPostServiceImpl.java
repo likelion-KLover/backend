@@ -40,7 +40,7 @@ public class CommPostServiceImpl implements CommPostService {
     // 본인 게시글 조회
     @Override
     @Transactional(readOnly = true)
-    public Page<CommPostDto> findByTestMemberId(Pageable pageable){
+    public Page<CommPostDto> findByMemberId(Pageable pageable){
         checkPageSize(pageable.getPageSize());
         Page<CommPost> commPosts = commPostRepository.findByMemberId(1L, pageable);
         return commPosts.map(this::convertToCommPostDto);
@@ -57,10 +57,9 @@ public class CommPostServiceImpl implements CommPostService {
     // 사용자가 저장한 게시글 조회
     @Override
     @Transactional(readOnly = true)
-    public Page<CommPostDto> getSavedCommPostByTestMember(Pageable pageable){
+    public Page<CommPostDto> getSavedCommPostByMember(Pageable pageable){
         checkPageSize(pageable.getPageSize());
-        Long testMemberId = 1L;   // 임시 - 변경 필요
-        Page<CommPost> commPosts = commPostRepository.findSavedCommPostByTestMemberId(testMemberId, pageable);
+        Page<CommPost> commPosts = commPostRepository.findSavedCommPostByMemberId(AuthUtil.getCurrentMemberId(), pageable);
         return commPosts.map(this::convertToCommPostDto);
     }
 

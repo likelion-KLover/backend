@@ -21,9 +21,9 @@ import team.klover.server.global.jpa.BaseEntity;
 public class TourPostSave extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
-    private Member Member;
+    private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tour_post_id", nullable = false)
+    @JoinColumn(name = "tour_post_content_id", nullable = false)
     private TourPost tourPost;
 }
