@@ -143,7 +143,7 @@ public class AuthV1Controller {
 
         if (savedRefreshToken == null || !savedRefreshToken.equals(refreshToken)) {
             redisService.deleteRefreshToken(email);
-            throw new KloverRequestException(ReturnCode.FORGED_TOKEN);
+            throw new KloverRequestException(ReturnCode.INVALID_REQUEST);
         }
 
         Member member = memberService.findByEmail(email);

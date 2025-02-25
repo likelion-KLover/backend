@@ -17,8 +17,6 @@ import team.klover.server.domain.community.commPost.entity.CommPostPage;
 import team.klover.server.domain.community.commPost.entity.CommPostSave;
 import team.klover.server.domain.community.commPost.repository.CommPostRepository;
 import team.klover.server.domain.community.commPost.service.CommPostService;
-import team.klover.server.domain.member.test.entity.TestMember;
-import team.klover.server.domain.member.test.repository.TestMemberRepository;
 import team.klover.server.domain.member.v1.entity.Member;
 import team.klover.server.domain.member.v1.repository.MemberV1Repository;
 import team.klover.server.global.common.response.ApiResponse;

@@ -13,7 +13,7 @@ public interface TourPostService {
     DetailTourPostDto findByContentId(String contentId);
 
     // 사용자가 저장한 관광지 조회
-    Page<TourPostDto> getSavedTourPostByTestMember(Pageable pageable);
+    Page<TourPostDto> getSavedTourPostByMember(Pageable pageable);
 
     // 사용자 언어 & 관광지명/지역명 검색
     Page<TourPostDto> searchByLanguageAndKeyword(String language, String keyword, Pageable pageable);

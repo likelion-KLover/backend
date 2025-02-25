@@ -41,7 +41,7 @@ public class ApiV1TourPostController {
     @GetMapping("/collection")
     public ApiResponse<TourPostDto> getCollectionTourPost(@ModelAttribute TourPostPage request) {
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
-        return ApiResponse.of(KloverPage.of(tourPostService.getSavedTourPostByTestMember(pageable)));
+        return ApiResponse.of(KloverPage.of(tourPostService.getSavedTourPostByMember(pageable)));
     }
 
     // 사용자 언어 & 관광지명/지역명 검색
