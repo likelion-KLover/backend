@@ -48,7 +48,17 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 .authorizeHttpRequests(auth -> auth     // 인가 (Authorization) 설정
-                        .requestMatchers("/api/v1/auth/signup", "/api/v1/auth/login", "/oauth2/**", "/h2-console", "/h2-console/**","/api/v1/auth/google","/api/v1/auth/logout","/api/v1/auth/refresh","/api/v1/auth/line").permitAll()
+                        .requestMatchers("/api/v1/auth/signup",
+                                "/api/v1/auth/login",
+                                "/oauth2/**",
+                                "/h2-console",
+                                "/h2-console/**",
+                                "/api/v1/auth/google",
+                                "/api/v1/auth/logout",
+                                "/api/v1/auth/refresh",
+                                "/api/v1/auth/line",
+                                "/api/v1/tour-post/**",
+                                "/api/v1/comm-post/**").permitAll()
                         .anyRequest().authenticated()
                 )
 
