@@ -56,10 +56,13 @@ public class SecurityConfig {
                                 "/api/v1/auth/google",
                                 "/api/v1/auth/logout",
                                 "/api/v1/auth/refresh",
-                                "/api/v1/auth/line"
-                                //"/api/v1/tour-post/**",
-                                //"/api/v1/comm-post/**"
-                        ).permitAll()
+                                "/api/v1/auth/line",
+                                "/api/v1/tour-post/**",
+                                "/api/v1/comm-post/**",
+                                // Swagger 관련 URL 추가
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html").permitAll()
                         .anyRequest().authenticated()
                 )
 

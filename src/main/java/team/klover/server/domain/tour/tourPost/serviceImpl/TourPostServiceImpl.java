@@ -1,11 +1,13 @@
 package team.klover.server.domain.tour.tourPost.serviceImpl;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import team.klover.server.domain.community.commPost.dto.req.XYForm;
 import team.klover.server.domain.member.v1.entity.Member;
 import team.klover.server.domain.member.v1.repository.MemberV1Repository;
 import team.klover.server.domain.tour.review.repository.ReviewRepository;
@@ -26,6 +28,13 @@ public class TourPostServiceImpl implements TourPostService {
     private final TourPostRepository tourPostRepository;
     private final MemberV1Repository MemberV1Repository;
     private final ReviewRepository reviewRepository;
+
+    // 사용자 위치 주변 게시글(관광지&사용자) 조회
+    public Page<TourPostDto> findPostsWithinRadius(@Valid XYForm xyForm, Pageable pageable) {
+        Page<TourPost> tourPosts = tourPostRepository.findPostsWithinRadius(
+                xyForm.getMapX(), xyForm.getMapY(), xyForm.getRadius(), pageable);
+        return tourPosts.map(this::convertToTourPostDto);
+    }
 
     // 사용자 언어 & 지역기반 관광지 데이터 조회
     @Override
