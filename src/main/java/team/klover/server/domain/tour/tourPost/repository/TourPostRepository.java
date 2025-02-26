@@ -66,5 +66,11 @@ public interface TourPostRepository extends JpaRepository<TourPost, Long> {
     @Query(value = "DROP TABLE IF EXISTS tour_post_backup", nativeQuery = true)
     void dropBackupTable();  // 4. 백업 테이블 삭제 (선택 사항)
 
-
+    // 사용자 위치 주변 게시글(관광지&사용자) 조회
+    @Query(value = """
+        SELECT * FROM tour_post 
+        WHERE earth_distance(ll_to_earth(:mapY, :mapX), ll_to_earth(mapy, mapx)) <= :radius
+        ORDER BY create_date DESC
+        """, nativeQuery = true)
+    Page<TourPost> findPostsWithinRadius(@Param("mapX") Double mapX, @Param("mapY") Double mapY, @Param("radius") Integer radius, Pageable pageable);
 }

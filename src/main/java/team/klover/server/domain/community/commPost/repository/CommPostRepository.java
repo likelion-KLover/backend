@@ -10,9 +10,9 @@ import team.klover.server.domain.community.commPost.entity.CommPost;
 
 @Repository
 public interface CommPostRepository extends JpaRepository<CommPost, Long> {
-    // 사용자 위치 주변 게시글 조회
+    // 사용자 위치 주변 게시글(관광지&사용자) 조회
     @Query(value = """
-        SELECT * FROM comm_post 
+        SELECT * FROM comm_post
         WHERE earth_distance(ll_to_earth(:mapY, :mapX), ll_to_earth(mapy, mapx)) <= :radius
         ORDER BY create_date DESC
         """, nativeQuery = true)

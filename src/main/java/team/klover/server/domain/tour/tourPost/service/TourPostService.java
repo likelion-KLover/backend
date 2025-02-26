@@ -1,11 +1,16 @@
 package team.klover.server.domain.tour.tourPost.service;
 
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import team.klover.server.domain.community.commPost.dto.req.XYForm;
 import team.klover.server.domain.tour.tourPost.dto.res.DetailTourPostDto;
 import team.klover.server.domain.tour.tourPost.dto.res.TourPostDto;
 
 public interface TourPostService {
+    // 사용자 위치 주변 게시글(관광지&사용자) 조회
+    Page<TourPostDto> findPostsWithinRadius(@Valid XYForm xyForm, Pageable pageable);
+
     // 사용자 언어 & 지역기반 관광지 데이터 조회
     Page<TourPostDto> findByLanguageAndAreaCode(String language, String areaCode, Pageable pageable);
 
