@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import team.klover.server.domain.tour.review.entity.Review;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ import java.util.List;
 @EntityListeners(AuditingEntityListener.class)
 public class TourPost {
     @Id
-    private String contentId;
+    private Long contentId;
     private String commonPlaceId;
     private String title;
     private String areaCode;
@@ -38,6 +39,7 @@ public class TourPost {
     private String language;
 
     @OneToMany(mappedBy = "tourPost", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<TourPostSave> savedMembers = new ArrayList<>();
 
     @CreatedDate

@@ -15,5 +15,5 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     // 해당 관광지의 리뷰 평점 구하기
     @Query("SELECT COALESCE(AVG(r.rating), 0) FROM Review r WHERE r.tourPost.contentId = :tourPostContentId")
-    Double findAverageRatingByTourPostId(@Param("tourPostContentId") String tourPostContentId);
+    Double findAverageRatingByTourPostId(@Param("tourPostContentId") Long tourPostContentId);
 }

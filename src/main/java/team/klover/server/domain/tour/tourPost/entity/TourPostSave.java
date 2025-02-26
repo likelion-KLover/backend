@@ -24,6 +24,6 @@ public class TourPostSave extends BaseEntity {
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tour_post_id", nullable = false)
+    @JoinColumn(name = "tour_post_content_id", nullable = false)
     private TourPost tourPost;
 }

@@ -19,7 +19,6 @@ import team.klover.server.domain.tour.tourPost.entity.TourPost;
 import team.klover.server.domain.tour.tourPost.repository.TourPostRepository;
 import team.klover.server.global.exception.KloverRequestException;
 import team.klover.server.global.exception.ReturnCode;
-import team.klover.server.global.util.AuthUtil;
 
 @Slf4j
 @Service
@@ -41,9 +40,9 @@ public class ReviewServiceImpl implements ReviewService {
     // 해당 관광지 게시글에 리뷰 생성
     @Override
     @Transactional
-    public void addReview(String contentId, @Valid ReviewForm reviewForm){
+    public void addReview(Long memberId, Long contentId, @Valid ReviewForm reviewForm){
         // 현재 로그인한 사용자의 member 객체를 가져오는 메서드
-        Member member = memberV1Repository.findById(AuthUtil.getCurrentMemberId()).orElse(null);
+        Member member = memberV1Repository.findById(memberId).orElse(null);
         TourPost tourPost = tourPostRepository.findByContentId(contentId);
 
         // 평점은(1,2,3,4,5)만 가능
@@ -63,12 +62,12 @@ public class ReviewServiceImpl implements ReviewService {
     // 해당 리뷰 수정
     @Override
     @Transactional
-    public void updateReview(Long id, @Valid ReviewForm reviewForm){
+    public void updateReview(Long memberId, Long id, @Valid ReviewForm reviewForm){
         Review review = reviewRepository.findById(id)
                 .orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
 
         // 작성자 검증 - 현재 로그인한 사용자의 ID를 가져와서 검증
-        Member member = memberV1Repository.findById(AuthUtil.getCurrentMemberId()).orElse(null);
+        Member member = memberV1Repository.findById(memberId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
         Long currentUserId = member.getId();
         if (!review.getMember().getId().equals(currentUserId)) {
             throw new KloverRequestException(ReturnCode.NOT_AUTHORIZED);
@@ -85,12 +84,12 @@ public class ReviewServiceImpl implements ReviewService {
     // 해당 리뷰 삭제
     @Override
     @Transactional
-    public void deleteReview(Long id){
+    public void deleteReview(Long memberId, Long id){
         Review review = reviewRepository.findById(id)
                 .orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
 
         // 작성자 검증 - 현재 로그인한 사용자의 ID를 가져와서 검증
-        Member member = memberV1Repository.findById(AuthUtil.getCurrentMemberId()).orElse(null);
+        Member member = memberV1Repository.findById(memberId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
         Long currentUserId = member.getId();
         if (!review.getMember().getId().equals(currentUserId)) {
             throw new KloverRequestException(ReturnCode.NOT_AUTHORIZED);

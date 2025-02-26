@@ -1,10 +1,7 @@
 package team.klover.server.domain.community.comment.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 import team.klover.server.domain.community.commPost.entity.CommPost;
 import team.klover.server.domain.member.v1.entity.Member;
@@ -29,6 +26,7 @@ public class Comment extends BaseEntity {
     private CommPost commPost;
 
     @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<CommentLike> likedMembers = new ArrayList<>();
 
     private String nickname;

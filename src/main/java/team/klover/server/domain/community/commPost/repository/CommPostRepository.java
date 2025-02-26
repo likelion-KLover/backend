@@ -22,8 +22,8 @@ public interface CommPostRepository extends JpaRepository<CommPost, Long> {
     Page<CommPost> findByMemberId(Long id, Pageable pageable);
 
     // 사용자가 저장한 게시글 조회
-    @Query("SELECT p FROM CommPost p JOIN p.savedMembers sm WHERE sm.member.id = :testMemberId")
-    Page<CommPost> findSavedCommPostByTestMemberId(@Param("testMemberId") Long testMemberId, Pageable pageable);
+    @Query("SELECT p FROM CommPost p JOIN p.savedMembers sm WHERE sm.member.id = :memberId")
+    Page<CommPost> findSavedCommPostByMemberId(@Param("memberId") Long memberId, Pageable pageable);
 
     // 사용자 닉네임 & 게시글 내용 검색
     @Query("SELECT c FROM CommPost c WHERE c.nickname LIKE %:keyword% OR c.content LIKE %:keyword%")

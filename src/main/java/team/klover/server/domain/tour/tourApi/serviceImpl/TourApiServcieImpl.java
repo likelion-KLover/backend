@@ -2,6 +2,8 @@ package team.klover.server.domain.tour.tourApi.serviceImpl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
@@ -20,6 +22,9 @@ import java.util.stream.Collectors;
 public class TourApiServcieImpl implements TourApiService {
     private final TourPostRepository tourPostRepository;
 
+    @PersistenceContext
+    private EntityManager entityManager;  // EntityManager 주입
+
     // Apis의 데이터를 Post에 저장
     @Override
     @Transactional
@@ -33,7 +38,7 @@ public class TourApiServcieImpl implements TourApiService {
 
             for (JsonNode item : items) {
                 TourPost entity = TourPost.builder()
-                        .contentId(item.path("contentid").asText())
+                        .contentId(item.path("contentid").asLong())
                         .title(item.path("title").asText())
                         .areaCode(item.path("areacode").asText())
                         .sigungucode(item.path("sigungucode").asText())
@@ -79,10 +84,48 @@ public class TourApiServcieImpl implements TourApiService {
         tourPostRepository.deleteByCat3NotIn(cat3List);
     }
 
+    // 관광지의 X, Y 좌표가 모든 언어에 공통으로 있는 관광지 선별
+    @Override
+    @Transactional
+    public void getCommonPlace() {
+        List<TourPost> allPosts = tourPostRepository.findAllPosts(); // 모든 데이터 가져오기
+
+        // mapX, mapY 기준으로 그룹핑하여 개수 확인
+        Map<String, List<TourPost>> groupedByCoordinates = allPosts.stream()
+                .collect(Collectors.groupingBy(t -> t.getMapX() + "," + t.getMapY()));
+        int commonPlaceId = 1; // commonPlaceId 초기값 설정
+
+        for (Map.Entry<String, List<TourPost>> entry : groupedByCoordinates.entrySet()) {
+            List<TourPost> tourPosts = entry.getValue();
+            if (tourPosts.size() == 4) { // 4개인 경우 commonPlaceId 부여
+                for (TourPost tourPost : tourPosts) {
+                    tourPost.setCommonPlaceId(String.valueOf(commonPlaceId));
+                }
+                commonPlaceId++; // 다음 그룹을 위해 증가
+            } else { // 4개가 아닌 경우 삭제
+                String[] coordinates = entry.getKey().split(",");
+                String mapX = coordinates[0];
+                String mapY = coordinates[1];
+                tourPostRepository.deleteByMapCoordinates(mapX, mapY);
+            }
+        }
+        tourPostRepository.saveAll(allPosts);
+    }
+
+    // contentId 기준으로 오름차순 정렬
+    @Override
+    @Transactional
+    public void sortAsc() {
+        tourPostRepository.backupSortedData();  // 정렬된 데이터를 임시 테이블에 저장
+        tourPostRepository.deleteAllPostsAndReviews();    // 기존 데이터 삭제
+        tourPostRepository.restoreSortedData(); // 정렬된 데이터를 원래 테이블에 삽입
+        tourPostRepository.dropBackupTable();     // 임시 테이블 삭제 (선택 사항)
+    }
+
     // 관광지별 개요 데이터 추가를 위해 관광지별 고유 ID 가져오기
     @Override
     @Transactional(readOnly = true)
-    public List<String> getAllContentIds() {
+    public List<Long> getAllContentIds() {
         return tourPostRepository.findAllContentIds();
     }
 
@@ -96,7 +139,7 @@ public class TourApiServcieImpl implements TourApiService {
             JsonNode item = root.path("response").path("body").path("items").path("item");
 
             // JSON 응답에서 contentId, overview, homepage 추출
-            String contentId = item.path("contentid").asText();
+            Long contentId = item.path("contentid").asLong();
             String overview = item.path("overview").asText();
             String homepage = item.path("homepage").asText();
 
@@ -116,42 +159,5 @@ public class TourApiServcieImpl implements TourApiService {
             log.error("addOverview 처리 중 오류 발생", e);
             throw new RuntimeException("addOverview 처리 중 오류 발생", e);
         }
-    }
-
-    // 관광지의 X, Y 좌표가 모든 언어에 공통으로 있는 관광지 선별
-    @Override
-    @Transactional
-    public void getCommonPlace() {
-        List<TourPost> allPosts = tourPostRepository.findAllPosts(); // 모든 데이터 가져오기
-
-        // mapX, mapY 기준으로 그룹핑하여 개수 확인
-        Map<String, List<TourPost>> groupedByCoordinates = allPosts.stream()
-                .collect(Collectors.groupingBy(t -> t.getMapX() + "," + t.getMapY()));
-        int commonPlaceId = 1; // commonPlaceId 초기값 설정
-
-        for (Map.Entry<String, List<TourPost>> entry : groupedByCoordinates.entrySet()) {
-            List<TourPost> posts = entry.getValue();
-            if (posts.size() == 4) { // 4개인 경우 commonPlaceId 부여
-                for (TourPost post : posts) {
-                    post.setCommonPlaceId(String.valueOf(commonPlaceId));
-                }
-                commonPlaceId++; // 다음 그룹을 위해 증가
-            } else { // 4개가 아닌 경우 삭제
-                String[] coordinates = entry.getKey().split(",");
-                String mapX = coordinates[0];
-                String mapY = coordinates[1];
-                tourPostRepository.deleteByMapCoordinates(mapX, mapY);
-            }
-        }
-    }
-
-    // contentId 기준으로 오름차순 정렬
-    @Override
-    @Transactional
-    public void sortAsc() {
-        // 1. 모든 데이터를 contentId 기준으로 정렬하여 가져옴
-        List<TourPost> sortedPosts = tourPostRepository.findAll(Sort.by(Sort.Direction.ASC, "contentId"));
-        tourPostRepository.deleteAll(); // 기존 데이터 삭제
-        tourPostRepository.saveAll(sortedPosts); // 정렬된 데이터 다시 저장
     }
 }

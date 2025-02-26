@@ -14,6 +14,7 @@ import team.klover.server.domain.community.commPost.service.CommPostService;
 import team.klover.server.global.common.response.ApiResponse;
 import team.klover.server.global.common.response.KloverPage;
 import team.klover.server.global.exception.ReturnCode;
+import team.klover.server.global.util.AuthUtil;
 
 @RestController
 @RequestMapping("/api/v1/comm-post")
@@ -22,7 +23,7 @@ public class ApiV1CommPostController {
     private final CommPostService commPostService;
 
     // 사용자 위치 주변 게시글 조회
-    // http://localhost:8090/api/v1/comm-post/surroundings
+    // http://localhost:8080/api/v1/comm-post/surroundings
     @GetMapping("/surroundings")
     public ApiResponse<CommPostDto> getSurroundings(@ModelAttribute CommPostPage request, @RequestBody @Valid XYForm xyForm) {
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
@@ -30,30 +31,32 @@ public class ApiV1CommPostController {
     }
 
     // 본인 게시글 조회
-    // http://localhost:8090/api/v1/comm-post/me
+    // http://localhost:8080/api/v1/comm-post/me
     @GetMapping("/me")
     public ApiResponse<CommPostDto> getMyCommPost(@ModelAttribute CommPostPage request) {
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
-        return ApiResponse.of(KloverPage.of(commPostService.findByTestMemberId(pageable)));
+        Long currentMemberId = AuthUtil.getCurrentMemberId();
+        return ApiResponse.of(KloverPage.of(commPostService.findByMemberId(currentMemberId, pageable)));
     }
 
     // 해당 게시글 상세 조회
-    // http://localhost:8090/api/v1/comm-post/detail/1
+    // http://localhost:8080/api/v1/comm-post/detail/1
     @GetMapping("/detail/{id}")
     public ApiResponse<DetailCommPostDto> getDetailCommPost(@PathVariable("id") Long id) {
         return ApiResponse.of(commPostService.findById(id));
     }
 
     // 사용자가 저장한 게시글 조회
-    // http://localhost:8090/api/v1/comm-post/collection
+    // http://localhost:8080/api/v1/comm-post/collection
     @GetMapping("/collection")
     public ApiResponse<CommPostDto> getCollectionCommPost(@ModelAttribute CommPostPage request) {
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
-        return ApiResponse.of(KloverPage.of(commPostService.getSavedCommPostByTestMember(pageable)));
+        Long currentMemberId = AuthUtil.getCurrentMemberId();
+        return ApiResponse.of(KloverPage.of(commPostService.getSavedCommPostByMember(currentMemberId, pageable)));
     }
 
     // 사용자 닉네임 & 게시글 내용 검색
-    // http://localhost:8090/api/v1/comm-post?keyword=게시글
+    // http://localhost:8080/api/v1/comm-post?keyword=게시글
     @GetMapping
     public ApiResponse<CommPostDto> searchCommPost(@ModelAttribute CommPostPage request, @RequestParam("keyword") String keyword) {
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
@@ -61,58 +64,65 @@ public class ApiV1CommPostController {
     }
 
     // 해당 게시글 저장
-    // http://localhost:8090/api/v1/comm-post/collection/1
+    // http://localhost:8080/api/v1/comm-post/collection/1
     @PostMapping("/collection/{id}")
     public ApiResponse<String> addCollectionCommPost(@PathVariable("id") Long id){
-        commPostService.addCollectionCommPost(id);
+        Long currentMemberId = AuthUtil.getCurrentMemberId();
+        commPostService.addCollectionCommPost(currentMemberId, id);
         return ApiResponse.of(ReturnCode.SUCCESS);
     }
 
     // 해당 게시글 저장 취소
-    // http://localhost:8090/api/v1/comm-post/collection/1
+    // http://localhost:8080/api/v1/comm-post/collection/1
     @DeleteMapping("/collection/{id}")
     public ApiResponse<String> deleteCollectionCommPost(@PathVariable("id") Long id){
-        commPostService.deleteCollectionCommPost(id);
+        Long currentMemberId = AuthUtil.getCurrentMemberId();
+        commPostService.deleteCollectionCommPost(currentMemberId, id);
         return ApiResponse.of(ReturnCode.SUCCESS);
     }
 
     // 게시글 좋아요
-    // http://localhost:8090/api/v1/comm-post/like/1
+    // http://localhost:8080/api/v1/comm-post/like/1
     @PostMapping("/like/{id}")
     public ApiResponse<String> addCommPostLike(@PathVariable("id") Long id){
-        commPostService.addCommPostLike(id);
+        Long currentMemberId = AuthUtil.getCurrentMemberId();
+        commPostService.addCommPostLike(currentMemberId, id);
         return ApiResponse.of(ReturnCode.SUCCESS);
     }
 
     // 게시글 좋아요 취소
-    // http://localhost:8090/api/v1/comm-post/like/1
+    // http://localhost:8080/api/v1/comm-post/like/1
     @DeleteMapping("/like/{id}")
     public ApiResponse<String> deleteCommPostLike(@PathVariable("id") Long id){
-        commPostService.deleteCommPostLike(id);
+        Long currentMemberId = AuthUtil.getCurrentMemberId();
+        commPostService.deleteCommPostLike(currentMemberId, id);
         return ApiResponse.of(ReturnCode.SUCCESS);
     }
 
     // 게시글 생성
-    // http://localhost:8090/api/v1/comm-post
+    // http://localhost:8080/api/v1/comm-post
     @PostMapping
     public ApiResponse<String> addCommPost(@RequestBody @Valid CommPostForm commPostForm) {
-        commPostService.addCommPost(commPostForm);
+        Long currentMemberId = AuthUtil.getCurrentMemberId();
+        commPostService.addCommPost(currentMemberId, commPostForm);
         return ApiResponse.of(ReturnCode.SUCCESS);
     }
 
     // 해당 게시글 수정
-    // http://localhost:8090/api/v1/comm-post/1
+    // http://localhost:8080/api/v1/comm-post/1
     @PutMapping("/{id}")
     public ApiResponse<String> updateCommPost(@PathVariable("id") Long id, @RequestBody @Valid CommPostForm commPostForm) {
-        commPostService.updateCommPost(id, commPostForm);
+        Long currentMemberId = AuthUtil.getCurrentMemberId();
+        commPostService.updateCommPost(currentMemberId, id, commPostForm);
         return ApiResponse.of(ReturnCode.SUCCESS);
     }
 
     // 해당 게시글 삭제
-    // http://localhost:8090/api/v1/comm-post/1
+    // http://localhost:8080/api/v1/comm-post/1
     @DeleteMapping("/{id}")
     public ApiResponse<String> deleteCommPost(@PathVariable("id") Long id) {
-        commPostService.deleteCommPost(id);
+        Long currentMemberId = AuthUtil.getCurrentMemberId();
+        commPostService.deleteCommPost(currentMemberId, id);
         return ApiResponse.of(ReturnCode.SUCCESS);
     }
 }

@@ -39,7 +39,7 @@ public class TourPostServiceImpl implements TourPostService {
     // 해당 관광지 상세 조회
     @Override
     @Transactional(readOnly = true)
-    public DetailTourPostDto findByContentId(String contentId) {
+    public DetailTourPostDto findByContentId(Long contentId) {
         TourPost tourPost = tourPostRepository.findByContentId(contentId);
         return convertToDetailTourPostDto(tourPost);
     }
@@ -47,9 +47,8 @@ public class TourPostServiceImpl implements TourPostService {
     // 사용자가 저장한 관광지 조회
     @Override
     @Transactional(readOnly = true)
-    public Page<TourPostDto> getSavedTourPostByMember(Pageable pageable) {
+    public Page<TourPostDto> getSavedTourPostByMember(Long memberId, Pageable pageable) {
         checkPageSize(pageable.getPageSize());
-        Long memberId = 1L;   // 임시 - 변경 필요
         Page<TourPost> tourPosts = tourPostRepository.findSavedTourPostsByMemberId(memberId, pageable);
         return tourPosts.map(this::convertToTourPostDto);
     }
@@ -66,13 +65,13 @@ public class TourPostServiceImpl implements TourPostService {
     // 해당 관광지 저장
     @Override
     @Transactional
-    public void addCollectionTourPost(String contentId){
-        Member Member = MemberV1Repository.findById(1L).orElse(null); // 임시 - 변경 필요
+    public void addCollectionTourPost(Long memberId, Long contentId){
+        Member Member = MemberV1Repository.findById(memberId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY)); // 임시 - 변경 필요
         TourPost tourPost = tourPostRepository.findByContentId(contentId);
 
         boolean alreadySaved = tourPost.getSavedMembers()
                 .stream()
-                .anyMatch(savedMember -> savedMember.getId().equals(1L));
+                .anyMatch(savedMember -> savedMember.getId().equals(Member.getId()));
         if (alreadySaved) {
             throw new KloverRequestException(ReturnCode.ALREADY_EXIST);
         }
@@ -83,11 +82,11 @@ public class TourPostServiceImpl implements TourPostService {
     // 해당 관광지 저장 취소
     @Override
     @Transactional
-    public void deleteCollectionTourPost(String contentId){
+    public void deleteCollectionTourPost(Long memberId, Long contentId){
         TourPost tourPost = tourPostRepository.findByContentId(contentId);
         TourPostSave tourPostSave = tourPost.getSavedMembers()
                 .stream()
-                .filter(m -> m.getMember().getId().equals(1L))
+                .filter(m -> m.getMember().getId().equals(memberId))
                 .findFirst()
                 .orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
         tourPost.getSavedMembers().remove(tourPostSave);

@@ -19,10 +19,10 @@ public interface TourPostRepository extends JpaRepository<TourPost, Long> {
 
     // 관광지별 개요 데이터 추가를 위해 관광지별 고유 ID 가져오기
     @Query("SELECT p.contentId FROM TourPost p")
-    List<String> findAllContentIds();
+    List<Long> findAllContentIds();
 
-    // 관광지별 공통 ID로 해당 관광지 데이터 가져오기
-    TourPost findByContentId(String commonPlaceId);
+    // 관광지별 고유 ID로 해당 관광지 데이터 가져오기
+    TourPost findByContentId(Long contentId);
 
     // 사용자 언어 & 지역기반 관광지 데이터 조회
     Page<TourPost> findByLanguageAndAreaCode(String language, String areaCode, Pageable pageable);
@@ -44,4 +44,27 @@ public interface TourPostRepository extends JpaRepository<TourPost, Long> {
     @Transactional
     @Query("DELETE FROM TourPost t WHERE t.mapX = :mapX AND t.mapY = :mapY")
     void deleteByMapCoordinates(@Param("mapX") String mapX, @Param("mapY") String mapY);
+
+    @Modifying
+    @Transactional
+    @Query(value = "CREATE TABLE IF NOT EXISTS tour_post_backup AS " +
+            "SELECT * FROM tour_post ORDER BY content_id ASC", nativeQuery = true)
+    void backupSortedData();  // 1. 정렬된 데이터를 백업 테이블에 저장
+
+    @Modifying
+    @Transactional
+    @Query(value = "TRUNCATE TABLE review, tour_post RESTART IDENTITY CASCADE", nativeQuery = true)
+    void deleteAllPostsAndReviews();  // `tour_post`와 `review` 함께 삭제
+
+    @Modifying
+    @Transactional
+    @Query(value = "INSERT INTO tour_post SELECT * FROM tour_post_backup", nativeQuery = true)
+    void restoreSortedData();  // 3. 정렬된 데이터를 원래 테이블로 복원
+
+    @Modifying
+    @Transactional
+    @Query(value = "DROP TABLE IF EXISTS tour_post_backup", nativeQuery = true)
+    void dropBackupTable();  // 4. 백업 테이블 삭제 (선택 사항)
+
+
 }
