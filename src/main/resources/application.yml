@@ -1,0 +1,15 @@
+server:
+  port: 8080
+spring:
+  messages:
+    basename: locales/messages
+    fallback-to-system-locale: false
+    always-use-message-format: true
+    encoding: UTF-8
+  application:
+    name: my-application
+  profiles:
+    active: dev
+    include: secret
+aws:
+  bucket_name: klover-bucket-lshkw0315-1

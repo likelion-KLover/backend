@@ -1,0 +1,93 @@
+{
+  "index_patterns": ["tourpost_kor*"],
+  "template": {
+    "settings": {
+      "analysis": {
+        "tokenizer": {
+          "nori_mixed": {
+            "type": "nori_tokenizer",
+            "decompound_mode": "mixed"
+          }
+        },
+        "analyzer": {
+          "korean_mixed": {
+            "type": "custom",
+            "tokenizer": "nori_mixed",
+            "filter": [
+              "nori_part_of_speech",
+              "nori_posfilter",
+              "nori_readingform",
+              "lowercase",
+              "english_stop",
+              "porter_stem",
+              "asciifolding",
+              "word_delimiter_graph"
+            ]
+          },
+          "korean_word": {
+            "type": "custom",
+            "tokenizer": "nori_mixed",
+            "filter": [
+              "nori_part_of_speech",
+              "nori_posfilter",
+              "nori_readingform",
+              "ngram_filter",
+              "lowercase",
+              "english_stop",
+              "porter_stem",
+              "asciifolding",
+              "word_delimiter_graph"
+            ]
+          }
+        },
+        "filter": {
+          "nori_posfilter": {
+            "type": "nori_part_of_speech",
+            "stoptags": [
+              "E", "IC", "J", "MAG", "MAJ", "MM", "SP",
+              "SSC", "SSO", "SC", "SE", "XPN", "XSA",
+              "XSN", "XSV", "UNA", "NA", "VSV"
+            ]
+          },
+          "english_stop": {
+            "type": "stop",
+            "stopwords": "_english_"
+          }
+        }
+      },
+      "index": {
+        "max_ngram_diff": 5
+      }
+    },
+    "mappings": {
+      "properties": {
+        "content_id": {
+          "type": "keyword"
+        },
+        "common_place_id": {
+          "type": "keyword"
+        },
+        "first_image":{
+          "type": "keyword"
+        },
+        "addr1": {
+          "type": "keyword"
+        },
+        "firstImage": {
+          "type": "keyword"
+        },
+        "title": {
+          "type": "text",
+          "analyzer": "korean_word"
+        },
+        "location": {
+          "type": "geo_point"
+        },
+        "overview": {
+          "type": "text",
+          "analyzer": "korean_mixed"
+        }
+      }
+    }
+  }
+}

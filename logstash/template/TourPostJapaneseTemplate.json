@@ -1,0 +1,79 @@
+{
+  "index_patterns": ["tourpost_jpn*"],
+  "template": {
+    "settings": {
+      "analysis": {
+        "tokenizer": {
+          "kuromoji_search_tokenizer": {
+            "type": "kuromoji_tokenizer",
+            "mode": "search"
+          }
+        },
+        "analyzer": {
+            "japanese_content_search": {
+              "type": "custom",
+              "tokenizer": "kuromoji_search_tokenizer",
+              "filter": ["kuromoji_baseform",
+                "kuromoji_part_of_speech",
+                "cjk_width",
+                "lowercase",
+                "english_stop",
+                "porter_stem",
+                "asciifolding",
+                "word_delimiter_graph"]
+            }
+          },
+          "japanese_word_search": {
+            "type": "custom",
+            "tokenizer": "kuromoji_search_tokenizer",
+            "filter": [
+              "kuromoji_baseform",
+              "kuromoji_part_of_speech",
+              "cjk_width",
+              "ngram_filter",
+              "lowercase",
+              "english_stop",
+              "porter_stem",
+              "asciifolding",
+              "word_delimiter_graph"
+            ]
+          }
+        },
+        "filter": {
+          "english_stop": {
+            "type": "stop",
+            "stopwords": "_english_"
+          }
+        }
+      },
+      "index": {
+        "max_ngram_diff": 5
+      }
+    },
+    "mappings": {
+      "properties": {
+        "content_id": {
+          "type": "keyword"
+        },
+        "common_place_id": {
+          "type": "keyword"
+        },
+        "first_image":{
+          "type": "keyword"
+        },
+        "addr1": {
+          "type": "keyword"
+        },
+        "firstImage": {
+          "type": "keyword"
+        },
+        "title": {
+          "type": "text",
+          "analyzer": "korean_word"
+        },
+        "location": {
+          "type": "geo_point"
+        }
+      }
+    }
+  }

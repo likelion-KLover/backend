@@ -1,0 +1,75 @@
+{
+  "index_patterns": ["tourpost_eng*"],
+  "template": {
+    "settings": {
+      "analysis": {
+        "tokenizer": {
+          "nori_mixed": {
+            "type": "nori_tokenizer",
+            "decompound_mode": "mixed"
+          }
+        },
+        "analyzer": {
+          "english_content_analyzer": {
+            "type": "custom",
+            "tokenizer": "nori_mixed",
+            "filter": [
+              "lowercase",
+              "english_stop",
+              "porter_stem",
+              "asciifolding",
+              "word_delimiter_graph"
+            ]
+          },
+          "korean_word": {
+            "type": "custom",
+            "tokenizer": "nori_mixed",
+            "filter": [
+              "lowercase",
+              "english_stop",
+              "porter_stem",
+              "asciifolding",
+              "word_delimiter_graph",
+              "ngram_filter"
+            ]
+          }
+        },
+        "filter": {
+          "english_stop": {
+            "type": "stop",
+            "stopwords": "_english_"
+          }
+        }
+      },
+      "index": {
+        "max_ngram_diff": 5
+      }
+    },
+    "mappings": {
+      "properties": {
+        "content_id": {
+          "type": "keyword"
+        },
+        "common_place_id": {
+          "type": "keyword"
+        },
+        "first_image":{
+          "type": "keyword"
+        },
+        "addr1": {
+          "type": "keyword"
+        },
+        "firstImage": {
+          "type": "keyword"
+        },
+        "title": {
+          "type": "text",
+          "analyzer": "korean_word"
+        },
+        "location": {
+          "type": "geo_point"
+        }
+      }
+    }
+  }
+}
