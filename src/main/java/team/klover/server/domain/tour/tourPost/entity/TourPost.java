@@ -29,8 +29,8 @@ public class TourPost {
     private String firstImage;
     private String homepage;
     private String contentTypeId;
-    private String mapX;
-    private String mapY;
+    private Double mapX;
+    private Double mapY;
     private String cat1;
     private String cat2;
     private String cat3;
