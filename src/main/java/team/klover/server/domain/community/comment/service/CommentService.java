@@ -11,17 +11,17 @@ public interface CommentService {
     Page<CommentDto> findByCommPostId(Long commPostId, Pageable pageable);
 
     // 댓글 좋아요
-    void addCommentLike(Long memberId, Long id);
+    void addCommentLike(Long memberId);
 
     // 댓글 좋아요 취소
-    void deleteCommentLike(Long memberId, Long id);
+    void deleteCommentLike(Long memberId);
 
     // 해당 게시글에 댓글 생성
     void addComment(Long memberId, Long commPostId, @Valid CommentForm commentForm);
 
     // 해당 댓글 수정
-    void updateComment(Long memberId, Long id, @Valid CommentForm commentForm);
+    void updateComment(Long memberId, @Valid CommentForm commentForm);
 
     // 해당 댓글 삭제
-    void deleteComment(Long memberID, Long id);
+    void deleteComment(Long memberId);
 }

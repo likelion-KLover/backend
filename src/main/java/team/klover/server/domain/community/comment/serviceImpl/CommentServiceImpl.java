@@ -43,9 +43,9 @@ public class CommentServiceImpl implements CommentService {
     // 댓글 좋아요
     @Override
     @Transactional
-    public void addCommentLike(Long memberId, Long id){
+    public void addCommentLike(Long memberId){
         Member member = memberV1Repository.findById(memberId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
-        Comment comment = commentRepository.findById(id).orElse(null);
+        Comment comment = commentRepository.findByMemberId(memberId);
 
         boolean alreadySaved = comment.getLikedMembers()
                 .stream()
@@ -60,8 +60,8 @@ public class CommentServiceImpl implements CommentService {
     // 댓글 좋아요 취소
     @Override
     @Transactional
-    public void deleteCommentLike(Long memberId, Long id) {
-        Comment comment = commentRepository.findById(id).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
+    public void deleteCommentLike(Long memberId) {
+        Comment comment = commentRepository.findByMemberId(memberId);
         CommentLike commentLike = comment.getLikedMembers()
                 .stream()
                 .filter(m -> m.getMember().getId().equals(memberId))
@@ -81,7 +81,6 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = Comment.builder()
                 .member(member)
                 .commPost(commPost)
-                .nickname(member.getNickname())
                 .content(commentForm.getContent())
                 .superCommentId(commentForm.getSuperCommentId())
                 .build();
@@ -91,8 +90,8 @@ public class CommentServiceImpl implements CommentService {
     // 해당 댓글 수정
     @Override
     @Transactional
-    public void updateComment(Long memberId, Long id, @Valid CommentForm commentForm){
-        Comment comment = commentRepository.findById(id).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
+    public void updateComment(Long memberId, @Valid CommentForm commentForm){
+        Comment comment = commentRepository.findByMemberId(memberId);
 
         // 작성자 검증 - 현재 로그인한 사용자의 ID를 가져와서 검증
         Member member = memberV1Repository.findById(memberId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
@@ -106,8 +105,8 @@ public class CommentServiceImpl implements CommentService {
     // 해당 댓글 삭제
     @Override
     @Transactional
-    public void deleteComment(Long memberId, Long id){
-        Comment comment = commentRepository.findById(id).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
+    public void deleteComment(Long memberId){
+        Comment comment = commentRepository.findByMemberId(memberId);
 
         // 작성자 검증 - 현재 로그인한 사용자의 ID를 가져와서 검증
         Member member = memberV1Repository.findById(memberId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
@@ -115,7 +114,7 @@ public class CommentServiceImpl implements CommentService {
         if (!comment.getMember().getId().equals(currentUserId)) {
             throw new KloverRequestException(ReturnCode.NOT_AUTHORIZED);
         }
-        deleteChildComments(id);
+        deleteChildComments(comment.getId());
         commentRepository.save(comment); // 답글 삭제 후 더티 체킹
         commentRepository.delete(comment);
     }
@@ -142,7 +141,7 @@ public class CommentServiceImpl implements CommentService {
         return CommentDto.builder()
                 .id(comment.getId())
                 .memberId(comment.getMember().getId())
-                .nickname(comment.getNickname())
+                .nickname(comment.getMember().getNickname())
                 .likeCount(comment.getLikedMembers().size())
                 .content(comment.getContent())
                 .superCommentId(comment.getSuperCommentId())

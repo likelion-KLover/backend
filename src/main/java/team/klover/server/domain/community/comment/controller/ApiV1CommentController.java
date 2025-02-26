@@ -30,19 +30,19 @@ public class ApiV1CommentController {
 
     // 댓글 좋아요
     // http://localhost:8080/api/v1/comm-post/comment/like/1
-    @PostMapping("/like/{id}")
-    public ApiResponse<String> addCommentLike(@PathVariable("id") Long id){
+    @PostMapping("/like")
+    public ApiResponse<String> addCommentLike(){
         Long currentMemberId = AuthUtil.getCurrentMemberId();
-        commentService.addCommentLike(currentMemberId, id);
+        commentService.addCommentLike(currentMemberId);
         return ApiResponse.of(ReturnCode.SUCCESS);
     }
 
     // 댓글 좋아요 취소
     // http://localhost:8080/api/v1/comm-post/comment/like/1
-    @DeleteMapping("/like/{id}")
-    public ApiResponse<String> deleteCommentLike(@PathVariable("id") Long id){
+    @DeleteMapping("/like")
+    public ApiResponse<String> deleteCommentLike(){
         Long currentMemberId = AuthUtil.getCurrentMemberId();
-        commentService.deleteCommentLike(currentMemberId, id);
+        commentService.deleteCommentLike(currentMemberId);
         return ApiResponse.of(ReturnCode.SUCCESS);
     }
 
@@ -57,19 +57,19 @@ public class ApiV1CommentController {
 
     // 해당 댓글 수정
     // http://localhost:8080/api/v1/comm-post/comment/1
-    @PutMapping("/{id}")
-    public ApiResponse<String> updateComment(@PathVariable("id") Long id, @RequestBody @Valid CommentForm commentForm){
+    @PutMapping
+    public ApiResponse<String> updateComment(@RequestBody @Valid CommentForm commentForm){
         Long currentMemberId = AuthUtil.getCurrentMemberId();
-        commentService.updateComment(currentMemberId, id, commentForm);
+        commentService.updateComment(currentMemberId, commentForm);
         return ApiResponse.of(ReturnCode.SUCCESS);
     }
 
     // 해당 댓글 삭제
     // http://localhost:8080/api/v1/comm-post/comment/1
-    @DeleteMapping("/{id}")
-    public ApiResponse<String> deleteComment(@PathVariable("id") Long id){
+    @DeleteMapping
+    public ApiResponse<String> deleteComment(){
         Long currentMemberId = AuthUtil.getCurrentMemberId();
-        commentService.deleteComment(currentMemberId, id);
+        commentService.deleteComment(currentMemberId);
         return ApiResponse.of(ReturnCode.SUCCESS);
     }
 }
