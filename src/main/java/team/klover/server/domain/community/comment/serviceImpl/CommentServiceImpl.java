@@ -116,6 +116,7 @@ public class CommentServiceImpl implements CommentService {
             throw new KloverRequestException(ReturnCode.NOT_AUTHORIZED);
         }
         deleteChildComments(id);
+        commentRepository.save(comment); // 답글 삭제 후 더티 체킹
         commentRepository.delete(comment);
     }
 

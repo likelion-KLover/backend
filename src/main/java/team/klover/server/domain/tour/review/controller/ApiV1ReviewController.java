@@ -21,7 +21,7 @@ public class ApiV1ReviewController {
     private final ReviewService reviewService;
 
     // 해당 관광지 게시글에 작성된 리뷰 조회
-    // http://localhost:8080/api/v1/tour-post/review/7?page=0&size=10
+    // http://localhost:8080/api/v1/tour-post/review/617?page=0&size=10
     @GetMapping("/{commonPlaceId}")
     public ApiResponse<ReviewDto> findByCommonPlaceId(@ModelAttribute ReviewPage request, @PathVariable("commonPlaceId") String commonPlaceId) {
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
@@ -29,7 +29,7 @@ public class ApiV1ReviewController {
     }
 
     // 해당 관광지 게시글에 리뷰 생성
-    // http://localhost:8080/api/v1/tour-post/review/2701680
+    // http://localhost:8080/api/v1/tour-post/review/264107
     @PostMapping("/{contentId}")
     public ApiResponse<String> addReview(@PathVariable("contentId") Long contentId, @RequestBody @Valid ReviewForm reviewForm) {
         Long currentMemberId = AuthUtil.getCurrentMemberId();

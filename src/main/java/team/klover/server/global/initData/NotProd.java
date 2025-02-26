@@ -16,18 +16,18 @@ import team.klover.server.domain.tour.tourApi.service.TourApiService;
 
 @Configuration
 @Profile("!prod")
-
 public class NotProd {
-    private final AuthV1Service authV1Service;
+    private final MemberV1Repository MemberRepository;
 
-    public NotProd(AuthV1Service authV1Service) {
-        this.authV1Service = authV1Service;
+    public NotProd(MemberV1Repository MemberRepository) {
+        this.MemberRepository = MemberRepository;
     }
 
     @Bean
     public ApplicationRunner applicationRunner(
             ApisScheduler apisScheduler,
-            TourApiService tourApiService
+            TourApiService tourApiService,
+            AuthV1Service authV1Service
     ) {
         return new ApplicationRunner() {
             @Transactional
@@ -37,34 +37,30 @@ public class NotProd {
                 //
                 //
                 //
-                apisScheduler.getApisApiData();
+//                apisScheduler.getApisApiData();
 
 
-//                try {
-//                    // Member 1,2,3 생성
-//                    SignupRequestDto Member1 = SignupRequestDto.builder()
-//                            .email("test1@test.com")
-//                            .password("1234")
-//                            .nickname("test1")
-//                            .build();
-//                    authV1Service.signup(Member1);
-//                    SignupRequestDto Member2 = SignupRequestDto.builder()
-//                            .email("test2@test.com")
-//                            .password("1234")
-//                            .nickname("test2")
-//                            .build();
-//                    authV1Service.signup(Member2);
-//                    SignupRequestDto Member3 = SignupRequestDto.builder()
-//                            .email("test3@test.com")
-//                            .password("1234")
-//                            .nickname("test3")
-//                            .build();
-//                    authV1Service.signup(Member3);
-//                } catch (Exception e) {
-//                    System.out.println("Duplicate sign up");
-//                }
+
+                // Member 1,2,3 생성
+//                Member Member1 = authV1Service.signup(SignupRequestDto.builder()
+//                                .email("test1@test.com")
+//                                .nickname("test1")
+//                                .password("1234")
+//                        .build());
+//                MemberRepository.save(Member1);
+//                Member Member2 = authV1Service.signup(SignupRequestDto.builder()
+//                        .email("test2@test.com")
+//                        .nickname("test2")
+//                        .password("1234")
+//                        .build());
+//                MemberRepository.save(Member2);
+//                Member Member3 = authV1Service.signup(SignupRequestDto.builder()
+//                        .email("test3@test.com")
+//                        .nickname("test3")
+//                        .password("1234")
+//                        .build());
+//                MemberRepository.save(Member3);
             }
         };
     }
 }
-
