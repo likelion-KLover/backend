@@ -34,6 +34,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
+        String method = request.getMethod();
+
         // Skip filtering for these paths
         return path.startsWith("/h2-console")
                 || path.startsWith("/api/v1/auth/signup")
@@ -43,8 +45,16 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 || path.startsWith("/api/v1/auth/line")
                 || path.startsWith("/api/v1/auth/logout")
                 || path.startsWith("/api/v1/auth/refresh")
-                || path.startsWith("/api/v1/tour-post")
-                || path.startsWith("/api/v1/comm-post");
+                || (path.startsWith("/api/v1/comm-post/comment") && method.equals("GET"))
+                || (path.startsWith("/api/v1/comm-post/surroundings") && method.equals("GET"))
+                || (path.startsWith("/api/v1/comm-post/detail") && method.equals("GET"))
+                || (path.equals("/api/v1/comm-post") && method.equals("GET"))
+                || (path.startsWith("/api/v1/tour-post/review") && method.equals("GET"))
+                || (path.startsWith("/api/v1/tour-post/KorService1") && method.equals("GET"))
+                || (path.startsWith("/api/v1/tour-post/EngService1") && method.equals("GET"))
+                || (path.startsWith("/api/v1/tour-post/JpnService1") && method.equals("GET"))
+                || (path.startsWith("/api/v1/tour-post/ChsService1") && method.equals("GET"))
+                || (path.startsWith("/api/v1/tour-post/detail") && method.equals("GET"));
     }
 
     @Override

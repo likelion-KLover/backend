@@ -21,6 +21,7 @@ public class ApiV1CommentController {
     private final CommentService commentService;
 
     // 해당 게시글에 작성된 모든 댓글 조회
+    // http://localhost:8080/api/v1/comm-post/comment/1
     @GetMapping("/{commPostId}")
     public ApiResponse<CommentDto> findByCommPostId(@ModelAttribute CommentPage request, @PathVariable("commPostId") Long commPostId){
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
@@ -28,6 +29,7 @@ public class ApiV1CommentController {
     }
 
     // 댓글 좋아요
+    // http://localhost:8080/api/v1/comm-post/comment/like/1
     @PostMapping("/like/{id}")
     public ApiResponse<String> addCommentLike(@PathVariable("id") Long id){
         Long currentMemberId = AuthUtil.getCurrentMemberId();
@@ -36,6 +38,7 @@ public class ApiV1CommentController {
     }
 
     // 댓글 좋아요 취소
+    // http://localhost:8080/api/v1/comm-post/comment/like/1
     @DeleteMapping("/like/{id}")
     public ApiResponse<String> deleteCommentLike(@PathVariable("id") Long id){
         Long currentMemberId = AuthUtil.getCurrentMemberId();
@@ -44,6 +47,7 @@ public class ApiV1CommentController {
     }
 
     // 해당 게시글에 댓글 생성
+    // http://localhost:8080/api/v1/comm-post/comment/1
     @PostMapping("/{commPostId}")
     public ApiResponse<String> addComment(@PathVariable("commPostId") Long commPostId, @RequestBody @Valid CommentForm commentForm){
         Long currentMemberId = AuthUtil.getCurrentMemberId();
@@ -52,6 +56,7 @@ public class ApiV1CommentController {
     }
 
     // 해당 댓글 수정
+    // http://localhost:8080/api/v1/comm-post/comment/1
     @PutMapping("/{id}")
     public ApiResponse<String> updateComment(@PathVariable("id") Long id, @RequestBody @Valid CommentForm commentForm){
         Long currentMemberId = AuthUtil.getCurrentMemberId();
@@ -60,6 +65,7 @@ public class ApiV1CommentController {
     }
 
     // 해당 댓글 삭제
+    // http://localhost:8080/api/v1/comm-post/comment/1
     @DeleteMapping("/{id}")
     public ApiResponse<String> deleteComment(@PathVariable("id") Long id){
         Long currentMemberId = AuthUtil.getCurrentMemberId();
