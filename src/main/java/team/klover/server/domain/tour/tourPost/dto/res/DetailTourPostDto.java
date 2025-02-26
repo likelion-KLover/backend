@@ -13,7 +13,7 @@ public class DetailTourPostDto {
     private String addr1;
     private String firstImage;
     private String homepage;
-    private String mapX;
-    private String mapY;
+    private Double mapX;
+    private Double mapY;
     private String overview;
 }

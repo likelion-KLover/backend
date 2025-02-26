@@ -5,12 +5,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import team.klover.server.domain.community.commPost.dto.req.CommPostForm;
 import team.klover.server.domain.community.commPost.dto.req.XYForm;
+import team.klover.server.domain.community.commPost.dto.res.CombinedPostResponse;
 import team.klover.server.domain.community.commPost.dto.res.CommPostDto;
 import team.klover.server.domain.community.commPost.dto.res.DetailCommPostDto;
 
 public interface CommPostService {
-    // 사용자 위치 주변 게시글 조회
-    Page<CommPostDto> findPostsWithinRadius(@Valid XYForm xyForm, Pageable pageable);
+    // 사용자 위치 주변 게시글(관광지&사용자) 조회
+    CombinedPostResponse findPostsWithinRadius(@Valid XYForm xyForm, Pageable pageable);
 
     // 본인 게시글 조회
     Page<CommPostDto> findByMemberId(Long memberId, Pageable pageable);

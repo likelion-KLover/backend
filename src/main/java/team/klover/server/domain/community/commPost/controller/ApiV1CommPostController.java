@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import team.klover.server.domain.community.commPost.dto.req.CommPostForm;
 import team.klover.server.domain.community.commPost.dto.req.XYForm;
+import team.klover.server.domain.community.commPost.dto.res.CombinedPostResponse;
 import team.klover.server.domain.community.commPost.dto.res.CommPostDto;
 import team.klover.server.domain.community.commPost.dto.res.DetailCommPostDto;
 import team.klover.server.domain.community.commPost.entity.CommPostPage;
@@ -22,12 +23,12 @@ import team.klover.server.global.util.AuthUtil;
 public class ApiV1CommPostController {
     private final CommPostService commPostService;
 
-    // 사용자 위치 주변 게시글 조회
+    // 사용자 위치 주변 게시글(관광지&사용자) 조회
     // http://localhost:8080/api/v1/comm-post/surroundings
     @GetMapping("/surroundings")
-    public ApiResponse<CommPostDto> getSurroundings(@ModelAttribute CommPostPage request, @RequestBody @Valid XYForm xyForm) {
+    public CombinedPostResponse getSurroundings(@ModelAttribute CommPostPage request, @RequestBody @Valid XYForm xyForm) {
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
-        return ApiResponse.of(KloverPage.of(commPostService.findPostsWithinRadius(xyForm, pageable)));
+        return commPostService.findPostsWithinRadius(xyForm, pageable);
     }
 
     // 본인 게시글 조회

@@ -12,6 +12,6 @@ public class TourPostDto {
     private String title;
     private String addr1;
     private String firstImage;
-    private String mapX;
-    private String mapY;
+    private Double mapX;
+    private Double mapY;
 }

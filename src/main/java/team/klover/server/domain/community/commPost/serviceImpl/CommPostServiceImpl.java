@@ -3,23 +3,22 @@ package team.klover.server.domain.community.commPost.serviceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.checkerframework.checker.units.qual.N;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import team.klover.server.domain.community.commPost.dto.req.CommPostForm;
 import team.klover.server.domain.community.commPost.dto.req.XYForm;
+import team.klover.server.domain.community.commPost.dto.res.CombinedPostResponse;
 import team.klover.server.domain.community.commPost.dto.res.CommPostDto;
 import team.klover.server.domain.community.commPost.dto.res.DetailCommPostDto;
-import team.klover.server.domain.community.commPost.entity.CommPost;
-import team.klover.server.domain.community.commPost.entity.CommPostLike;
-import team.klover.server.domain.community.commPost.entity.CommPostPage;
-import team.klover.server.domain.community.commPost.entity.CommPostSave;
+import team.klover.server.domain.community.commPost.entity.*;
 import team.klover.server.domain.community.commPost.repository.CommPostRepository;
 import team.klover.server.domain.community.commPost.service.CommPostService;
 import team.klover.server.domain.member.v1.entity.Member;
 import team.klover.server.domain.member.v1.repository.MemberV1Repository;
+import team.klover.server.domain.tour.tourPost.dto.res.TourPostDto;
+import team.klover.server.domain.tour.tourPost.service.TourPostService;
 import team.klover.server.global.exception.KloverRequestException;
 import team.klover.server.global.exception.ReturnCode;
 
@@ -29,12 +28,18 @@ import team.klover.server.global.exception.ReturnCode;
 public class CommPostServiceImpl implements CommPostService {
     private final CommPostRepository commPostRepository;
     private final MemberV1Repository memberV1Repository;
+    private final TourPostService tourPostService;
 
-    // 사용자 위치 주변 게시글 조회
-    public Page<CommPostDto> findPostsWithinRadius(@Valid XYForm xyForm, Pageable pageable){
+    // 사용자 위치 주변 게시글(관광지&사용자) 조회
+    public CombinedPostResponse findPostsWithinRadius(@Valid XYForm xyForm, Pageable pageable){
         checkPageSize(pageable.getPageSize());
-        Page<CommPost> commPosts = commPostRepository.findPostsWithinRadius(xyForm.getMapX(), xyForm.getMapY(), xyForm.getRadius(), pageable);
-        return commPosts.map(this::convertToCommPostDto);
+        Page<CommPostDto> commPosts = commPostRepository.findPostsWithinRadius(
+                xyForm.getMapX(), xyForm.getMapY(), xyForm.getRadius(), pageable
+        ).map(this::convertToCommPostDto);
+
+        Page<TourPostDto> tourPosts = tourPostService.findPostsWithinRadius(xyForm, pageable);
+
+        return new CombinedPostResponse(commPosts, tourPosts);
     }
 
     // 본인 게시글 조회

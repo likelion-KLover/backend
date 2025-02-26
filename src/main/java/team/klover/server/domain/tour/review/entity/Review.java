@@ -1,6 +1,8 @@
 package team.klover.server.domain.tour.review.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -28,8 +30,9 @@ public class Review extends BaseEntity {
     private String content;
 
     @Column(length = 1)
-    @Size(max = 1)
-    private int rating;
+    @Min(0)
+    @Max(5)
+    private Integer rating;
 
     private String commonPlaceId;
 }
