@@ -1,32 +1,26 @@
 {
-  "index_patterns": ["tourpost_eng*"],
+  "index_patterns": ["tourpost-eng*"],
   "template": {
     "settings": {
       "analysis": {
-        "tokenizer": {
-          "nori_mixed": {
-            "type": "nori_tokenizer",
-            "decompound_mode": "mixed"
-          }
-        },
         "analyzer": {
           "english_content_analyzer": {
             "type": "custom",
-            "tokenizer": "nori_mixed",
+            "tokenizer": "standard",
             "filter": [
               "lowercase",
-              "english_stop",
+              "stop",
               "porter_stem",
               "asciifolding",
               "word_delimiter_graph"
             ]
           },
-          "korean_word": {
+          "english_word_analyzer": {
             "type": "custom",
-            "tokenizer": "nori_mixed",
+            "tokenizer": "standard",
             "filter": [
               "lowercase",
-              "english_stop",
+              "stop",
               "porter_stem",
               "asciifolding",
               "word_delimiter_graph",
@@ -35,39 +29,39 @@
           }
         },
         "filter": {
-          "english_stop": {
-            "type": "stop",
-            "stopwords": "_english_"
+          "ngram_filter":{
+            "type": "ngram",
+            "min_gram": 2,
+            "max_gram": 3
           }
         }
-      },
-      "index": {
-        "max_ngram_diff": 5
       }
     },
     "mappings": {
       "properties": {
         "content_id": {
-          "type": "keyword"
+          "type": "long"
         },
         "common_place_id": {
-          "type": "keyword"
-        },
-        "first_image":{
           "type": "keyword"
         },
         "addr1": {
           "type": "keyword"
         },
-        "firstImage": {
-          "type": "keyword"
-        },
         "title": {
           "type": "text",
-          "analyzer": "korean_word"
+          "analyzer": "english_word_analyzer"
+        },
+        "overview": {
+          "type": "text",
+          "analyzer": "english_content_analyzer"
         },
         "location": {
           "type": "geo_point"
+        },
+        "create_date": {
+          "type": "date",
+          "format": "strict_date_time"
         }
       }
     }

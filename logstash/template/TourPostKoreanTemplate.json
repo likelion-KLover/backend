@@ -1,5 +1,5 @@
 {
-  "index_patterns": ["tourpost_kor*"],
+  "index_patterns": ["tourpost-kor*"],
   "template": {
     "settings": {
       "analysis": {
@@ -18,7 +18,7 @@
               "nori_posfilter",
               "nori_readingform",
               "lowercase",
-              "english_stop",
+              "stop",
               "porter_stem",
               "asciifolding",
               "word_delimiter_graph"
@@ -33,7 +33,7 @@
               "nori_readingform",
               "ngram_filter",
               "lowercase",
-              "english_stop",
+              "stop",
               "porter_stem",
               "asciifolding",
               "word_delimiter_graph"
@@ -41,6 +41,11 @@
           }
         },
         "filter": {
+          "ngram_filter":{
+            "type": "ngram",
+            "min_gram": 2,
+            "max_gram": 3
+          },
           "nori_posfilter": {
             "type": "nori_part_of_speech",
             "stoptags": [
@@ -48,21 +53,14 @@
               "SSC", "SSO", "SC", "SE", "XPN", "XSA",
               "XSN", "XSV", "UNA", "NA", "VSV"
             ]
-          },
-          "english_stop": {
-            "type": "stop",
-            "stopwords": "_english_"
           }
         }
-      },
-      "index": {
-        "max_ngram_diff": 5
       }
     },
     "mappings": {
       "properties": {
         "content_id": {
-          "type": "keyword"
+          "type": "long"
         },
         "common_place_id": {
           "type": "keyword"
@@ -71,9 +69,6 @@
           "type": "keyword"
         },
         "addr1": {
-          "type": "keyword"
-        },
-        "firstImage": {
           "type": "keyword"
         },
         "title": {
@@ -86,6 +81,10 @@
         "overview": {
           "type": "text",
           "analyzer": "korean_mixed"
+        },
+        "create_date": {
+          "type": "date",
+          "format": "strict_date_time"
         }
       }
     }

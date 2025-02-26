@@ -1,5 +1,7 @@
 {
-  "index_patterns": ["news*"],
+  "index_patterns": [
+    "commpost*"
+  ],
   "template": {
     "settings": {
       "analysis": {
@@ -14,22 +16,29 @@
             "type": "custom",
             "tokenizer": "nori_mixed",
             "filter": [
-              "lowercase",
               "nori_part_of_speech",
               "nori_posfilter",
-              "nori_readingform"
+              "nori_readingform",
+              "lowercase",
+              "stop",
+              "porter_stem",
+              "asciifolding",
+              "word_delimiter_graph"
             ]
           },
           "korean_word": {
             "type": "custom",
             "tokenizer": "nori_mixed",
             "filter": [
-              "lowercase",
               "nori_part_of_speech",
               "nori_posfilter",
               "nori_readingform",
               "ngram_filter",
-              "unique"
+              "lowercase",
+              "stop",
+              "porter_stem",
+              "asciifolding",
+              "word_delimiter_graph"
             ]
           }
         },
@@ -37,38 +46,42 @@
           "nori_posfilter": {
             "type": "nori_part_of_speech",
             "stoptags": [
-              "E", "IC", "J", "MAG", "MAJ", "MM", "SP",
-              "SSC", "SSO", "SC", "SE", "XPN", "XSA",
-              "XSN", "XSV", "UNA", "NA", "VSV"
+              "E",
+              "IC",
+              "J",
+              "MAG",
+              "MAJ",
+              "MM",
+              "SP",
+              "SSC",
+              "SSO",
+              "SC",
+              "SE",
+              "XPN",
+              "XSA",
+              "XSN",
+              "XSV",
+              "UNA",
+              "NA",
+              "VSV"
             ]
           },
-          "ngram_filter":{
+          "ngram_filter": {
             "type": "ngram",
             "min_gram": 2,
             "max_gram": 3
           }
         }
-      },
-      "index": {
-        "max_ngram_diff": 5
       }
     },
     "mappings": {
       "properties": {
-        "id": {
+        "member_id": {
           "type": "long"
-        },
-        "title": {
-          "type": "text",
-          "analyzer": "korean_mixed"
         },
         "content": {
           "type": "text",
           "analyzer": "korean_mixed"
-        },
-        "deleted_at": {
-          "type": "date",
-          "format": "strict_date_time"
         },
         "create_date": {
           "type": "date",
@@ -78,28 +91,8 @@
           "type": "date",
           "format": "strict_date_time"
         },
-        "category": {
-          "type": "keyword"
-        },
-        "author": {
-          "type": "keyword"
-        },
-        "image_url": {
-          "type": "keyword"
-        },
-        "content_url": {
-          "type": "keyword"
-        },
-        "thumbnail_url": {
-          "type": "keyword"
-        },
-        "published_at": {
-          "type": "date",
-          "format": "strict_date_time"
-        },
-        "publisher": {
-          "type": "text",
-          "analyzer": "korean_word"
+        "location": {
+          "type": "geo_point"
         }
       }
     }

@@ -1,5 +1,7 @@
 {
-  "index_patterns": ["tourpost_jpn*"],
+  "index_patterns": [
+    "tourpost-jpn*"
+  ],
   "template": {
     "settings": {
       "analysis": {
@@ -10,70 +12,75 @@
           }
         },
         "analyzer": {
-            "japanese_content_search": {
-              "type": "custom",
-              "tokenizer": "kuromoji_search_tokenizer",
-              "filter": ["kuromoji_baseform",
-                "kuromoji_part_of_speech",
-                "cjk_width",
-                "lowercase",
-                "english_stop",
-                "porter_stem",
-                "asciifolding",
-                "word_delimiter_graph"]
-            }
-          },
-          "japanese_word_search": {
+          "japanese_content_search": {
             "type": "custom",
             "tokenizer": "kuromoji_search_tokenizer",
             "filter": [
               "kuromoji_baseform",
               "kuromoji_part_of_speech",
               "cjk_width",
-              "ngram_filter",
               "lowercase",
-              "english_stop",
+              "stop",
               "porter_stem",
               "asciifolding",
               "word_delimiter_graph"
             ]
           }
         },
-        "filter": {
-          "english_stop": {
-            "type": "stop",
-            "stopwords": "_english_"
-          }
+        "japanese_word_search": {
+          "type": "custom",
+          "tokenizer": "kuromoji_search_tokenizer",
+          "filter": [
+            "kuromoji_baseform",
+            "kuromoji_part_of_speech",
+            "cjk_width",
+            "ngram_filter",
+            "lowercase",
+            "stop",
+            "porter_stem",
+            "asciifolding",
+            "word_delimiter_graph"
+          ]
         }
       },
-      "index": {
-        "max_ngram_diff": 5
+      "filter": {
+        "ngram_filter": {
+          "type": "ngram",
+          "min_gram": 2,
+          "max_gram": 3
+        }
       }
     },
     "mappings": {
       "properties": {
         "content_id": {
-          "type": "keyword"
+          "type": "long"
         },
         "common_place_id": {
           "type": "keyword"
         },
-        "first_image":{
+        "first_image": {
           "type": "keyword"
         },
         "addr1": {
           "type": "keyword"
         },
-        "firstImage": {
-          "type": "keyword"
-        },
         "title": {
           "type": "text",
-          "analyzer": "korean_word"
+          "analyzer": "japanese_word_search"
+        },
+        "overview": {
+          "type": "text",
+          "analyzer": "japanese_content_search"
         },
         "location": {
           "type": "geo_point"
+        },
+        "create_date": {
+          "type": "date",
+          "format": "strict_date_time"
         }
       }
     }
   }
+}

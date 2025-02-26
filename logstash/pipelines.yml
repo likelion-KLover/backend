@@ -2,26 +2,26 @@
   path.config: "/usr/share/logstash/pipeline/logpipeline.conf"
 
 - pipeline.id: commpost_pipeline
-  path.config: "/usr/share/logstash/pipeline/CommPostPipeline.conf"
+  path.config: "/usr/share/logstash/pipeline/commpostpipeline.conf"
 - pipeline.id: commpost_update_pipeline
-  path.config: "/usr/share/logstash/pipeline/CommPostUpdatePipeline.conf"
+  path.config: "/usr/share/logstash/pipeline/commpostupdatepipeline.conf"
 
 - pipeline.id: tourpost_korean_pipeline
-  path.config: "/usr/share/logstash/pipeline/TourPostKoreanPipeline.conf"
+  path.config: "/usr/share/logstash/pipeline/tourpostkoreanpipeline.conf"
 - pipeline.id: tourpost_korean_update_pipeline
-  path.config: "/usr/share/logstash/pipeline/TourPostKoreanUpdatePipeline.conf"
+  path.config: "/usr/share/logstash/pipeline/tourpostkoreanupdatepipeline.conf"
 
 - pipeline.id: tourpost_chinese_pipeline
-  path.config: "/usr/share/logstash/pipeline/TourPostChinesePipeline.conf"
+  path.config: "/usr/share/logstash/pipeline/tourpostchinesepipeline.conf"
 - pipeline.id: tourpost_chinese_update_pipeline
-  path.config: "/usr/share/logstash/pipeline/TourPostChineseUpdatePipeline.conf"
+  path.config: "/usr/share/logstash/pipeline/tourpostchineseupdatepipeline.conf"
 
 - pipeline.id: tourpost_japanese_pipeline
-  path.config: "/usr/share/logstash/pipeline/TourPostJapanesePipeline.conf"
+  path.config: "/usr/share/logstash/pipeline/tourpostjapanesepipeline.conf"
 - pipeline.id: tourpost_japanese_update_pipeline
-  path.config: "/usr/share/logstash/pipeline/TourPostJapaneseUpdatePipeline.conf"
+  path.config: "/usr/share/logstash/pipeline/tourpostjapaneseupdatepipeline.conf"
 
 - pipeline.id: tourpost_english_pipeline
-  path.config: "/usr/share/logstash/pipeline/TourPostEnglishUpdatePipeline.conf"
+  path.config: "/usr/share/logstash/pipeline/tourpostenglishpipeline.conf"
 - pipeline.id: tourpost_english_update_pipeline
-  path.config: "/usr/share/logstash/pipeline/TourPostEnglishUpdatePipeline.conf"
+  path.config: "/usr/share/logstash/pipeline/tourpostenglishupdatepipeline.conf"
