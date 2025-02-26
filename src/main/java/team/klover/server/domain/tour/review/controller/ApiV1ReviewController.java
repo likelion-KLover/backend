@@ -12,6 +12,7 @@ import team.klover.server.domain.tour.review.service.ReviewService;
 import team.klover.server.global.common.response.ApiResponse;
 import team.klover.server.global.common.response.KloverPage;
 import team.klover.server.global.exception.ReturnCode;
+import team.klover.server.global.util.AuthUtil;
 
 @RestController
 @RequestMapping("/api/v1/tour-post/review")
@@ -31,7 +32,8 @@ public class ApiV1ReviewController {
     // http://localhost:8080/api/v1/tour-post/review/2701680
     @PostMapping("/{contentId}")
     public ApiResponse<String> addReview(@PathVariable("contentId") Long contentId, @RequestBody @Valid ReviewForm reviewForm) {
-        reviewService.addReview(contentId, reviewForm);
+        Long currentMemberId = AuthUtil.getCurrentMemberId();
+        reviewService.addReview(currentMemberId, contentId, reviewForm);
         return ApiResponse.of(ReturnCode.SUCCESS);
     }
 
@@ -39,7 +41,8 @@ public class ApiV1ReviewController {
     // http://localhost:8080/api/v1/tour-post/review/1
     @PutMapping("/{id}")
     public ApiResponse<String> updateReview(@PathVariable("id") Long id, @RequestBody @Valid ReviewForm reviewForm) {
-        reviewService.updateReview(id, reviewForm);
+        Long currentMemberId = AuthUtil.getCurrentMemberId();
+        reviewService.updateReview(currentMemberId, id, reviewForm);
         return ApiResponse.of(ReturnCode.SUCCESS);
     }
 
@@ -47,7 +50,8 @@ public class ApiV1ReviewController {
     // http://localhost:8080/api/v1/tour-post/review/1
     @DeleteMapping("/{id}")
     public ApiResponse<String> deleteReview(@PathVariable("id") Long id) {
-        reviewService.deleteReview(id);
+        Long currentMemberId = AuthUtil.getCurrentMemberId();
+        reviewService.deleteReview(currentMemberId, id);
         return ApiResponse.of(ReturnCode.SUCCESS);
     }
 }

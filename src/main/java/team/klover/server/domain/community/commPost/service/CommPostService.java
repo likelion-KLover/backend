@@ -13,35 +13,35 @@ public interface CommPostService {
     Page<CommPostDto> findPostsWithinRadius(@Valid XYForm xyForm, Pageable pageable);
 
     // 본인 게시글 조회
-    Page<CommPostDto> findByMemberId(Pageable pageable);
+    Page<CommPostDto> findByMemberId(Long memberId, Pageable pageable);
 
     // 해당 게시글 상세 조회
     DetailCommPostDto findById(Long id);
 
     // 사용자가 저장한 게시글 조회
-    Page<CommPostDto> getSavedCommPostByMember(Pageable pageable);
+    Page<CommPostDto> getSavedCommPostByMember(Long memberId, Pageable pageable);
 
     // 사용자 닉네임 & 게시글 내용 검색
     Page<CommPostDto> searchByNicknameAndContent(String keyword, Pageable pageable);
 
     // 해당 게시글 저장
-    void addCollectionCommPost(Long id);
+    void addCollectionCommPost(Long memberId, Long id);
 
     // 해당 게시글 저장 취소
-    void deleteCollectionCommPost(Long id);
+    void deleteCollectionCommPost(Long memberId, Long id);
 
     // 게시글 좋아요
-    void addCommPostLike(Long id);
+    void addCommPostLike(Long memberId, Long id);
 
     // 게시글 좋아요 취소
-    void deleteCommPostLike(Long id);
+    void deleteCommPostLike(Long memberId, Long id);
 
     // 게시글 생성
-    void addCommPost(@Valid CommPostForm commPostForm);
+    void addCommPost(Long memberId, @Valid CommPostForm commPostForm);
 
     // 해당 게시글 수정
-    void updateCommPost(Long id, @Valid CommPostForm commPostForm);
+    void updateCommPost(Long memberId, Long id, @Valid CommPostForm commPostForm);
 
     // 해당 게시글 삭제
-    void deleteCommPost(Long id);
+    void deleteCommPost(Long memberId, Long id);
 }

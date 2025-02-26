@@ -11,6 +11,7 @@ import team.klover.server.domain.tour.tourPost.service.TourPostService;
 import team.klover.server.global.common.response.ApiResponse;
 import team.klover.server.global.common.response.KloverPage;
 import team.klover.server.global.exception.ReturnCode;
+import team.klover.server.global.util.AuthUtil;
 
 @RestController
 @RequestMapping("/api/v1/tour-post")
@@ -41,7 +42,8 @@ public class ApiV1TourPostController {
     @GetMapping("/collection")
     public ApiResponse<TourPostDto> getCollectionTourPost(@ModelAttribute TourPostPage request) {
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
-        return ApiResponse.of(KloverPage.of(tourPostService.getSavedTourPostByMember(pageable)));
+        Long currentMemberId = AuthUtil.getCurrentMemberId();
+        return ApiResponse.of(KloverPage.of(tourPostService.getSavedTourPostByMember(currentMemberId, pageable)));
     }
 
     // 사용자 언어 & 관광지명/지역명 검색
@@ -57,7 +59,8 @@ public class ApiV1TourPostController {
     // http://localhost:8080/api/v1/tour-post/collection/3407946
     @PostMapping("/collection/{contentId}")
     public ApiResponse<String> addCollectionTourPost(@PathVariable("contentId") Long contentId){
-        tourPostService.addCollectionTourPost(contentId);
+        Long currentMemberId = AuthUtil.getCurrentMemberId();
+        tourPostService.addCollectionTourPost(currentMemberId, contentId);
         return ApiResponse.of(ReturnCode.SUCCESS);
     }
 
@@ -65,7 +68,8 @@ public class ApiV1TourPostController {
     // http://localhost:8080/api/v1/tour-post/collection/3407946
     @DeleteMapping("/collection/{contentId}")
     public ApiResponse<String> deleteCollectionTourPost(@PathVariable("contentId") Long contentId){
-        tourPostService.deleteCollectionTourPost(contentId);
+        Long currentMemberId = AuthUtil.getCurrentMemberId();
+        tourPostService.deleteCollectionTourPost(currentMemberId, contentId);
         return ApiResponse.of(ReturnCode.SUCCESS);
     }
 }
