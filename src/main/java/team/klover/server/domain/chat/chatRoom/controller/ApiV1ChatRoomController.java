@@ -20,7 +20,7 @@ import team.klover.server.global.util.AuthUtil;
 public class ApiV1ChatRoomController {
     private final ChatRoomService chatRoomService;
 
-    // 채팅방 목록 조회
+    // 채팅방 목록 조회(DM/그룹)
     @GetMapping
     public ApiResponse<ChatRoom> findByMemberId(@ModelAttribute ChatRoomPage request) {
         Long currentMemberId = AuthUtil.getCurrentMemberId();
@@ -28,9 +28,7 @@ public class ApiV1ChatRoomController {
         return ApiResponse.of(KloverPage.of(chatRoomService.findByMemberId(currentMemberId, pageable)));
     }
 
-    //
-
-    // 채팅방 생성
+    // 채팅방 생성(DM/그룹)
     @PostMapping
     public ApiResponse<String> addChatRoom(@RequestBody @Valid ChatRoomForm chatRoomForm) {
         Long currentMemberId = AuthUtil.getCurrentMemberId();
@@ -38,6 +36,15 @@ public class ApiV1ChatRoomController {
         return ApiResponse.of(ReturnCode.SUCCESS);
     }
 
-    // 채팅방 나가기
+    // 채팅방에 초대(그룹)
+
+
+    // 채팅방에서 강퇴(그룹) / 방장권한
+
+
+    // 방장권한 위임(그룹) / 방장권한
+
+
+    // 채팅방 나가기(DM/그룹)
 
 }
