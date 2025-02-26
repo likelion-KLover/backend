@@ -60,9 +60,8 @@ public class SecurityConfig {
                                 "/api/v1/tour-post/**",
                                 "/api/v1/comm-post/**",
                                 // Swagger 관련 URL 추가
-                                "/v3/api-docs/**",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html").permitAll()
+                                "/v1/api-docs/**",
+                                "/swagger-ui/**").permitAll()
                         .anyRequest().authenticated()
                 )
 
