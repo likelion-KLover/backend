@@ -1,7 +1,5 @@
 {
-  "index_patterns": [
-    "tourpost-jpn*"
-  ],
+  "index_patterns": ["tourpostjpn*"],
   "template": {
     "settings": {
       "analysis": {
@@ -25,29 +23,29 @@
               "asciifolding",
               "word_delimiter_graph"
             ]
+          },
+          "japanese_word_search": {
+            "type": "custom",
+            "tokenizer": "kuromoji_search_tokenizer",
+            "filter": [
+              "kuromoji_baseform",
+              "kuromoji_part_of_speech",
+              "cjk_width",
+              "ngram_filter",
+              "lowercase",
+              "stop",
+              "porter_stem",
+              "asciifolding",
+              "word_delimiter_graph"
+            ]
           }
         },
-        "japanese_word_search": {
-          "type": "custom",
-          "tokenizer": "kuromoji_search_tokenizer",
-          "filter": [
-            "kuromoji_baseform",
-            "kuromoji_part_of_speech",
-            "cjk_width",
-            "ngram_filter",
-            "lowercase",
-            "stop",
-            "porter_stem",
-            "asciifolding",
-            "word_delimiter_graph"
-          ]
-        }
-      },
-      "filter": {
-        "ngram_filter": {
-          "type": "ngram",
-          "min_gram": 2,
-          "max_gram": 3
+        "filter": {
+          "ngram_filter": {
+            "type": "ngram",
+            "min_gram": 2,
+            "max_gram": 3
+          }
         }
       }
     },
@@ -57,7 +55,7 @@
           "type": "long"
         },
         "common_place_id": {
-          "type": "keyword"
+          "type": "long"
         },
         "first_image": {
           "type": "keyword"
@@ -79,6 +77,21 @@
         "create_date": {
           "type": "date",
           "format": "strict_date_time"
+        },
+        "cat1": {
+          "type": "keyword"
+        },
+        "cat2": {
+          "type": "keyword"
+        },
+        "cat3": {
+          "type": "keyword"
+        },
+        "content_type_id": {
+          "type": "long"
+        },
+        "area_code": {
+          "type": "long"
         }
       }
     }

@@ -14,6 +14,13 @@ services:
       echo 'analysis-nori already exists';
       fi;
       
+      if ! bin/elasticsearch-plugin list | grep -q 'analysis-kuromoji'; then
+      echo 'start to install analysis-kuromoji';
+      bin/elasticsearch-plugin install analysis-kuromoji;
+      else
+      echo 'analysis-kuromoji already exists';
+      fi;
+      
       if ! bin/elasticsearch-plugin list | grep -q 'analysis-ik'; then
       echo 'start to install analysis-ik...';
       bin/elasticsearch-plugin install --batch https://get.infini.cloud/elasticsearch/analysis-ik/8.17.1;

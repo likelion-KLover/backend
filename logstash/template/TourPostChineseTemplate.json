@@ -1,12 +1,12 @@
 {
-  "index_patterns": ["tourpost-chs*"],
+  "index_patterns": ["tourpostchs*"],
   "template": {
     "settings": {
       "analysis": {
         "analyzer": {
           "chs_content_analyzer": {
             "type": "custom",
-            "tokenizer": "ik_smart_word",
+            "tokenizer": "ik_smart",
             "filter": [
               "lowercase",
               "stop",
@@ -65,6 +65,21 @@
         "create_date": {
           "type": "date",
           "format": "strict_date_time"
+        },
+        "cat1": {
+          "type": "keyword"
+        },
+        "cat2": {
+          "type": "keyword"
+        },
+        "cat3": {
+          "type": "keyword"
+        },
+        "content_type_id": {
+          "type": "long"
+        },
+        "area_code": {
+          "type": "long"
         }
       }
     }

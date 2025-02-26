@@ -1,5 +1,5 @@
 {
-  "index_patterns": ["tourpost-kor*"],
+  "index_patterns": ["tourpostkor*"],
   "template": {
     "settings": {
       "analysis": {
@@ -85,6 +85,21 @@
         "create_date": {
           "type": "date",
           "format": "strict_date_time"
+        },
+        "cat1": {
+          "type": "keyword"
+        },
+        "cat2": {
+          "type": "keyword"
+        },
+        "cat3": {
+          "type": "keyword"
+        },
+        "content_type_id": {
+          "type": "long"
+        },
+        "area_code": {
+          "type": "long"
         }
       }
     }
