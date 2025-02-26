@@ -37,30 +37,33 @@ public class NotProd {
                 //
                 //
                 //
-//                apisScheduler.getApisApiData();
+                /*
+                apisScheduler.getApisApiData();
 
 
 
                 // Member 1,2,3 생성
-//                Member Member1 = authV1Service.signup(SignupRequestDto.builder()
-//                                .email("test1@test.com")
-//                                .nickname("test1")
-//                                .password("1234")
-//                        .build());
-//                MemberRepository.save(Member1);
-//                Member Member2 = authV1Service.signup(SignupRequestDto.builder()
-//                        .email("test2@test.com")
-//                        .nickname("test2")
-//                        .password("1234")
-//                        .build());
-//                MemberRepository.save(Member2);
-//                Member Member3 = authV1Service.signup(SignupRequestDto.builder()
-//                        .email("test3@test.com")
-//                        .nickname("test3")
-//                        .password("1234")
-//                        .build());
-//                MemberRepository.save(Member3);
+                Member Member1 = authV1Service.signup(SignupRequestDto.builder()
+                                .email("test1@test.com")
+                                .nickname("test1")
+                                .password("1234")
+                        .build());
+                Member Member2 = authV1Service.signup(SignupRequestDto.builder()
+                        .email("test2@test.com")
+                        .nickname("test2")
+                        .password("1234")
+                        .build());
+                Member Member3 = authV1Service.signup(SignupRequestDto.builder()
+                        .email("test3@test.com")
+                        .nickname("test3")
+                        .password("1234")
+                        .build());
             }
+
+                 */
+            }
+
         };
+
     }
 }
