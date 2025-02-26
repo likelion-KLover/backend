@@ -1,5 +1,7 @@
 package team.klover.server.domain.chat.chatRoom.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -14,14 +16,18 @@ import team.klover.server.global.common.response.KloverPage;
 import team.klover.server.global.exception.ReturnCode;
 import team.klover.server.global.util.AuthUtil;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+
 @RestController
-@RequestMapping("/api/v1/chat-room")
+@RequestMapping(value="/api/v1/chat-room",produces = APPLICATION_JSON_VALUE)
+@Tag(name="ApiV1ChatRoomController",description = "ChatRoom API")
 @RequiredArgsConstructor
 public class ApiV1ChatRoomController {
     private final ChatRoomService chatRoomService;
 
     // 채팅방 목록 조회(DM/그룹)
     @GetMapping
+    @Operation(summary = "채팅방 목록 조회(DM/그룹)")
     public ApiResponse<ChatRoom> findByMemberId(@ModelAttribute ChatRoomPage request) {
         Long currentMemberId = AuthUtil.getCurrentMemberId();
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
@@ -30,6 +36,7 @@ public class ApiV1ChatRoomController {
 
     // 채팅방 생성(DM/그룹)
     @PostMapping
+    @Operation(summary = "채팅방 생성(DM/그룹)")
     public ApiResponse<String> addChatRoom(@RequestBody @Valid ChatRoomForm chatRoomForm) {
         Long currentMemberId = AuthUtil.getCurrentMemberId();
         chatRoomService.addChatRoom(currentMemberId, chatRoomForm);
