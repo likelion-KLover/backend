@@ -1,6 +1,7 @@
 package team.klover.server.domain.auth.controller;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -29,12 +30,14 @@ import team.klover.server.global.redis.RedisService;
 import team.klover.server.global.security.custom.CustomUserDetailsService;
 import team.klover.server.global.security.provider.JwtTokenProvider;
 import team.klover.server.global.util.AuthUtil;
-
+import io.swagger.v3.oas.annotations.tags.Tag;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import java.util.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/auth")
+@RequestMapping(value="/api/v1/auth",produces = APPLICATION_JSON_VALUE)
+@Tag(name="AuthV1Controller",description="AUTH API")
 public class AuthV1Controller {
     private final AuthV1Service authService;
     private final MemberV1Service memberService;
@@ -53,13 +56,15 @@ public class AuthV1Controller {
 
 
     @PostMapping("/signup")
-    public ApiResponse<LoginResponse> signup(@RequestBody SignupRequestDto requestDto) {
+    @Operation(summary="백엔드 서버 자체 회원가입")
+            public ApiResponse<LoginResponse> signup(@RequestBody SignupRequestDto requestDto) {
         Member member = authService.signup(requestDto);
         return ApiResponse.of(ReturnCode.SUCCESS);
 
     }
 
     @PostMapping("/login")
+    @Operation(summary="")
     public ApiResponse<LoginResponse> login(@RequestBody LoginRequestDto requestDto) {
         Member member = memberService.findServerMember(requestDto.getEmail());
 
@@ -84,6 +89,7 @@ public class AuthV1Controller {
     }
 
     @PostMapping("/logout")
+    @Operation(summary="로그아웃")
     public ApiResponse logout(HttpServletRequest request,
                                  HttpServletResponse response,
                                  @RequestBody RefreshRequest refreshRequest) {
@@ -121,12 +127,14 @@ public class AuthV1Controller {
     }
 
     @GetMapping("/authinfo")
+    @Operation(summary="로그인 상태 조회(프론트 상태관리용)")
     public ApiResponse<MemberDto> authorize() {
         MemberDto realMember = new MemberDto(memberService.getMemberById(AuthUtil.getCurrentMemberId()));
         return ApiResponse.of(realMember);
     }
 
     @PostMapping("/refresh")
+    @Operation(summary="엑세스토큰 재발급")
     public ApiResponse<JwtResponse> refresh(@RequestBody RefreshRequest refreshRequest) {
 
         String refreshToken = refreshRequest.getRefreshToken();
@@ -158,6 +166,7 @@ public class AuthV1Controller {
     }
 
     @PatchMapping("/password")
+    @Operation(summary="비밀번호 변경")
     public ApiResponse changePassword(@RequestBody PasswordChangeRequest request) {
 
         Long memberId = AuthUtil.getCurrentMemberId();
@@ -167,6 +176,7 @@ public class AuthV1Controller {
     }
 
     @PostMapping("/google")
+    @Operation(summary="구글 소셜 로그인")
     public ApiResponse<LoginResponse> googleNativeLogin(@RequestBody Map<String,String> request){
         GoogleIdToken.Payload payload = verifyGoogleIdToken(request.get("idToken")).block();
         if (payload != null) {
@@ -216,6 +226,7 @@ public class AuthV1Controller {
     }
 
     @PostMapping("/line")
+    @Operation(summary="라인 소셜 로그인")
     public ApiResponse<LoginResponse> lineLogin(@RequestBody Map<String,String> request){
         Map payload = verifyLineIdToken(request.get("idToken")).block();
         if (payload == null || payload.isEmpty()) {
