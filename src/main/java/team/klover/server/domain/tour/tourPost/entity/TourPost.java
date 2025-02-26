@@ -39,6 +39,7 @@ public class TourPost {
     private String language;
 
     @OneToMany(mappedBy = "tourPost", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<TourPostSave> savedMembers = new ArrayList<>();
 
     @CreatedDate

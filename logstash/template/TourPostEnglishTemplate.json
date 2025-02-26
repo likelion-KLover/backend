@@ -1,5 +1,5 @@
 {
-  "index_patterns": ["tourpost_kor*"],
+  "index_patterns": ["tourpost_eng*"],
   "template": {
     "settings": {
       "analysis": {
@@ -10,13 +10,10 @@
           }
         },
         "analyzer": {
-          "korean_mixed": {
+          "english_content_analyzer": {
             "type": "custom",
             "tokenizer": "nori_mixed",
             "filter": [
-              "nori_part_of_speech",
-              "nori_posfilter",
-              "nori_readingform",
               "lowercase",
               "english_stop",
               "porter_stem",
@@ -28,27 +25,16 @@
             "type": "custom",
             "tokenizer": "nori_mixed",
             "filter": [
-              "nori_part_of_speech",
-              "nori_posfilter",
-              "nori_readingform",
-              "ngram_filter",
               "lowercase",
               "english_stop",
               "porter_stem",
               "asciifolding",
-              "word_delimiter_graph"
+              "word_delimiter_graph",
+              "ngram_filter"
             ]
           }
         },
         "filter": {
-          "nori_posfilter": {
-            "type": "nori_part_of_speech",
-            "stoptags": [
-              "E", "IC", "J", "MAG", "MAJ", "MM", "SP",
-              "SSC", "SSO", "SC", "SE", "XPN", "XSA",
-              "XSN", "XSV", "UNA", "NA", "VSV"
-            ]
-          },
           "english_stop": {
             "type": "stop",
             "stopwords": "_english_"
@@ -82,10 +68,6 @@
         },
         "location": {
           "type": "geo_point"
-        },
-        "overview": {
-          "type": "text",
-          "analyzer": "korean_mixed"
         }
       }
     }
