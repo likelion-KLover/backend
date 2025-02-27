@@ -12,6 +12,9 @@ import team.klover.server.domain.member.v1.enums.MemberRole;
 import team.klover.server.domain.member.v1.enums.SocialProvider;
 import team.klover.server.global.jpa.BaseEntity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Setter

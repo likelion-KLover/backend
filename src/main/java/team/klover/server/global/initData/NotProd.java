@@ -44,9 +44,9 @@ public class NotProd {
                 //
                 //
                 //
-                /*
-                apisScheduler.getApisApiData();
 
+//                apisScheduler.getApisApiData();
+                /*
 
 
                 // Member 1,2,3 생성
@@ -65,7 +65,7 @@ public class NotProd {
                         .nickname("test3")
                         .password("1234")
                         .build());
-            }
+
 
                  */
 

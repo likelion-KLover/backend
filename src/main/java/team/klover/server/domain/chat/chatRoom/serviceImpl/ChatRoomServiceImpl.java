@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import team.klover.server.domain.chat.chatRoom.dto.req.ChatRoomForm;
 import team.klover.server.domain.chat.chatRoom.dto.res.ChatRoomDto;
+import team.klover.server.domain.chat.chatRoom.dto.res.MemberInfoDto;
 import team.klover.server.domain.chat.chatRoom.entity.ChatRoom;
 import team.klover.server.domain.chat.chatRoom.entity.ChatRoomMember;
 import team.klover.server.domain.chat.chatRoom.entity.ChatRoomPage;
@@ -34,8 +35,12 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     @Override
     @Transactional(readOnly = true)
     public Page<ChatRoomDto> findByMemberId(Long currentMemberId, Pageable pageable){
+        // 현재 로그인한 사용자의 member 객체를 가져오는 메서드
+        Member member = memberV1Repository.findById(currentMemberId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
         checkPageSize(pageable.getPageSize());
-        Page<ChatRoom> chatRooms = chatRoomRepository.findByMemberId(currentMemberId, pageable);
+
+        // 사용자가 참여 중인 채팅방 목록 조회
+        Page<ChatRoom> chatRooms = chatRoomRepository.findByChatRoomMembers_Member(member, pageable);
         return chatRooms.map(this::convertToChatRoomDto);
     }
 
@@ -45,6 +50,10 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     public void addChatRoom(Long currentMemberId, @Valid ChatRoomForm chatRoomForm){
         // 현재 로그인한 사용자의 member 객체를 가져오는 메서드
         Member member = memberV1Repository.findById(currentMemberId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
+        // 제한 인원 초과 여부 확인 (본인 제외)
+        if (chatRoomForm.getChatRoomMembers().size() > ChatRoom.ROOM_MEMBER_LIMIT - 1) {
+            throw new KloverRequestException(ReturnCode.WRONG_PARAMETER);
+        }
 
         // 새로운 채팅방 생성
         ChatRoom chatRoom = ChatRoom.builder()
@@ -77,9 +86,10 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     public void updateChatRoomTitle(Long chatRoomId, Long currentMemberId, @Valid ChatRoomForm chatRoomForm){
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
 
-        // 작성자 검증 - 현재 로그인한 사용자의 ID를 가져와서 검증
-        Member member = memberV1Repository.findById(currentMemberId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
-        if (!chatRoom.getMember().getId().equals(member.getId())) {
+        // 채팅방 멤버 누구나 수정 가능함
+        boolean memberExists = chatRoom.getChatRoomMembers().stream()
+                .anyMatch(joinedMember -> joinedMember.getMember().getId().equals(currentMemberId));
+        if (!memberExists) {
             throw new KloverRequestException(ReturnCode.NOT_AUTHORIZED);
         }
         chatRoom.setTitle(chatRoomForm.getTitle());
@@ -92,17 +102,22 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     public void inviteChatRoomMember(Long chatRoomId, Long currentMemberId, @Valid ChatRoomForm chatRoomForm){
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
-        // 기존 멤버인지 확인
+        // 채팅방 멤버 누구나 초대 가능함
         boolean memberExists = chatRoom.getChatRoomMembers().stream()
                 .anyMatch(joinedMember -> joinedMember.getMember().getId().equals(currentMemberId));
         if (!memberExists) {
             throw new KloverRequestException(ReturnCode.NOT_AUTHORIZED);
+        }
+        // 제한 인원 초과 여부 확인 (본인 제외)
+        if (chatRoomForm.getChatRoomMembers().size() > ChatRoom.ROOM_MEMBER_LIMIT - 1) {
+            throw new KloverRequestException(ReturnCode.WRONG_PARAMETER);
         }
 
         // 초대할 멤버 추가(기존 멤버 아닌 경우에만 추가)
         List<ChatRoomMember> newMembers = chatRoomForm.getChatRoomMembers().stream()
                 .filter(newMember -> chatRoom.getChatRoomMembers().stream()
                         .noneMatch(existingMember -> existingMember.getMember().getId().equals(newMember.getMember().getId())))
+                .peek(newMember -> newMember.setChatRoom(chatRoom)) // chatRoom 설정
                 .collect(Collectors.toList());
         chatRoom.getChatRoomMembers().addAll(newMembers);
     }
@@ -113,7 +128,6 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     public void kickOutChatRoomMember(Long chatRoomId, Long currentMemberId, @Valid ChatRoomForm chatRoomForm){
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
-
         // 방장인지 확인 (방장만 강퇴 가능)
         if (!chatRoom.getMember().getId().equals(currentMemberId)) {
             throw new KloverRequestException(ReturnCode.NOT_AUTHORIZED);
@@ -123,8 +137,19 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         List<Long> kickMemberIds = chatRoomForm.getChatRoomMembers().stream()
                 .map(member -> member.getMember().getId())
                 .collect(Collectors.toList());
+        // 방장은 자기자신을 강퇴하지 못함
+        if (kickMemberIds.contains(currentMemberId)) {
+            throw new KloverRequestException(ReturnCode.INVALID_REQUEST);
+        }
         chatRoom.getChatRoomMembers().removeIf(existingMember ->
                 kickMemberIds.contains(existingMember.getMember().getId()));
+
+        // 강퇴 후 남은 인원이 2명 미만이면 채팅방 삭제
+        if (chatRoom.getChatRoomMembers().size() < 2) {
+            chatRoomRepository.delete(chatRoom);
+        } else {
+            chatRoomRepository.save(chatRoom);
+        }
     }
 
     // 채팅방 나가기(DM/그룹)
@@ -133,20 +158,27 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     public void leaveChatRoomMember(Long chatRoomId, Long currentMemberId){
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
                 .orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
-        Member member = memberV1Repository.findById(currentMemberId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
+        // 현재 멤버가 속한 ChatRoomMember 찾기
+        ChatRoomMember chatRoomMember = chatRoom.getChatRoomMembers().stream()
+                .filter(member -> member.getMember().getId().equals(currentMemberId))
+                .findFirst()
+                .orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
+        chatRoom.getChatRoomMembers().remove(chatRoomMember);  // ChatRoomMember 제거
 
         // 방장인지 확인
         if (chatRoom.getMember().getId().equals(currentMemberId)) {
-            // 방장이 나갈 경우, 다음 멤버를 방장으로 지정
-            chatRoom.getChatRoomMembers().remove(member);
-            if (!chatRoom.getChatRoomMembers().isEmpty()) {
+            if (chatRoom.getChatRoomMembers().size() > 1) { // 2명 이상 남아있으면 다음 방장 지정
                 ChatRoomMember nextOwner = chatRoom.getChatRoomMembers().get(0);
                 chatRoom.setMember(nextOwner.getMember());
+            } else { // 1명 미만(0명)이면 채팅방 삭제
+                chatRoomRepository.delete(chatRoom);
+                return;
             }
-        } else {
-            // 방장이 아니라면 그냥 채팅방에서 나가기
-            chatRoom.getChatRoomMembers().remove(member);
+        } else if (chatRoom.getChatRoomMembers().size() < 2) { // 방장이 아닌데 나갔을 때 1명이 되면 삭제
+            chatRoomRepository.delete(chatRoom);
+            return;
         }
+        chatRoomRepository.save(chatRoom);
     }
 
     // 요청 페이지 수 제한
@@ -160,9 +192,16 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     // ChatRoom을 ChatRoomDto로 변환
     private ChatRoomDto convertToChatRoomDto(ChatRoom chatRoom) {
         return ChatRoomDto.builder()
+                .id(chatRoom.getId())
                 .memberId(chatRoom.getMember().getId())
                 .title(chatRoom.getTitle())
-                .chatRoomMembers(chatRoom.getChatRoomMembers())
+                .chatRoomMembers(chatRoom.getChatRoomMembers().stream()
+                        .map(chatRoomMember -> MemberInfoDto.builder()
+                                .memberId(chatRoomMember.getMember().getId())
+                                .memberNickname(chatRoomMember.getMember().getNickname())
+                                .build()
+                        )
+                        .collect(Collectors.toList()))
                 .build();
     }
 }

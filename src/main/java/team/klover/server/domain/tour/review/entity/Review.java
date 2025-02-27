@@ -7,8 +7,10 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import team.klover.server.domain.member.v1.entity.Member;
-import team.klover.server.domain.tour.tourPost.entity.TourPost;
 import team.klover.server.global.jpa.BaseEntity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Setter
@@ -21,9 +23,9 @@ public class Review extends BaseEntity {
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tour_post_content_id", nullable = false)
-    private TourPost tourPost;
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ReviewTourPost> reviewTourPosts = new ArrayList<>();
 
     @Column(length = 1000)
     @Size(max = 1000)
@@ -33,6 +35,4 @@ public class Review extends BaseEntity {
     @Min(0)
     @Max(5)
     private Integer rating;
-
-    private String commonPlaceId;
 }
