@@ -6,12 +6,19 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import team.klover.server.domain.community.commPost.entity.CommPost;
+import team.klover.server.domain.community.commPost.repository.CommPostRepository;
+import team.klover.server.domain.community.commPost.service.CommPostService;
+import team.klover.server.domain.community.comment.entity.Comment;
+import team.klover.server.domain.community.comment.repository.CommentRepository;
 import team.klover.server.domain.member.v1.dto.MemberDto;
 import team.klover.server.domain.member.v1.dto.MemberInfo;
 import team.klover.server.domain.member.v1.dto.MemberUpdateParam;
 import team.klover.server.domain.member.v1.entity.Member;
 import team.klover.server.domain.member.v1.enums.SocialProvider;
 import team.klover.server.domain.member.v1.repository.MemberV1Repository;
+import team.klover.server.domain.tour.review.entity.Review;
+import team.klover.server.domain.tour.review.repository.ReviewRepository;
 import team.klover.server.global.exception.KloverException;
 import team.klover.server.global.exception.KloverLogicException;
 import team.klover.server.global.exception.KloverRequestException;
@@ -19,6 +26,7 @@ import team.klover.server.global.exception.ReturnCode;
 import team.klover.server.global.s3.S3Service;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -26,6 +34,8 @@ import java.util.Optional;
 public class MemberV1Service {
     private final MemberV1Repository memberRepository;
     private final S3Service s3Service;
+    private final CommPostRepository commPostRepository;
+    private final CommentRepository commentRepository;
 
     @Transactional
     public void updateMember(Long memberId, MemberUpdateParam param
@@ -49,6 +59,7 @@ public class MemberV1Service {
             throw new KloverLogicException(ReturnCode.INTERNAL_ERROR);
         }
 
+        String prevNickname = member.getNickname();
 
         member.update(param);
     }

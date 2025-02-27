@@ -1,5 +1,7 @@
 {
-  "index_patterns": ["tourpostchs*"],
+  "index_patterns": [
+    "commpostkor*"
+  ],
   "template": {
     "settings": {
       "analysis": {
@@ -39,54 +41,33 @@
     },
     "mappings": {
       "properties": {
-        "content_id": {
+        "member_id": {
           "type": "long"
         },
-        "common_place_id": {
-          "type": "keyword"
-        },
-        "first_image":{
-          "type": "keyword"
-        },
-        "addr1": {
-          "type": "keyword"
-        },
-        "title": {
-          "type": "text",
-          "analyzer": "chs_word_analyzer"
-        },
-        "overview": {
+        "content": {
           "type": "text",
           "analyzer": "chs_content_analyzer"
-        },
-        "location": {
-          "type": "geo_point"
         },
         "create_date": {
           "type": "date",
           "format": "strict_date_time"
         },
-        "cat1": {
-          "type": "keyword"
+        "modify_date": {
+          "type": "date",
+          "format": "strict_date_time"
         },
-        "cat2": {
-          "type": "keyword"
+        "location": {
+          "type": "geo_point"
         },
-        "cat3": {
-          "type": "keyword"
+        "nickname": {
+          "type": "text",
+          "analyzer": "chs_word_analyzer"
         },
-        "content_type_id": {
+        "comment_count": {
           "type": "long"
         },
-        "area_code": {
+        "like_count": {
           "type": "long"
-        },
-        "review_count": {
-          "type": "long"
-        },
-        "rating_average": {
-          "type": "float",
-          "scaling_factor": 10
         }
       }
     }

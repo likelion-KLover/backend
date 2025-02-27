@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import team.klover.server.domain.member.v1.entity.Member;
+import team.klover.server.domain.member.v1.enums.Country;
 import team.klover.server.global.jpa.BaseEntity;
 
 import java.util.ArrayList;
@@ -33,8 +34,10 @@ public class CommPost extends BaseEntity {
     @Size(max = 3000)
     private String content;
 
-    private String nickname;
     private Double mapX;
     private Double mapY;
     private String imageUrl;
+
+    @Enumerated(EnumType.STRING)
+    private Country language;
 }

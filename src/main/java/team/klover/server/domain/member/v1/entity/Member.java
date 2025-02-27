@@ -7,9 +7,10 @@ import jakarta.persistence.Table;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import team.klover.server.domain.member.v1.dto.MemberUpdateParam;
+import team.klover.server.domain.member.v1.enums.Country;
 import team.klover.server.domain.member.v1.enums.MemberRole;
 import team.klover.server.domain.member.v1.enums.SocialProvider;
-import team.klover.server.global.common.entity.BaseEntity;
+import team.klover.server.global.jpa.BaseEntity;
 
 @Entity
 @Getter
@@ -36,7 +37,8 @@ public class Member extends BaseEntity {
 
     private String profileUrl;
 
-    private String country;
+    @Enumerated(EnumType.STRING)
+    private Country country;
 
     //회원 탈퇴는 하드 삭제이므로,
     //멤버를 참조하는 엔티티를 OneToMany로 관리하되 이 리스트에서 조회하지 않고 Repository를 통해 조회하여
@@ -49,7 +51,7 @@ public class Member extends BaseEntity {
             nickname = param.getNickname();
         }
 
-        if(param.getCountry()!=null && !param.getCountry().isBlank() && !param.getCountry().equals(country)){
+        if(param.getCountry()!=null && !param.getCountry().equals(country)){
             country = param.getCountry();
         }
     }
