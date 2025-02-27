@@ -18,14 +18,14 @@ public interface TourPostService {
     DetailTourPostDto findByContentId(Long contentId);
 
     // 사용자가 저장한 관광지 조회
-    Page<TourPostDto> getSavedTourPostByMember(Long memberId, Pageable pageable);
+    Page<TourPostDto> getSavedTourPostByMember(Long currentMemberId, Pageable pageable);
 
     // 사용자 언어 & 관광지명/지역명 검색
     Page<TourPostDto> searchByLanguageAndKeyword(String language, String keyword, Pageable pageable);
 
     // 해당 관광지 저장
-    void addCollectionTourPost(Long memberId, Long contentId);
+    void addCollectionTourPost(Long currentMemberId, Long contentId);
 
     // 해당 관광지 저장 취소
-    void deleteCollectionTourPost(Long memberId, Long contentId);
+    void deleteCollectionTourPost(Long currentMemberId, Long contentId);
 }

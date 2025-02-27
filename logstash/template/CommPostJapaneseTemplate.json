@@ -80,6 +80,9 @@
         },
         "like_count": {
           "type": "long"
+        },
+        "language": {
+          "type": "keyword"
         }
       }
     }

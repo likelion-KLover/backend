@@ -1,6 +1,3 @@
-- pipeline.id: log_pipeline
-  path.config: "/usr/share/logstash/pipeline/logpipeline.conf"
-
 - pipeline.id: commpost_korean_pipeline
   path.config: "/usr/share/logstash/pipeline/commpost/korean/commpostkoreanpipeline.conf"
 - pipeline.id: commpost_korean_update_pipeline

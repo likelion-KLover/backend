@@ -46,21 +46,21 @@ public class ApiV1ReviewController {
 
     // 해당 리뷰 수정
     // http://localhost:8080/api/v1/tour-post/review/1
-    @PutMapping("/{id}")
+    @PutMapping("/{reviewId}")
     @Operation(summary="해당 리뷰 수정")
-    public ApiResponse<String> updateReview(@PathVariable("id") Long id, @RequestBody @Valid ReviewForm reviewForm) {
+    public ApiResponse<String> updateReview(@PathVariable("reviewId") Long reviewId, @RequestBody @Valid ReviewForm reviewForm) {
         Long currentMemberId = AuthUtil.getCurrentMemberId();
-        reviewService.updateReview(currentMemberId, id, reviewForm);
+        reviewService.updateReview(currentMemberId, reviewId, reviewForm);
         return ApiResponse.of(ReturnCode.SUCCESS);
     }
 
     // 해당 리뷰 삭제
     // http://localhost:8080/api/v1/tour-post/review/1
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{reviewId}")
     @Operation(summary="해당 리뷰 삭제")
-    public ApiResponse<String> deleteReview(@PathVariable("id") Long id) {
+    public ApiResponse<String> deleteReview(@PathVariable("reviewId") Long reviewId) {
         Long currentMemberId = AuthUtil.getCurrentMemberId();
-        reviewService.deleteReview(currentMemberId, id);
+        reviewService.deleteReview(currentMemberId, reviewId);
         return ApiResponse.of(ReturnCode.SUCCESS);
     }
 }

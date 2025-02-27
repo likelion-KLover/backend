@@ -8,6 +8,6 @@ import team.klover.server.domain.chat.chatRoom.entity.ChatRoom;
 
 @Repository
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
-    // 채팅방 목록 조회
+    // 채팅방 목록 조회(DM/그룹)
     Page<ChatRoom> findByMemberId(Long memberId, Pageable pageable);
 }

@@ -15,4 +15,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     // 해당 댓글의 모든 하위 댓글 삭제
     List<Comment> findBySuperCommentId(Long superCommentId);
+
+    Comment findByMemberId(Long memberId);
 }

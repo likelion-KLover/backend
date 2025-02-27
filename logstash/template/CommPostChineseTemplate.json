@@ -1,6 +1,6 @@
 {
   "index_patterns": [
-    "commpostkor*"
+    "commpostchs*"
   ],
   "template": {
     "settings": {
@@ -68,6 +68,9 @@
         },
         "like_count": {
           "type": "long"
+        },
+        "language": {
+          "type": "keyword"
         }
       }
     }

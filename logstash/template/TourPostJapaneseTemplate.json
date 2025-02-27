@@ -99,6 +99,9 @@
         "rating_average": {
           "type": "float",
           "scaling_factor": 10
+        },
+        "language": {
+          "type": "keyword"
         }
       }
     }
