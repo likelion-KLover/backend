@@ -11,11 +11,11 @@ public interface ReviewService {
     Page<ReviewDto> findByCommonPlaceId(String commonPlaceId, Pageable pageable);
 
     // 해당 관광지 게시글에 리뷰 생성
-    void addReview(Long currentMemberId, Long contentId, @Valid ReviewForm reviewForm);
+    void addReview(Long currentMemberId, Long commonPlaceId, @Valid ReviewForm reviewForm);
 
-    // 해당 리뷰 수정
+    // 본인 리뷰 수정
     void updateReview(Long currentMemberId, Long reviewId, @Valid ReviewForm reviewForm);
 
-    // 해당 리뷰 삭제
+    // 본인 리뷰 삭제
     void deleteReview(Long currentMemberId, Long reviewId);
 }

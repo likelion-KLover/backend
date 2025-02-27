@@ -24,6 +24,9 @@ public interface TourPostRepository extends JpaRepository<TourPost, Long> {
     // 관광지별 고유 ID로 해당 관광지 데이터 가져오기
     TourPost findByContentId(Long contentId);
 
+    // 관광지 동일 위치로 데이터 가져오기
+    List<TourPost> findByCommonPlaceId(Long commonPlaceId);
+
     // 사용자 언어 & 지역기반 관광지 데이터 조회
     Page<TourPost> findByLanguageAndAreaCode(String language, String areaCode, Pageable pageable);
 
