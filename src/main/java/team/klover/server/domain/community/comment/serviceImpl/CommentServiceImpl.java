@@ -43,9 +43,9 @@ public class CommentServiceImpl implements CommentService {
     // 댓글 좋아요
     @Override
     @Transactional
-    public void addCommentLike(Long memberId){
-        Member member = memberV1Repository.findById(memberId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
-        Comment comment = commentRepository.findByMemberId(memberId);
+    public void addCommentLike(Long currentMemberId, Long commentId){
+        Member member = memberV1Repository.findById(currentMemberId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
+        Comment comment = commentRepository.findByMemberId(commentId);
 
         boolean alreadySaved = comment.getLikedMembers()
                 .stream()
@@ -60,11 +60,11 @@ public class CommentServiceImpl implements CommentService {
     // 댓글 좋아요 취소
     @Override
     @Transactional
-    public void deleteCommentLike(Long memberId) {
-        Comment comment = commentRepository.findByMemberId(memberId);
+    public void deleteCommentLike(Long currentMemberId, Long commentId) {
+        Comment comment = commentRepository.findByMemberId(commentId);
         CommentLike commentLike = comment.getLikedMembers()
                 .stream()
-                .filter(m -> m.getMember().getId().equals(memberId))
+                .filter(m -> m.getMember().getId().equals(currentMemberId))
                 .findFirst()
                 .orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
         comment.getLikedMembers().remove(commentLike);
@@ -73,9 +73,9 @@ public class CommentServiceImpl implements CommentService {
     // 해당 게시글에 댓글 생성
     @Override
     @Transactional
-    public void addComment(Long memberId, Long commPostId, @Valid CommentForm commentForm){
+    public void addComment(Long currentMemberId, Long commPostId, @Valid CommentForm commentForm){
         // 현재 로그인한 사용자의 member 객체를 가져오는 메서드
-        Member member = memberV1Repository.findById(memberId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
+        Member member = memberV1Repository.findById(currentMemberId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
         CommPost commPost = commPostRepository.findById(commPostId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
 
         Comment comment = Comment.builder()
@@ -90,11 +90,11 @@ public class CommentServiceImpl implements CommentService {
     // 해당 댓글 수정
     @Override
     @Transactional
-    public void updateComment(Long memberId, @Valid CommentForm commentForm){
-        Comment comment = commentRepository.findByMemberId(memberId);
+    public void updateComment(Long currentMemberId, Long commentId, @Valid CommentForm commentForm){
+        Comment comment = commentRepository.findByMemberId(commentId);
 
         // 작성자 검증 - 현재 로그인한 사용자의 ID를 가져와서 검증
-        Member member = memberV1Repository.findById(memberId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
+        Member member = memberV1Repository.findById(currentMemberId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
         if (!comment.getMember().getId().equals(member.getId())) {
             throw new KloverRequestException(ReturnCode.NOT_AUTHORIZED);
         }
@@ -105,11 +105,11 @@ public class CommentServiceImpl implements CommentService {
     // 해당 댓글 삭제
     @Override
     @Transactional
-    public void deleteComment(Long memberId){
-        Comment comment = commentRepository.findByMemberId(memberId);
+    public void deleteComment(Long currentMemberId, Long commentId){
+        Comment comment = commentRepository.findByMemberId(commentId);
 
         // 작성자 검증 - 현재 로그인한 사용자의 ID를 가져와서 검증
-        Member member = memberV1Repository.findById(memberId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
+        Member member = memberV1Repository.findById(currentMemberId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
         Long currentUserId = member.getId();
         if (!comment.getMember().getId().equals(currentUserId)) {
             throw new KloverRequestException(ReturnCode.NOT_AUTHORIZED);
