@@ -14,35 +14,35 @@ public interface CommPostService {
     CombinedPostResponse findPostsWithinRadius(@Valid XYForm xyForm, Pageable pageable);
 
     // 본인 게시글 조회
-    Page<CommPostDto> findByMemberId(Long memberId, Pageable pageable);
+    Page<CommPostDto> findByMemberId(Long currentMemberId, Pageable pageable);
 
     // 해당 게시글 상세 조회
-    DetailCommPostDto findById(Long id);
+    DetailCommPostDto findById(Long commPostId);
 
     // 사용자가 저장한 게시글 조회
-    Page<CommPostDto> getSavedCommPostByMember(Long memberId, Pageable pageable);
+    Page<CommPostDto> getSavedCommPostByMember(Long currentMemberId, Pageable pageable);
 
     // 사용자 닉네임 & 게시글 내용 검색
     Page<CommPostDto> searchByNicknameAndContent(String keyword, Pageable pageable);
 
     // 해당 게시글 저장
-    void addCollectionCommPost(Long memberId, Long id);
+    void addCollectionCommPost(Long currentMemberId, Long commPostId);
 
     // 해당 게시글 저장 취소
-    void deleteCollectionCommPost(Long memberId, Long id);
+    void deleteCollectionCommPost(Long currentMemberId, Long commPostId);
 
     // 게시글 좋아요
-    void addCommPostLike(Long memberId, Long id);
+    void addCommPostLike(Long currentMemberId, Long commPostId);
 
     // 게시글 좋아요 취소
-    void deleteCommPostLike(Long memberId, Long id);
+    void deleteCommPostLike(Long currentMemberId, Long commPostId);
 
     // 게시글 생성
-    void addCommPost(Long memberId, @Valid CommPostForm commPostForm);
+    void addCommPost(Long currentMemberId, @Valid CommPostForm commPostForm);
 
     // 해당 게시글 수정
-    void updateCommPost(Long memberId, Long id, @Valid CommPostForm commPostForm);
+    void updateCommPost(Long currentMemberId, Long commPostId, @Valid CommPostForm commPostForm);
 
     // 해당 게시글 삭제
-    void deleteCommPost(Long memberId, Long id);
+    void deleteCommPost(Long currentMemberId, Long commPostId);
 }
