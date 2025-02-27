@@ -42,7 +42,7 @@ public class ReviewServiceImpl implements ReviewService {
     @Transactional
     public void addReview(Long memberId, Long contentId, @Valid ReviewForm reviewForm){
         // 현재 로그인한 사용자의 member 객체를 가져오는 메서드
-        Member member = memberV1Repository.findById(memberId).orElse(null);
+        Member member = memberV1Repository.findById(memberId).orElseThrow(()->new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
         TourPost tourPost = tourPostRepository.findByContentId(contentId);
 
         // 평점은(1,2,3,4,5)만 가능
@@ -57,6 +57,8 @@ public class ReviewServiceImpl implements ReviewService {
                 .commonPlaceId(tourPost.getCommonPlaceId())
                 .build();
         reviewRepository.save(review);
+
+        member.addReview(review);
     }
 
     // 해당 리뷰 수정
@@ -95,6 +97,7 @@ public class ReviewServiceImpl implements ReviewService {
             throw new KloverRequestException(ReturnCode.NOT_AUTHORIZED);
         }
         reviewRepository.delete(review);
+        member.removeReview(review);
     }
 
     // 요청 페이지 수 제한

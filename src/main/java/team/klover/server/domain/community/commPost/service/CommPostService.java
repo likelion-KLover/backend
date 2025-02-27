@@ -8,6 +8,7 @@ import team.klover.server.domain.community.commPost.dto.req.XYForm;
 import team.klover.server.domain.community.commPost.dto.res.CombinedPostResponse;
 import team.klover.server.domain.community.commPost.dto.res.CommPostDto;
 import team.klover.server.domain.community.commPost.dto.res.DetailCommPostDto;
+import team.klover.server.domain.community.commPost.entity.CommPost;
 
 public interface CommPostService {
     // 사용자 위치 주변 게시글(관광지&사용자) 조회
@@ -38,7 +39,7 @@ public interface CommPostService {
     void deleteCommPostLike(Long memberId, Long id);
 
     // 게시글 생성
-    void addCommPost(Long memberId, @Valid CommPostForm commPostForm);
+    CommPost addCommPost(Long memberId, @Valid CommPostForm commPostForm);
 
     // 해당 게시글 수정
     void updateCommPost(Long memberId, Long id, @Valid CommPostForm commPostForm);

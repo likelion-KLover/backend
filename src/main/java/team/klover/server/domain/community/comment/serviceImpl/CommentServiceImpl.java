@@ -49,7 +49,7 @@ public class CommentServiceImpl implements CommentService {
 
         boolean alreadySaved = comment.getLikedMembers()
                 .stream()
-                .anyMatch(savedMember -> savedMember.getId().equals(member.getId()));
+                .anyMatch(savedMember -> savedMember.getMember() != null && savedMember.getMember().getId().equals(member.getId()));
         if (alreadySaved) {
             throw new KloverRequestException(ReturnCode.ALREADY_EXIST);
         }
@@ -64,7 +64,7 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = commentRepository.findById(id).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
         CommentLike commentLike = comment.getLikedMembers()
                 .stream()
-                .filter(m -> m.getMember().getId().equals(memberId))
+                .filter(m -> m.getMember()!=null && m.getMember().getId().equals(memberId))
                 .findFirst()
                 .orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
         comment.getLikedMembers().remove(commentLike);

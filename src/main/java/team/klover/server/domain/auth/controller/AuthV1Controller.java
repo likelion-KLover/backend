@@ -54,7 +54,7 @@ public class AuthV1Controller {
     private String lineAndroidClientId;
 
 
-
+///api/v1/auth/signup
     @PostMapping("/signup")
     @Operation(summary="백엔드 서버 자체 회원가입")
             public ApiResponse<LoginResponse> signup(@RequestBody SignupRequestDto requestDto) {
