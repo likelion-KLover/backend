@@ -48,6 +48,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 || path.startsWith("/v1/api-docs")
                 || path.startsWith("/v1/api-docs/swagger-config")
                 || path.startsWith("/swagger-ui")
+                || path.startsWith("/api/v1/translate")
                 || (path.startsWith("/api/v1/comm-post/comment") && method.equals("GET"))
                 || (path.startsWith("/api/v1/comm-post/surroundings") && method.equals("GET"))
                 || (path.startsWith("/api/v1/comm-post/detail") && method.equals("GET"))
