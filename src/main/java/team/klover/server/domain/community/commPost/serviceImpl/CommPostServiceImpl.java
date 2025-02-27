@@ -16,11 +16,13 @@ import team.klover.server.domain.community.commPost.entity.*;
 import team.klover.server.domain.community.commPost.repository.CommPostRepository;
 import team.klover.server.domain.community.commPost.service.CommPostService;
 import team.klover.server.domain.member.v1.entity.Member;
+import team.klover.server.domain.member.v1.enums.Country;
 import team.klover.server.domain.member.v1.repository.MemberV1Repository;
 import team.klover.server.domain.tour.tourPost.dto.res.TourPostDto;
 import team.klover.server.domain.tour.tourPost.service.TourPostService;
 import team.klover.server.global.exception.KloverRequestException;
 import team.klover.server.global.exception.ReturnCode;
+import team.klover.server.global.util.LanguageDetect;
 
 @Slf4j
 @Service
@@ -29,6 +31,8 @@ public class CommPostServiceImpl implements CommPostService {
     private final CommPostRepository commPostRepository;
     private final MemberV1Repository memberV1Repository;
     private final TourPostService tourPostService;
+    private final LanguageDetect languageDetect;
+
 
     // 사용자 위치 주변 게시글(관광지&사용자) 조회
     public CombinedPostResponse findPostsWithinRadius(@Valid XYForm xyForm, Pageable pageable){
@@ -143,13 +147,15 @@ public class CommPostServiceImpl implements CommPostService {
     public void addCommPost(Long memberId, @Valid CommPostForm commPostForm){
         // 현재 로그인한 사용자의 member 객체를 가져오는 메서드
         Member member = memberV1Repository.findById(memberId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
+
+        Country country = languageDetect.execute(commPostForm.getContent());
         CommPost commPost = CommPost.builder()
                 .member(member)
                 .content(commPostForm.getContent())
-                .nickname(member.getNickname())
                 .mapX(commPostForm.getMapX())
                 .mapY(commPostForm.getMapY())
                 .imageUrl(commPostForm.getImageUrl())
+                .language(country)
                 .build();
         commPostRepository.save(commPost);
     }
@@ -170,6 +176,7 @@ public class CommPostServiceImpl implements CommPostService {
         commPost.setMapY(commPostForm.getMapY());
         commPost.setContent(commPostForm.getContent());
         commPost.setImageUrl(commPostForm.getImageUrl());
+        //language는 작성 당시의 language만을 따라갑니다.
         commPostRepository.save(commPost);
     }
 
@@ -200,7 +207,7 @@ public class CommPostServiceImpl implements CommPostService {
     private CommPostDto convertToCommPostDto(CommPost commPost) {
         return CommPostDto.builder()
                 .memberId(commPost.getMember().getId())
-                .nickname(commPost.getNickname())
+                .nickname(commPost.getMember().getNickname())
                 .mapX(commPost.getMapX())
                 .mapY(commPost.getMapY())
                 .imageUrl(commPost.getImageUrl())
@@ -212,7 +219,7 @@ public class CommPostServiceImpl implements CommPostService {
     private DetailCommPostDto convertToDetailCommPostDto(CommPost commPost) {
         return DetailCommPostDto.builder()
                 .memberId(commPost.getMember().getId())
-                .nickname(commPost.getNickname())
+                .nickname(commPost.getMember().getNickname())
                 .likeCount(commPost.getLikedMembers().size())
                 .mapX(commPost.getMapX())
                 .mapY(commPost.getMapY())

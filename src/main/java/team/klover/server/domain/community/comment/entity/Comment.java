@@ -29,7 +29,6 @@ public class Comment extends BaseEntity {
     @Builder.Default
     private List<CommentLike> likedMembers = new ArrayList<>();
 
-    private String nickname;
     private String content;
     private Long superCommentId;
 }
