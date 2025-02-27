@@ -36,28 +36,28 @@ public class ApiV1ReviewController {
 
     // 해당 관광지 게시글에 리뷰 생성
     // http://localhost:8080/api/v1/tour-post/review/264107
-    @PostMapping("/{contentId}")
+    @PostMapping("/{commonPlaceId}")
     @Operation(summary="해당 관광지 게시글에 리뷰 생성")
-    public ApiResponse<String> addReview(@PathVariable("contentId") Long contentId, @RequestBody @Valid ReviewForm reviewForm) {
+    public ApiResponse<String> addReview(@PathVariable("commonPlaceId") Long commonPlaceId, @RequestBody @Valid ReviewForm reviewForm) {
         Long currentMemberId = AuthUtil.getCurrentMemberId();
-        reviewService.addReview(currentMemberId, contentId, reviewForm);
+        reviewService.addReview(currentMemberId, commonPlaceId, reviewForm);
         return ApiResponse.of(ReturnCode.SUCCESS);
     }
 
-    // 해당 리뷰 수정
+    // 본인 리뷰 수정
     // http://localhost:8080/api/v1/tour-post/review/1
     @PutMapping("/{reviewId}")
-    @Operation(summary="해당 리뷰 수정")
+    @Operation(summary="본인 리뷰 수정")
     public ApiResponse<String> updateReview(@PathVariable("reviewId") Long reviewId, @RequestBody @Valid ReviewForm reviewForm) {
         Long currentMemberId = AuthUtil.getCurrentMemberId();
         reviewService.updateReview(currentMemberId, reviewId, reviewForm);
         return ApiResponse.of(ReturnCode.SUCCESS);
     }
 
-    // 해당 리뷰 삭제
+    // 본인 리뷰 삭제
     // http://localhost:8080/api/v1/tour-post/review/1
     @DeleteMapping("/{reviewId}")
-    @Operation(summary="해당 리뷰 삭제")
+    @Operation(summary="본인 리뷰 삭제")
     public ApiResponse<String> deleteReview(@PathVariable("reviewId") Long reviewId) {
         Long currentMemberId = AuthUtil.getCurrentMemberId();
         reviewService.deleteReview(currentMemberId, reviewId);

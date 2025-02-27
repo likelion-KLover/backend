@@ -56,9 +56,9 @@ public class NotProd {
                 //
                 //
                 //
-                /*
-                apisScheduler.getApisApiData();
 
+//                apisScheduler.getApisApiData();
+                /*
 
 
                 // Member 1,2,3 생성

@@ -25,7 +25,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class ApiV1ChatRoomController {
     private final ChatRoomService chatRoomService;
 
-    // 채팅방 목록 조회(DM/그룹)
+    // 채팅방 목록 조회(DM/그룹) / 참여자권한
+    // http://localhost:8080/api/v1/chat-room
     @GetMapping
     @Operation(summary = "채팅방 목록 조회(DM/그룹)")
     public ApiResponse<ChatRoomDto> findByMemberId(@ModelAttribute ChatRoomPage request) {
@@ -34,7 +35,8 @@ public class ApiV1ChatRoomController {
         return ApiResponse.of(KloverPage.of(chatRoomService.findByMemberId(currentMemberId, pageable)));
     }
 
-    // 채팅방 생성(DM/그룹)
+    // 채팅방 생성(DM/그룹) / 로그인 멤버 권한
+    // http://localhost:8080/api/v1/chat-room
     @PostMapping
     @Operation(summary = "채팅방 생성(DM/그룹)")
     public ApiResponse<String> addChatRoom(@RequestBody @Valid ChatRoomForm chatRoomForm) {
@@ -43,33 +45,37 @@ public class ApiV1ChatRoomController {
         return ApiResponse.of(ReturnCode.SUCCESS);
     }
 
-    // 채팅방 이름 수정(그룹)
+    // 채팅방 이름 수정(그룹) / 참여자권한
+    // http://localhost:8080/api/v1/chat-room/title/1
     @PutMapping("/title/{chatRoomId}")
-    public ApiResponse<String> updateChatRoomTitle(@PathVariable Long chatRoomId, @RequestBody @Valid ChatRoomForm chatRoomForm) {
+    public ApiResponse<String> updateChatRoomTitle(@PathVariable("chatRoomId") Long chatRoomId, @RequestBody @Valid ChatRoomForm chatRoomForm) {
         Long currentMemberId = AuthUtil.getCurrentMemberId();
         chatRoomService.updateChatRoomTitle(chatRoomId, currentMemberId, chatRoomForm);
         return ApiResponse.of(ReturnCode.SUCCESS);
     }
 
-    // 채팅방에 초대(그룹)
+    // 채팅방에 초대(그룹) / 참여자권한
+    // http://localhost:8080/api/v1/chat-room/group/1
     @PutMapping("/group/{chatRoomId}")
-    public ApiResponse<String> inviteChatRoomMember(@PathVariable Long chatRoomId, @RequestBody @Valid ChatRoomForm chatRoomForm) {
+    public ApiResponse<String> inviteChatRoomMember(@PathVariable("chatRoomId") Long chatRoomId, @RequestBody @Valid ChatRoomForm chatRoomForm) {
         Long currentMemberId = AuthUtil.getCurrentMemberId();
         chatRoomService.inviteChatRoomMember(chatRoomId, currentMemberId, chatRoomForm);
         return ApiResponse.of(ReturnCode.SUCCESS);
     }
 
     // 채팅방에서 강퇴(그룹) / 방장권한
+    // http://localhost:8080/api/v1/chat-room/group/1
     @DeleteMapping("/group/{chatRoomId}")
-    public ApiResponse<String> kickOutChatRoomMember(@PathVariable Long chatRoomId, @RequestBody @Valid ChatRoomForm chatRoomForm) {
+    public ApiResponse<String> kickOutChatRoomMember(@PathVariable("chatRoomId") Long chatRoomId, @RequestBody @Valid ChatRoomForm chatRoomForm) {
         Long currentMemberId = AuthUtil.getCurrentMemberId();
         chatRoomService.kickOutChatRoomMember(chatRoomId, currentMemberId, chatRoomForm);
         return ApiResponse.of(ReturnCode.SUCCESS);
     }
 
-    // 채팅방 나가기(DM/그룹)
+    // 채팅방 나가기(DM/그룹) / 참여자권한
+    // http://localhost:8080/api/v1/chat-room/1
     @DeleteMapping("/{chatRoomId}")
-    public ApiResponse<String> leaveChatRoomMember(@PathVariable Long chatRoomId) {
+    public ApiResponse<String> leaveChatRoomMember(@PathVariable("chatRoomId") Long chatRoomId) {
         Long currentMemberId = AuthUtil.getCurrentMemberId();
         chatRoomService.leaveChatRoomMember(chatRoomId, currentMemberId);
         return ApiResponse.of(ReturnCode.SUCCESS);

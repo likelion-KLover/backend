@@ -6,7 +6,6 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import team.klover.server.domain.tour.tourApi.service.TourApiService;
@@ -99,7 +98,7 @@ public class TourApiServcieImpl implements TourApiService {
             List<TourPost> tourPosts = entry.getValue();
             if (tourPosts.size() == 4) { // 4개인 경우 commonPlaceId 부여
                 for (TourPost tourPost : tourPosts) {
-                    tourPost.setCommonPlaceId(String.valueOf(commonPlaceId));
+                    tourPost.setCommonPlaceId((long) commonPlaceId);
                 }
                 commonPlaceId++; // 다음 그룹을 위해 증가
             } else { // 4개가 아닌 경우 삭제
