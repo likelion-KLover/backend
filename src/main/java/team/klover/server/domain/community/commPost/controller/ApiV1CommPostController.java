@@ -49,10 +49,10 @@ public class ApiV1CommPostController {
 
     // 해당 게시글 상세 조회
     // http://localhost:8080/api/v1/comm-post/detail/1
-    @GetMapping("/detail/{id}")
+    @GetMapping("/detail/{commPostId}")
     @Operation(summary = "해당 게시글 상세 조회")
-    public ApiResponse<DetailCommPostDto> getDetailCommPost(@PathVariable("id") Long id) {
-        return ApiResponse.of(commPostService.findById(id));
+    public ApiResponse<DetailCommPostDto> getDetailCommPost(@PathVariable("commPostId") Long commPostId) {
+        return ApiResponse.of(commPostService.findById(commPostId));
     }
 
     // 사용자가 저장한 게시글 조회
@@ -76,41 +76,41 @@ public class ApiV1CommPostController {
 
     // 해당 게시글 저장
     // http://localhost:8080/api/v1/comm-post/collection/1
-    @PostMapping("/collection/{id}")
+    @PostMapping("/collection/{commPostId}")
     @Operation(summary = "해당 게시글 저장")
-    public ApiResponse<String> addCollectionCommPost(@PathVariable("id") Long id){
+    public ApiResponse<String> addCollectionCommPost(@PathVariable("commPostId") Long commPostId){
         Long currentMemberId = AuthUtil.getCurrentMemberId();
-        commPostService.addCollectionCommPost(currentMemberId, id);
+        commPostService.addCollectionCommPost(currentMemberId, commPostId);
         return ApiResponse.of(ReturnCode.SUCCESS);
     }
 
     // 해당 게시글 저장 취소
     // http://localhost:8080/api/v1/comm-post/collection/1
-    @DeleteMapping("/collection/{id}")
+    @DeleteMapping("/collection/{commPostId}")
     @Operation(summary = "해당 게시글 저장 취소")
-    public ApiResponse<String> deleteCollectionCommPost(@PathVariable("id") Long id){
+    public ApiResponse<String> deleteCollectionCommPost(@PathVariable("commPostId") Long commPostId){
         Long currentMemberId = AuthUtil.getCurrentMemberId();
-        commPostService.deleteCollectionCommPost(currentMemberId, id);
+        commPostService.deleteCollectionCommPost(currentMemberId, commPostId);
         return ApiResponse.of(ReturnCode.SUCCESS);
     }
 
     // 게시글 좋아요
     // http://localhost:8080/api/v1/comm-post/like/1
-    @PostMapping("/like/{id}")
+    @PostMapping("/like/{commPostId}")
     @Operation(summary = "게시글 좋아요")
-    public ApiResponse<String> addCommPostLike(@PathVariable("id") Long id){
+    public ApiResponse<String> addCommPostLike(@PathVariable("commPostId") Long commPostId){
         Long currentMemberId = AuthUtil.getCurrentMemberId();
-        commPostService.addCommPostLike(currentMemberId, id);
+        commPostService.addCommPostLike(currentMemberId, commPostId);
         return ApiResponse.of(ReturnCode.SUCCESS);
     }
 
     // 게시글 좋아요 취소
     // http://localhost:8080/api/v1/comm-post/like/1
-    @DeleteMapping("/like/{id}")
+    @DeleteMapping("/like/{commPostId}")
     @Operation(summary = "게시글 좋아요 취소")
-    public ApiResponse<String> deleteCommPostLike(@PathVariable("id") Long id){
+    public ApiResponse<String> deleteCommPostLike(@PathVariable("commPostId") Long commPostId){
         Long currentMemberId = AuthUtil.getCurrentMemberId();
-        commPostService.deleteCommPostLike(currentMemberId, id);
+        commPostService.deleteCommPostLike(currentMemberId, commPostId);
         return ApiResponse.of(ReturnCode.SUCCESS);
     }
 
@@ -126,21 +126,21 @@ public class ApiV1CommPostController {
 
     // 해당 게시글 수정
     // http://localhost:8080/api/v1/comm-post/1
-    @PutMapping("/{id}")
+    @PutMapping("/{commPostId}")
     @Operation(summary = "게시글 수정")
-    public ApiResponse<String> updateCommPost(@PathVariable("id") Long id, @RequestBody @Valid CommPostForm commPostForm) {
+    public ApiResponse<String> updateCommPost(@PathVariable("commPostId") Long commPostId, @RequestBody @Valid CommPostForm commPostForm) {
         Long currentMemberId = AuthUtil.getCurrentMemberId();
-        commPostService.updateCommPost(currentMemberId, id, commPostForm);
+        commPostService.updateCommPost(currentMemberId, commPostId, commPostForm);
         return ApiResponse.of(ReturnCode.SUCCESS);
     }
 
     // 해당 게시글 삭제
     // http://localhost:8080/api/v1/comm-post/1
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{commPostId}")
     @Operation(summary = "게시글 삭제")
-    public ApiResponse<String> deleteCommPost(@PathVariable("id") Long id) {
+    public ApiResponse<String> deleteCommPost(@PathVariable("commPostId") Long commPostId) {
         Long currentMemberId = AuthUtil.getCurrentMemberId();
-        commPostService.deleteCommPost(currentMemberId, id);
+        commPostService.deleteCommPost(currentMemberId, commPostId);
         return ApiResponse.of(ReturnCode.SUCCESS);
     }
 }

@@ -49,26 +49,26 @@ public class CommPostServiceImpl implements CommPostService {
     // 본인 게시글 조회
     @Override
     @Transactional(readOnly = true)
-    public Page<CommPostDto> findByMemberId(Long memberId, Pageable pageable){
+    public Page<CommPostDto> findByMemberId(Long currentMemberId, Pageable pageable){
         checkPageSize(pageable.getPageSize());
-        Page<CommPost> commPosts = commPostRepository.findByMemberId(memberId, pageable);
+        Page<CommPost> commPosts = commPostRepository.findByMemberId(currentMemberId, pageable);
         return commPosts.map(this::convertToCommPostDto);
     }
 
     // 해당 게시글 상세 조회
     @Override
     @Transactional(readOnly = true)
-    public DetailCommPostDto findById(Long id){
-        CommPost commPost = commPostRepository.findById(id).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
+    public DetailCommPostDto findById(Long commPostId){
+        CommPost commPost = commPostRepository.findById(commPostId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
         return convertToDetailCommPostDto(commPost);
     }
 
     // 사용자가 저장한 게시글 조회
     @Override
     @Transactional(readOnly = true)
-    public Page<CommPostDto> getSavedCommPostByMember(Long memberId, Pageable pageable){
+    public Page<CommPostDto> getSavedCommPostByMember(Long currentMemberId, Pageable pageable){
         checkPageSize(pageable.getPageSize());
-        Page<CommPost> commPosts = commPostRepository.findSavedCommPostByMemberId(memberId, pageable);
+        Page<CommPost> commPosts = commPostRepository.findSavedCommPostByMemberId(currentMemberId, pageable);
         return commPosts.map(this::convertToCommPostDto);
     }
 
@@ -84,9 +84,9 @@ public class CommPostServiceImpl implements CommPostService {
     // 해당 게시글 저장
     @Override
     @Transactional
-    public void addCollectionCommPost(Long memberId, Long id){
-        Member member = memberV1Repository.findById(memberId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
-        CommPost commPost = commPostRepository.findById(id).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
+    public void addCollectionCommPost(Long currentMemberId, Long commPostId){
+        Member member = memberV1Repository.findById(currentMemberId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
+        CommPost commPost = commPostRepository.findById(commPostId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
 
         boolean alreadySaved = commPost.getSavedMembers()
                 .stream()
@@ -101,11 +101,11 @@ public class CommPostServiceImpl implements CommPostService {
     // 해당 게시글 저장 취소
     @Override
     @Transactional
-    public void deleteCollectionCommPost(Long memberId, Long id){
-        CommPost commPost = commPostRepository.findById(id).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
+    public void deleteCollectionCommPost(Long currentMemberId, Long commPostId){
+        CommPost commPost = commPostRepository.findById(commPostId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
         CommPostSave commPostSave = commPost.getSavedMembers()
                 .stream()
-                .filter(m -> m.getMember().getId().equals(memberId))
+                .filter(m -> m.getMember().getId().equals(currentMemberId))
                 .findFirst()
                 .orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
         commPost.getSavedMembers().remove(commPostSave);
@@ -114,9 +114,9 @@ public class CommPostServiceImpl implements CommPostService {
     // 게시글 좋아요
     @Override
     @Transactional
-    public void addCommPostLike(Long memberId, Long id){
-        Member member = memberV1Repository.findById(memberId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
-        CommPost commPost = commPostRepository.findById(id).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
+    public void addCommPostLike(Long currentMemberId, Long commPostId){
+        Member member = memberV1Repository.findById(currentMemberId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
+        CommPost commPost = commPostRepository.findById(commPostId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
 
         boolean alreadySaved = commPost.getLikedMembers()
                 .stream()
@@ -131,11 +131,11 @@ public class CommPostServiceImpl implements CommPostService {
     // 게시글 좋아요 취소
     @Override
     @Transactional
-    public void deleteCommPostLike(Long memberId, Long id){
-        CommPost commPost = commPostRepository.findById(id).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
+    public void deleteCommPostLike(Long currentMemberId, Long commPostId){
+        CommPost commPost = commPostRepository.findById(commPostId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
         CommPostLike commPostLike = commPost.getLikedMembers()
                 .stream()
-                .filter(m -> m.getMember().getId().equals(memberId))
+                .filter(m -> m.getMember().getId().equals(currentMemberId))
                 .findFirst()
                 .orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
         commPost.getLikedMembers().remove(commPostLike);
@@ -144,9 +144,9 @@ public class CommPostServiceImpl implements CommPostService {
     // 게시글 생성
     @Override
     @Transactional
-    public void addCommPost(Long memberId, @Valid CommPostForm commPostForm){
+    public void addCommPost(Long currentMemberId, @Valid CommPostForm commPostForm){
         // 현재 로그인한 사용자의 member 객체를 가져오는 메서드
-        Member member = memberV1Repository.findById(memberId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
+        Member member = memberV1Repository.findById(currentMemberId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
 
         Country country = languageDetect.execute(commPostForm.getContent());
         CommPost commPost = CommPost.builder()
@@ -163,12 +163,12 @@ public class CommPostServiceImpl implements CommPostService {
     // 해당 게시글 수정
     @Override
     @Transactional
-    public void updateCommPost(Long memberId, Long id, @Valid CommPostForm commPostForm){
-        CommPost commPost = commPostRepository.findById(id)
+    public void updateCommPost(Long currentMemberId, Long commPostId, @Valid CommPostForm commPostForm){
+        CommPost commPost = commPostRepository.findById(commPostId)
                 .orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
 
         // 작성자 검증 - 현재 로그인한 사용자의 ID를 가져와서 검증
-        Member member = memberV1Repository.findById(memberId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
+        Member member = memberV1Repository.findById(currentMemberId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
         if (!commPost.getMember().getId().equals(member.getId())) {
             throw new KloverRequestException(ReturnCode.NOT_AUTHORIZED);
         }
@@ -183,12 +183,12 @@ public class CommPostServiceImpl implements CommPostService {
     // 해당 게시글 삭제
     @Override
     @Transactional
-    public void deleteCommPost(Long memberId, Long id){
-        CommPost commPost = commPostRepository.findById(id)
+    public void deleteCommPost(Long currentMemberId, Long commPostId){
+        CommPost commPost = commPostRepository.findById(commPostId)
                 .orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
 
         // 작성자 검증 - 현재 로그인한 사용자의 ID를 가져와서 검증
-        Member member = memberV1Repository.findById(memberId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
+        Member member = memberV1Repository.findById(currentMemberId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
         if (!commPost.getMember().getId().equals(member.getId())) {
             throw new KloverRequestException(ReturnCode.NOT_AUTHORIZED);
         }

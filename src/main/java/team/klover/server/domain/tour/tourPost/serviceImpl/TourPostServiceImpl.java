@@ -56,9 +56,9 @@ public class TourPostServiceImpl implements TourPostService {
     // 사용자가 저장한 관광지 조회
     @Override
     @Transactional(readOnly = true)
-    public Page<TourPostDto> getSavedTourPostByMember(Long memberId, Pageable pageable) {
+    public Page<TourPostDto> getSavedTourPostByMember(Long currentMemberId, Pageable pageable) {
         checkPageSize(pageable.getPageSize());
-        Page<TourPost> tourPosts = tourPostRepository.findSavedTourPostsByMemberId(memberId, pageable);
+        Page<TourPost> tourPosts = tourPostRepository.findSavedTourPostsByMemberId(currentMemberId, pageable);
         return tourPosts.map(this::convertToTourPostDto);
     }
 
@@ -74,8 +74,8 @@ public class TourPostServiceImpl implements TourPostService {
     // 해당 관광지 저장
     @Override
     @Transactional
-    public void addCollectionTourPost(Long memberId, Long contentId){
-        Member Member = MemberV1Repository.findById(memberId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY)); // 임시 - 변경 필요
+    public void addCollectionTourPost(Long currentMemberId, Long contentId){
+        Member Member = MemberV1Repository.findById(currentMemberId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY)); // 임시 - 변경 필요
         TourPost tourPost = tourPostRepository.findByContentId(contentId);
 
         boolean alreadySaved = tourPost.getSavedMembers()
@@ -91,11 +91,11 @@ public class TourPostServiceImpl implements TourPostService {
     // 해당 관광지 저장 취소
     @Override
     @Transactional
-    public void deleteCollectionTourPost(Long memberId, Long contentId){
+    public void deleteCollectionTourPost(Long currentMemberId, Long contentId){
         TourPost tourPost = tourPostRepository.findByContentId(contentId);
         TourPostSave tourPostSave = tourPost.getSavedMembers()
                 .stream()
-                .filter(m -> m.getMember().getId().equals(memberId))
+                .filter(m -> m.getMember().getId().equals(currentMemberId))
                 .findFirst()
                 .orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
         tourPost.getSavedMembers().remove(tourPostSave);

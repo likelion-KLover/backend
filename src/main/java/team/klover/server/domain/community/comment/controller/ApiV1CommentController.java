@@ -36,21 +36,21 @@ public class ApiV1CommentController {
 
     // 댓글 좋아요
     // http://localhost:8080/api/v1/comm-post/comment/like/1
-    @PostMapping("/like/{id}")
+    @PostMapping("/like/{commentId}")
     @Operation(summary = "댓글 좋아요")
-    public ApiResponse<String> addCommentLike(@PathVariable("id") Long id){
+    public ApiResponse<String> addCommentLike(@RequestParam("commentId") Long commentId){
         Long currentMemberId = AuthUtil.getCurrentMemberId();
-        commentService.addCommentLike(currentMemberId, id);
+        commentService.addCommentLike(currentMemberId, commentId);
         return ApiResponse.of(ReturnCode.SUCCESS);
     }
 
     // 댓글 좋아요 취소
     // http://localhost:8080/api/v1/comm-post/comment/like/1
-    @DeleteMapping("/like/{id}")
+    @DeleteMapping("/like/{commentId}")
     @Operation(summary = "좋아요 취소")
-    public ApiResponse<String> deleteCommentLike(@PathVariable("id") Long id){
+    public ApiResponse<String> deleteCommentLike(@RequestParam("commentId") Long commentId){
         Long currentMemberId = AuthUtil.getCurrentMemberId();
-        commentService.deleteCommentLike(currentMemberId, id);
+        commentService.deleteCommentLike(currentMemberId, commentId);
         return ApiResponse.of(ReturnCode.SUCCESS);
     }
 
@@ -66,21 +66,21 @@ public class ApiV1CommentController {
 
     // 해당 댓글 수정
     // http://localhost:8080/api/v1/comm-post/comment/1
-    @PutMapping("/{id}")
+    @PutMapping("/{commentId}")
     @Operation(summary = "댓글 수정")
-    public ApiResponse<String> updateComment(@PathVariable("id") Long id, @RequestBody @Valid CommentForm commentForm){
+    public ApiResponse<String> updateComment(@RequestParam("commentId") Long commentId, @RequestBody @Valid CommentForm commentForm){
         Long currentMemberId = AuthUtil.getCurrentMemberId();
-        commentService.updateComment(currentMemberId, id, commentForm);
+        commentService.updateComment(currentMemberId, commentId, commentForm);
         return ApiResponse.of(ReturnCode.SUCCESS);
     }
 
     // 해당 댓글 삭제
     // http://localhost:8080/api/v1/comm-post/comment/1
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{commentId}")
     @Operation(summary = "댓글 삭제")
-    public ApiResponse<String> deleteComment(@PathVariable("id") Long id){
+    public ApiResponse<String> deleteComment(@RequestParam("commentId") Long commentId){
         Long currentMemberId = AuthUtil.getCurrentMemberId();
-        commentService.deleteComment(currentMemberId, id);
+        commentService.deleteComment(commentId, currentMemberId);
         return ApiResponse.of(ReturnCode.SUCCESS);
     }
 }
