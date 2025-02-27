@@ -1,6 +1,7 @@
 package team.klover.server.domain.member.v1.dto;
 
 import lombok.*;
+import team.klover.server.domain.member.v1.enums.Country;
 
 @Getter
 @AllArgsConstructor
@@ -10,7 +11,7 @@ import lombok.*;
 public class MemberUpdateParam {
     private String nickname; //new nickname
     private String profileUrl; //oldProfileUrl
-    private String country;
+    private Country country;
 
     public void changeProfileUrl(String newUrl) {
         this.profileUrl = newUrl;

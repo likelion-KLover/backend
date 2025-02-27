@@ -45,7 +45,7 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     public void addCommentLike(Long memberId, Long id){
         Member member = memberV1Repository.findById(memberId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
-        Comment comment = commentRepository.findById(id).orElse(null);
+        Comment comment = commentRepository.findById(id).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
 
         boolean alreadySaved = comment.getLikedMembers()
                 .stream()
@@ -81,7 +81,6 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = Comment.builder()
                 .member(member)
                 .commPost(commPost)
-                .nickname(member.getNickname())
                 .content(commentForm.getContent())
                 .superCommentId(commentForm.getSuperCommentId())
                 .build();
@@ -142,7 +141,7 @@ public class CommentServiceImpl implements CommentService {
         return CommentDto.builder()
                 .id(comment.getId())
                 .memberId(comment.getMember().getId())
-                .nickname(comment.getNickname())
+                .nickname(comment.getMember().getNickname())
                 .likeCount(comment.getLikedMembers().size())
                 .content(comment.getContent())
                 .superCommentId(comment.getSuperCommentId())

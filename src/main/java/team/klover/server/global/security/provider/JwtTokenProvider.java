@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import team.klover.server.domain.member.v1.dto.MemberDto;
+import team.klover.server.domain.member.v1.enums.Country;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
@@ -136,7 +137,7 @@ public class JwtTokenProvider {
                 claims.get("profileUrl", String.class),             // 프로필 이미지
                 claims.get(AUTHORIZATION_KEY, String.class),         // 권한
                 claims.get("id", Long.class),
-                claims.get("country",String.class),
+                claims.get("country", Country.class),
                 claims.get("provider",String.class)
         );
     }

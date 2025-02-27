@@ -58,6 +58,12 @@ dependencies {
 	// elastic search
 	implementation("org.springframework.boot:spring-boot-starter-data-elasticsearch")
 
+	//언어 감지
+	implementation("com.github.pemistahl:lingua:1.2.2")
+
+	// https://mvnrepository.com/artifact/net.datafaker/datafaker repost 가데이터 밀어넣기
+	implementation("net.datafaker:datafaker:2.4.2")
+
 }
 
 tasks.withType<Test> {

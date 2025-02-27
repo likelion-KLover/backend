@@ -2,6 +2,7 @@ package team.klover.server.domain.member.v1.dto;
 
 import lombok.*;
 import team.klover.server.domain.member.v1.entity.Member;
+import team.klover.server.domain.member.v1.enums.Country;
 
 @Getter
 @Setter
@@ -14,7 +15,7 @@ public class MemberDto {
     private String profileUrl;
     private String role;
     private Long id;
-    private String country;
+    private Country country;
     private String provider;
 
     public MemberDto(Member member) {

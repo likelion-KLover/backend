@@ -3,10 +3,13 @@ package team.klover.server.domain.community.commPost.repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import team.klover.server.domain.community.commPost.entity.CommPost;
+
+import java.util.List;
 
 @Repository
 public interface CommPostRepository extends JpaRepository<CommPost, Long> {
@@ -26,6 +29,7 @@ public interface CommPostRepository extends JpaRepository<CommPost, Long> {
     Page<CommPost> findSavedCommPostByMemberId(@Param("memberId") Long memberId, Pageable pageable);
 
     // 사용자 닉네임 & 게시글 내용 검색
-    @Query("SELECT c FROM CommPost c WHERE c.nickname LIKE %:keyword% OR c.content LIKE %:keyword%")
+    @Query("SELECT c FROM CommPost c WHERE c.member.nickname LIKE %:keyword% OR c.content LIKE %:keyword%")
     Page<CommPost> searchByKeyword(@Param("keyword") String keyword, Pageable pageable);
+
 }

@@ -1,24 +1,15 @@
 {
   "index_patterns": [
-    "commpost*"
+    "commpostkor*"
   ],
   "template": {
     "settings": {
       "analysis": {
-        "tokenizer": {
-          "nori_mixed": {
-            "type": "nori_tokenizer",
-            "decompound_mode": "mixed"
-          }
-        },
         "analyzer": {
-          "korean_mixed": {
+          "chs_content_analyzer": {
             "type": "custom",
-            "tokenizer": "nori_mixed",
+            "tokenizer": "ik_smart",
             "filter": [
-              "nori_part_of_speech",
-              "nori_posfilter",
-              "nori_readingform",
               "lowercase",
               "stop",
               "porter_stem",
@@ -26,15 +17,12 @@
               "word_delimiter_graph"
             ]
           },
-          "korean_word": {
+          "chs_word_analyzer": {
             "type": "custom",
-            "tokenizer": "nori_mixed",
+            "tokenizer": "ik_max_word",
             "filter": [
-              "nori_part_of_speech",
-              "nori_posfilter",
-              "nori_readingform",
-              "ngram_filter",
               "lowercase",
+              "ngram_filter",
               "stop",
               "porter_stem",
               "asciifolding",
@@ -43,30 +31,7 @@
           }
         },
         "filter": {
-          "nori_posfilter": {
-            "type": "nori_part_of_speech",
-            "stoptags": [
-              "E",
-              "IC",
-              "J",
-              "MAG",
-              "MAJ",
-              "MM",
-              "SP",
-              "SSC",
-              "SSO",
-              "SC",
-              "SE",
-              "XPN",
-              "XSA",
-              "XSN",
-              "XSV",
-              "UNA",
-              "NA",
-              "VSV"
-            ]
-          },
-          "ngram_filter": {
+          "ngram_filter":{
             "type": "ngram",
             "min_gram": 2,
             "max_gram": 3
@@ -81,7 +46,7 @@
         },
         "content": {
           "type": "text",
-          "analyzer": "korean_mixed"
+          "analyzer": "chs_content_analyzer"
         },
         "create_date": {
           "type": "date",
@@ -93,6 +58,16 @@
         },
         "location": {
           "type": "geo_point"
+        },
+        "nickname": {
+          "type": "text",
+          "analyzer": "chs_word_analyzer"
+        },
+        "comment_count": {
+          "type": "long"
+        },
+        "like_count": {
+          "type": "long"
         }
       }
     }

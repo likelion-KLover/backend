@@ -80,6 +80,13 @@
         },
         "area_code": {
           "type": "long"
+        },
+        "review_count": {
+          "type": "long"
+        },
+        "rating_average": {
+          "type": "float",
+          "scaling_factor": 10
         }
       }
     }
