@@ -1,6 +1,7 @@
 package team.klover.server.domain.community.comment.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import team.klover.server.domain.community.commPost.entity.CommPost;
@@ -29,6 +30,8 @@ public class Comment extends BaseEntity {
     @Builder.Default
     private List<CommentLike> likedMembers = new ArrayList<>();
 
+    @Column(length = 1000)
+    @Size(max = 1000)
     private String content;
     private Long superCommentId;
 }
