@@ -36,8 +36,9 @@ out/
 ### VS Code ###
 .vscode/
 
-application-secret.yml
-
+### Custom ###
+dockerProjects
+src/main/resources/application-secret.yml
 
 # Terraform 상태 파일
 *.tfstate

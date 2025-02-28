@@ -1,6 +1,11 @@
 server:
   port: 8080
 spring:
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: admin
+    password: admin
   messages:
     basename: locales/messages
     fallback-to-system-locale: false

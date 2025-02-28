@@ -57,6 +57,17 @@ public class ChatRoomServiceImpl implements ChatRoomService {
             throw new KloverRequestException(ReturnCode.WRONG_PARAMETER);
         }
 
+        // 1대1 채팅방 중복 방지 로직
+        if (chatRoomForm.getChatRoomMembers().size() == 1) { // 1대1 채팅인지 확인
+            Long otherMemberId = chatRoomForm.getChatRoomMembers().get(0).getMember().getId();
+
+            // 현재 사용자가 otherMember와 이미 1대1 채팅방이 존재하는지 확인
+            boolean exists = chatRoomRepository.existsOneOnOneChatRoom(currentMemberId, otherMemberId);
+            if (exists) {
+                throw new KloverRequestException(ReturnCode.ALREADY_EXIST);
+            }
+        }
+
         // 새로운 채팅방 생성
         ChatRoom chatRoom = ChatRoom.builder()
                 .title(chatRoomForm.getTitle())
