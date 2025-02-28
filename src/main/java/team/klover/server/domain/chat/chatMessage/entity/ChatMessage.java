@@ -2,7 +2,6 @@ package team.klover.server.domain.chat.chatMessage.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,8 +26,4 @@ public class ChatMessage extends BaseEntity {
     @JoinColumn(name = "chat_room_id", nullable = false)
     @JsonIgnore
     private ChatRoom chatRoom;
-
-    @Column(length = 1000)
-    @Size(max = 1000)
-    private String content;
 }
