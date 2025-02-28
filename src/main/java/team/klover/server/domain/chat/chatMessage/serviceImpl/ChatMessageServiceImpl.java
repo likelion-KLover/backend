@@ -3,6 +3,7 @@ package team.klover.server.domain.chat.chatMessage.serviceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     private final ChatMessageRepository chatMessageRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final MemberV1Repository memberV1Repository;
+    private final RabbitTemplate rabbitTemplate;
 
     // 해당 채팅방의 메시지 조회
     // http://localhost:8080/api/v1/chat-room/message/1
@@ -86,6 +88,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
                 .content(chatMessageForm.getContent())
                 .build();
         chatMessageRepository.save(chatMessage);
+        rabbitTemplate.convertAndSend("amq.topic", "chatRoomId: " + chatRoomId + "MessageCreated: ", chatMessage);
     }
 
     // 해당 메시지 삭제

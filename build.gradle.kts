@@ -29,6 +29,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
+//	implementation("org.springframework.boot:spring-boot-docker-compose") 앱 실행시 도커 자동 실행
 	compileOnly("org.projectlombok:lombok")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	runtimeOnly("org.postgresql:postgresql")
@@ -36,7 +37,8 @@ dependencies {
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.security:spring-security-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-	implementation("io.netty:netty-all:4.1.100.Final")
+	implementation("org.springframework.boot:spring-boot-starter-reactor-netty")
+	developmentOnly("io.netty:netty-all:4.1.100.Final")
 
 	// jjwt
 	implementation("io.jsonwebtoken:jjwt-api:0.12.5")
@@ -65,7 +67,9 @@ dependencies {
 	implementation("net.datafaker:datafaker:2.4.2")
 
 	// rabbitMQ
+	implementation("org.springframework.boot:spring-boot-starter-websocket")
 	implementation("org.springframework.boot:spring-boot-starter-amqp")
+	testImplementation("org.springframework.amqp:spring-rabbit-test")
 }
 
 tasks.withType<Test> {

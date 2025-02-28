@@ -2,6 +2,7 @@ package team.klover.server.domain.chat.chatMessage.controller;
 
 import jakarta.validation.Valid;
 import lombok.*;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
