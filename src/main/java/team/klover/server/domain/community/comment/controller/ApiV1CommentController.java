@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,7 @@ import team.klover.server.domain.community.comment.service.CommentService;
 import team.klover.server.global.common.response.ApiResponse;
 import team.klover.server.global.common.response.KloverPage;
 import team.klover.server.global.exception.ReturnCode;
+import team.klover.server.global.translation.service.TranslationHelper;
 import team.klover.server.global.util.AuthUtil;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -24,6 +26,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequiredArgsConstructor
 public class ApiV1CommentController {
     private final CommentService commentService;
+    private final TranslationHelper translationHelper; // 추가: 번역 헬퍼
 
     // 해당 게시글에 작성된 모든 댓글 조회
     // http://localhost:8080/api/v1/comm-post/comment/1
@@ -31,7 +34,15 @@ public class ApiV1CommentController {
     @Operation(summary = "댓글 전체 조회")
     public ApiResponse<CommentDto> findByCommPostId(@ModelAttribute CommentPage request, @PathVariable("commPostId") Long commPostId){
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
-        return ApiResponse.of(KloverPage.of(commentService.findByCommPostId(commPostId, pageable)));
+        Page<CommentDto> commentPage = commentService.findByCommPostId(commPostId, pageable);
+        // 번역 로직 추가
+        commentPage.getContent().forEach(comment -> {
+            // 댓글 내용 번역
+            if (comment.getContent() != null && !comment.getContent().isEmpty()) {
+                comment.setContent(translationHelper.translateForCurrentLanguage(comment.getContent()));
+            }
+        });
+        return ApiResponse.of(KloverPage.of(commentPage));
     }
 
     // 댓글 좋아요
