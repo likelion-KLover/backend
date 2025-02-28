@@ -43,7 +43,7 @@
           "type": "long"
         },
         "common_place_id": {
-          "type": "keyword"
+          "type": "long"
         },
         "first_image":{
           "type": "keyword"

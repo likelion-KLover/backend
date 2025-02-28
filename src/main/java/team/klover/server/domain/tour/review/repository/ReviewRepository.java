@@ -34,11 +34,9 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     Double findAverageRatingByTourPostId(@Param("tourPostContentId") Long tourPostContentId);
 
     //하나의 공통 장소에 대해 해당 유저가 작성한 리뷰를 가져온다.
-    //distinct 를 사용하는 이유는 Review와 ReviewTourPost와의 join의 경우 리뷰는 게시물당 하나라는 제약이 있어 뻥튀기 문제가 없다.
-    //하지만 where 절에서 보면 join조차 안 한 TourPost의 필드를 가져다 쓰고 있다.
-    //네이티브 SQL 입장에서 생각해본다면 Review와도 join이 일어나는데, 이 때는 ReviewTourPost의 tour post id와 TourPost의 id를 기반으로 join한다.
-    //ReviewTourPost에서 리뷰 컬럼은 unique하지만 포스트 컬럼은 unique하지 않다. 리뷰를 여러 개 가질 수 있기 때문이다.
-    //따라서 2번째 언급한 곳에서 뻥튀기가 일어나고, 따라서 distinct가 필요하다.
+    //distinct 를 사용하는 이유는 데이터가 뻥튀기 되기 때문이다.
+    //저장 방식을 보면 모든 연관된 포스트에 대해 리뷰와의 관계가 맺어진다.
+    //따라서 그냥 inner join을 하면 리뷰가 4배가 되어버림. 하지만 한 유저가 한 장소에 쓴 리뷰는 오직 하나뿐.
     @Query("""
     select distinct r from Review r
     join ReviewTourPost rtp on r.id = rtp.review.id

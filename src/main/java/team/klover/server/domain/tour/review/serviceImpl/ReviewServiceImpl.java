@@ -50,6 +50,7 @@ public class ReviewServiceImpl implements ReviewService {
         // 현재 로그인한 사용자의 member 객체를 가져오는 메서드
         Member member = memberV1Repository.findById(currentMemberId).orElseThrow(() ->
                 new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
+
         List<TourPost> tourPosts = tourPostRepository.findByCommonPlaceId(commonPlaceId);
         if (tourPosts.isEmpty()) {
             throw new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY);

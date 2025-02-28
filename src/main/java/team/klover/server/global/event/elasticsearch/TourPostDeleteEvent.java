@@ -1,4 +1,4 @@
 package team.klover.server.global.event.elasticsearch;
 
-public class CommentAddEvent {
+public class TourPostDeleteEvent {
 }

@@ -25,9 +25,7 @@ import team.klover.server.domain.tour.tourPost.entity.TourPost;
 import team.klover.server.domain.tour.tourPost.repository.TourPostRepository;
 import team.klover.server.global.util.ChineseLoremGenerator;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.Random;
+import java.util.*;
 
 @Configuration
 @Profile("!prod")
@@ -57,7 +55,7 @@ public class NotProd {
                 //
                 //
 
-//                apisScheduler.getApisApiData();
+                apisScheduler.getApisApiData();
                 /*
 
 
@@ -80,8 +78,8 @@ public class NotProd {
 
 
                  */
-
                 /*
+
                 for(int i=0;i<50;i++){
                     authV1Service.signup(SignupRequestDto.builder()
                             .email("test"+(i+1)+"@test.com")
@@ -127,15 +125,19 @@ public class NotProd {
 
 
                 List<TourPost> tourPostList = tourPostRepository.findAll();
+                Set<Long> commonPlaceList = new HashSet<>();
+                for(TourPost tourPost : tourPostList){
+                    commonPlaceList.add(tourPost.getCommonPlaceId());
+                }
 
-                for (TourPost tourPost : tourPostList) {
-                    int randomCount = new Random(System.currentTimeMillis()).nextInt(1, 6);
+                for (Long commonPlaceId : commonPlaceList) {
+                    int randomCount = new Random(System.currentTimeMillis()).nextInt(0, 6);
                     for (int j = 0; j <= randomCount; j++) {
                         ReviewForm reviewForm = ReviewForm.builder()
                                 .content("테에에스트")
                                 .rating(new Random(System.currentTimeMillis()).nextInt(6))
                                 .build();
-                        reviewService.addReview(members.get(new Random(System.currentTimeMillis()).nextInt(members.size())).getId(), tourPost.getContentId(), reviewForm);
+                        reviewService.addReview(members.get(j).getId(), commonPlaceId, reviewForm);
                     }
                 }
                 */
