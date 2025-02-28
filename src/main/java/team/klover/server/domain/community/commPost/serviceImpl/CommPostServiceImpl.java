@@ -3,6 +3,7 @@ package team.klover.server.domain.community.commPost.serviceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import team.klover.server.domain.community.commPost.dto.res.CombinedPostResponse
 import team.klover.server.domain.community.commPost.dto.res.CommPostDto;
 import team.klover.server.domain.community.commPost.dto.res.DetailCommPostDto;
 import team.klover.server.domain.community.commPost.entity.*;
+import team.klover.server.domain.community.commPost.event.CommPostLikedEvent;
 import team.klover.server.domain.community.commPost.repository.CommPostRepository;
 import team.klover.server.domain.community.commPost.service.CommPostService;
 import team.klover.server.domain.member.v1.entity.Member;
@@ -32,7 +34,7 @@ public class CommPostServiceImpl implements CommPostService {
     private final MemberV1Repository memberV1Repository;
     private final TourPostService tourPostService;
     private final LanguageDetect languageDetect;
-
+    private final ApplicationEventPublisher publisher;
 
     // 사용자 위치 주변 게시글(관광지&사용자) 조회
     public CombinedPostResponse findPostsWithinRadius(@Valid XYForm xyForm, Pageable pageable){
@@ -114,9 +116,9 @@ public class CommPostServiceImpl implements CommPostService {
     // 게시글 좋아요
     @Override
     @Transactional
-    public void addCommPostLike(Long currentMemberId, Long commPostId){
-        Member member = memberV1Repository.findById(currentMemberId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
-        CommPost commPost = commPostRepository.findById(commPostId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
+    public void addCommPostLike(Long memberId, Long id){
+        Member member = memberV1Repository.findById(memberId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
+        CommPost commPost = commPostRepository.findById(id).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
 
         boolean alreadySaved = commPost.getLikedMembers()
                 .stream()
@@ -126,6 +128,9 @@ public class CommPostServiceImpl implements CommPostService {
         }
         CommPostLike commPostLike = new CommPostLike(member, commPost);
         commPost.getLikedMembers().add(commPostLike);
+
+        // 이벤트 발행 및 생성
+        publisher.publishEvent(new CommPostLikedEvent(this, commPost, member));
     }
 
     // 게시글 좋아요 취소
