@@ -7,6 +7,8 @@ import team.klover.server.domain.community.commPost.dto.res.CommPostDto;
 @Service
 public class CommPostDocService {
 
-    public Page<CommPostDto> search
+    public Page<CommPostDto> search(){
+
+    }
 }
 
