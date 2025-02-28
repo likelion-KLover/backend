@@ -23,7 +23,7 @@ public interface CommPostService {
     Page<CommPostDto> getSavedCommPostByMember(Long currentMemberId, Pageable pageable);
 
     // 사용자 닉네임 & 게시글 내용 검색
-    Page<CommPostDto> searchByNicknameAndContent(String keyword, Pageable pageable);
+    Page<CommPostDto> searchByKeyword(String keyword, Pageable pageable);
 
     // 해당 게시글 저장
     void addCollectionCommPost(Long currentMemberId, Long commPostId);

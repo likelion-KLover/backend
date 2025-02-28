@@ -77,7 +77,7 @@ public class CommPostServiceImpl implements CommPostService {
     // 사용자 닉네임 & 게시글 내용 검색
     @Override
     @Transactional(readOnly = true)
-    public Page<CommPostDto> searchByNicknameAndContent(String keyword, Pageable pageable){
+    public Page<CommPostDto> searchByKeyword(String keyword, Pageable pageable){
         checkPageSize(pageable.getPageSize());
         Page<CommPost> commPosts = commPostRepository.searchByKeyword(keyword, pageable);
         return commPosts.map(this::convertToCommPostDto);
