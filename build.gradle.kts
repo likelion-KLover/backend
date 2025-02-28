@@ -70,6 +70,9 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-websocket")
 	implementation("org.springframework.boot:spring-boot-starter-amqp")
 	testImplementation("org.springframework.amqp:spring-rabbit-test")
+
+	// MongoDB
+	implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
 }
 
 tasks.withType<Test> {

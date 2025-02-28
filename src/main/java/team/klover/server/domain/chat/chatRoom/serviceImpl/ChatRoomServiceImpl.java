@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import team.klover.server.domain.chat.chatMessage.service.ChatMessageService;
 import team.klover.server.domain.chat.chatRoom.dto.req.ChatRoomForm;
 import team.klover.server.domain.chat.chatRoom.dto.res.ChatRoomDto;
 import team.klover.server.domain.chat.chatRoom.dto.res.MemberInfoDto;
@@ -32,6 +33,7 @@ import java.util.stream.Collectors;
 public class ChatRoomServiceImpl implements ChatRoomService {
     private final ChatRoomRepository chatRoomRepository;
     private final MemberV1Repository memberV1Repository;
+    private final ChatMessageService chatMessageService;
 
     // 채팅방 목록 조회(DM/그룹)
     @Override
@@ -188,10 +190,12 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 ChatRoomMember nextOwner = chatRoom.getChatRoomMembers().get(0);
                 chatRoom.setMember(nextOwner.getMember());
             } else { // 1명 미만(0명)이면 채팅방 삭제
+                chatMessageService.deleteAllChatMessages(chatRoomId);
                 chatRoomRepository.delete(chatRoom);
                 return;
             }
         } else if (chatRoom.getChatRoomMembers().size() < 2) { // 방장이 아닌데 나갔을 때 1명이 되면 삭제
+            chatMessageService.deleteAllChatMessages(chatRoomId);
             chatRoomRepository.delete(chatRoom);
             return;
         }

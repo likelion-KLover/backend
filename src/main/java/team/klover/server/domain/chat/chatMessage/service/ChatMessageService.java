@@ -18,4 +18,7 @@ public interface ChatMessageService {
 
     // 해당 메시지 삭제
     void deleteChatMessage(Long currentMemberId, Long messageId);
+
+    // 해당 채팅방의 모든 메시지 삭제
+    void deleteAllChatMessages(Long chatRoomId);
 }
