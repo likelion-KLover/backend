@@ -64,6 +64,8 @@ dependencies {
 	// https://mvnrepository.com/artifact/net.datafaker/datafaker repost 가데이터 밀어넣기
 	implementation("net.datafaker:datafaker:2.4.2")
 
+	// rabbitMQ
+	implementation("org.springframework.boot:spring-boot-starter-amqp")
 }
 
 tasks.withType<Test> {
