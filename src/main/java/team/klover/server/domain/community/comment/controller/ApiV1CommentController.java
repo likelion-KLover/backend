@@ -38,7 +38,7 @@ public class ApiV1CommentController {
     // http://localhost:8080/api/v1/comm-post/comment/like/1
     @PostMapping("/like/{commentId}")
     @Operation(summary = "댓글 좋아요")
-    public ApiResponse<String> addCommentLike(@RequestParam("commentId") Long commentId){
+    public ApiResponse<String> addCommentLike(@PathVariable("commentId") Long commentId){
         Long currentMemberId = AuthUtil.getCurrentMemberId();
         commentService.addCommentLike(currentMemberId, commentId);
         return ApiResponse.of(ReturnCode.SUCCESS);
@@ -48,7 +48,7 @@ public class ApiV1CommentController {
     // http://localhost:8080/api/v1/comm-post/comment/like/1
     @DeleteMapping("/like/{commentId}")
     @Operation(summary = "좋아요 취소")
-    public ApiResponse<String> deleteCommentLike(@RequestParam("commentId") Long commentId){
+    public ApiResponse<String> deleteCommentLike(@PathVariable("commentId") Long commentId){
         Long currentMemberId = AuthUtil.getCurrentMemberId();
         commentService.deleteCommentLike(currentMemberId, commentId);
         return ApiResponse.of(ReturnCode.SUCCESS);
@@ -68,7 +68,7 @@ public class ApiV1CommentController {
     // http://localhost:8080/api/v1/comm-post/comment/1
     @PutMapping("/{commentId}")
     @Operation(summary = "댓글 수정")
-    public ApiResponse<String> updateComment(@RequestParam("commentId") Long commentId, @RequestBody @Valid CommentForm commentForm){
+    public ApiResponse<String> updateComment(@PathVariable("commentId") Long commentId, @RequestBody @Valid CommentForm commentForm){
         Long currentMemberId = AuthUtil.getCurrentMemberId();
         commentService.updateComment(currentMemberId, commentId, commentForm);
         return ApiResponse.of(ReturnCode.SUCCESS);
@@ -78,7 +78,7 @@ public class ApiV1CommentController {
     // http://localhost:8080/api/v1/comm-post/comment/1
     @DeleteMapping("/{commentId}")
     @Operation(summary = "댓글 삭제")
-    public ApiResponse<String> deleteComment(@RequestParam("commentId") Long commentId){
+    public ApiResponse<String> deleteComment(@PathVariable("commentId") Long commentId){
         Long currentMemberId = AuthUtil.getCurrentMemberId();
         commentService.deleteComment(commentId, currentMemberId);
         return ApiResponse.of(ReturnCode.SUCCESS);

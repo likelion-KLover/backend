@@ -21,7 +21,9 @@ import team.klover.server.global.exception.KloverRequestException;
 import team.klover.server.global.exception.ReturnCode;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -67,13 +69,17 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .chatRoom(chatRoom)
                 .build());
 
-        // 추가하려던 멤버 추가 (중복 방지)
+        // 추가하려는 멤버들 중 중복되지 않는 멤버만 추가
+        Set<Long> addedMemberIds = new HashSet<>();
+        addedMemberIds.add(member.getId()); // 본인 ID 추가
         for (ChatRoomMember chatRoomMember : chatRoomForm.getChatRoomMembers()) {
-            if (!chatRoomMember.getMember().getId().equals(currentMemberId)) {
+            Long memberId = chatRoomMember.getMember().getId();
+            if (!addedMemberIds.contains(memberId)) { // 중복 방지
                 chatRoomMembers.add(ChatRoomMember.builder()
                         .member(chatRoomMember.getMember())
                         .chatRoom(chatRoom)
                         .build());
+                addedMemberIds.add(memberId);
             }
         }
         chatRoom.setChatRoomMembers(chatRoomMembers);
