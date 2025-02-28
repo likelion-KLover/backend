@@ -3,6 +3,7 @@ package team.klover.server.domain.community.comment.serviceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,8 @@ import team.klover.server.domain.community.comment.dto.res.CommentDto;
 import team.klover.server.domain.community.comment.entity.Comment;
 import team.klover.server.domain.community.comment.entity.CommentLike;
 import team.klover.server.domain.community.comment.entity.CommentPage;
+import team.klover.server.domain.community.comment.event.CommentCreatedEvent;
+import team.klover.server.domain.community.comment.event.CommentLikedEvent;
 import team.klover.server.domain.community.comment.repository.CommentRepository;
 import team.klover.server.domain.community.comment.service.CommentService;
 import team.klover.server.domain.member.v1.entity.Member;
@@ -30,6 +33,7 @@ public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
     private final CommPostRepository commPostRepository;
     private final MemberV1Repository memberV1Repository;
+    private final ApplicationEventPublisher publisher;
 
     // 해당 게시글에 작성된 모든 댓글 조회
     @Override
@@ -55,6 +59,9 @@ public class CommentServiceImpl implements CommentService {
         }
         CommentLike commentLike = new CommentLike(member, comment);
         comment.getLikedMembers().add(commentLike);
+
+        // 이벤트 생성 및 발행
+        publisher.publishEvent(new CommentLikedEvent(this, comment, member));
     }
 
     // 댓글 좋아요 취소
@@ -85,6 +92,9 @@ public class CommentServiceImpl implements CommentService {
                 .superCommentId(commentForm.getSuperCommentId())
                 .build();
         commentRepository.save(comment);
+
+        // 이벤트 생성 및 발행
+        publisher.publishEvent(new CommentCreatedEvent(this, commPost, comment));
     }
 
     // 해당 댓글 수정
