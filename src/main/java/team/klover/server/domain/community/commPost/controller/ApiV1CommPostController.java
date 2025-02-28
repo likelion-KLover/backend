@@ -71,7 +71,7 @@ public class ApiV1CommPostController {
     @Operation(summary = "사용자 닉네임 & 게시글 내용 검색")
     public ApiResponse<CommPostDto> searchCommPost(@ModelAttribute CommPostPage request, @RequestParam("keyword") String keyword) {
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
-        return ApiResponse.of(KloverPage.of(commPostService.searchByNicknameAndContent(keyword, pageable)));
+        return ApiResponse.of(KloverPage.of(commPostService.searchByKeyword(keyword, pageable)));
     }
 
     // 해당 게시글 저장
