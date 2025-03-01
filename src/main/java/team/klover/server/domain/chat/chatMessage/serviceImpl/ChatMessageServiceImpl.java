@@ -1,5 +1,6 @@
 package team.klover.server.domain.chat.chatMessage.serviceImpl;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +19,8 @@ import team.klover.server.domain.chat.chatMessage.repository.ChatMessageReposito
 import team.klover.server.domain.chat.chatMessage.repository.MessageContentRepository;
 import team.klover.server.domain.chat.chatMessage.service.ChatMessageService;
 import team.klover.server.domain.chat.chatRoom.entity.ChatRoom;
+import team.klover.server.domain.chat.chatRoom.entity.ChatRoomMember;
+import team.klover.server.domain.chat.chatRoom.repository.ChatRoomMemberRepository;
 import team.klover.server.domain.chat.chatRoom.repository.ChatRoomRepository;
 import team.klover.server.domain.member.v1.entity.Member;
 import team.klover.server.domain.member.v1.repository.MemberV1Repository;
@@ -37,10 +40,11 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     private final MemberV1Repository memberV1Repository;
     private final RabbitTemplate rabbitTemplate;
     private final MessageContentRepository messageContentRepository;
+    private final ChatRoomMemberRepository chatRoomMemberRepository;
 
-    // 해당 채팅방의 메시지 조회
+    // 해당 채팅방의 메시지 실시간 조회 시작
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public Page<ChatMessageDto> findByChatRoomId(Long currentMemberId, Long chatRoomId, Pageable pageable) {
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
         checkPageSize(pageable.getPageSize());
@@ -51,8 +55,11 @@ public class ChatMessageServiceImpl implements ChatMessageService {
         if (!memberExists) {
             throw new KloverRequestException(ReturnCode.NOT_AUTHORIZED);
         }
+        // 해당 채팅방 내의 모든 메시지 읽음 처리 & 해당 채팅방 메시지 가져오기
+        readAllChatMessages(currentMemberId, chatRoom, chatRoomId);
         Page<ChatMessage> chatMessages = chatMessageRepository.findByChatRoomId(chatRoomId, pageable);
 
+        // MongoDB에서 메시지 내용 불러오기
         List<String> stringMessageIds = chatMessages.stream()
                 .map(chatMessage -> String.valueOf(chatMessage.getId()))
                 .collect(Collectors.toList());
@@ -122,9 +129,12 @@ public class ChatMessageServiceImpl implements ChatMessageService {
         if (!memberExists) {
             throw new KloverRequestException(ReturnCode.NOT_AUTHORIZED);
         }
+        Long inactiveMemberNum = countInactiveMembers(chatRoomId);
+
         ChatMessage chatMessage = ChatMessage.builder()
                 .member(member)
                 .chatRoom(chatRoom)
+                .readCount(inactiveMemberNum)
                 .build();
         chatMessageRepository.save(chatMessage);
 
@@ -134,7 +144,8 @@ public class ChatMessageServiceImpl implements ChatMessageService {
                 .content(chatMessageForm.getContent())
                 .build();
         messageContentRepository.save(messageContent);
-        rabbitTemplate.convertAndSend("amq.topic", "chatRoomId: " + chatRoomId + "MessageCreated: ", chatMessage);
+        rabbitTemplate.convertAndSend("amq.topic", "chatRoomId: " + chatRoomId + "MessageCreated: ",
+                convertToChatMessageDto(chatMessage, messageContent.getContent()));
     }
 
     // 해당 메시지 삭제
@@ -162,6 +173,53 @@ public class ChatMessageServiceImpl implements ChatMessageService {
         messages.forEach(message -> messageContentRepository.deleteById(String.valueOf(message.getId())));
     }
 
+    // 해당 채팅방의 메시지 실시간 조회 중단
+    @Override
+    @Transactional
+    public void updateLastReadMessage(Long currentMemberId, Long chatRoomId) {
+        ChatRoomMember chatRoomMember = chatRoomMemberRepository.findByMemberIdAndChatRoomId(currentMemberId, chatRoomId);
+        // lastReadMessageId=null로 업데이트
+        chatRoomMember.setLastReadMessageId(null);
+        chatRoomMemberRepository.save(chatRoomMember);
+    }
+
+    // 해당 채팅방 내의 모든 메시지 읽음 처리
+    @Transactional
+    public void readAllChatMessages(Long currentMemberId, ChatRoom chatRoom, Long chatRoomId){
+        ChatRoomMember chatRoomMember = chatRoom.getChatRoomMembers().stream()
+                .filter(member -> member.getMember().getId().equals(currentMemberId))
+                .findFirst()
+                .orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
+
+        // 처음 들어올 때만 모든 메시지 readCount - 1 처리
+        if (chatRoomMember.getLastReadMessageId() == null) {
+            List<ChatMessage> chatMessages = chatMessageRepository.findByChatRoom(chatRoom);
+            List<ChatMessage> updatedMessages = chatMessages.stream()
+                    .peek(chatMessage -> {
+                        if (chatMessage.getReadCount() > 0) {
+                            chatMessage.setReadCount(chatMessage.getReadCount() - 1);
+                        }
+                    })
+                    .collect(Collectors.toList());
+            chatMessageRepository.saveAll(updatedMessages);
+        }
+        
+        // 마지막으로 읽은 메시지ID 초기화
+        ChatMessage lastReadMessage = chatMessageRepository.findTopByChatRoomIdOrderByIdDesc(chatRoomId);
+        if (lastReadMessage != null) {
+            chatRoomMember.setLastReadMessageId(lastReadMessage.getId());
+        } else {
+            chatRoomMember.setLastReadMessageId(0L);
+        }
+        chatRoomMemberRepository.save(chatRoomMember);
+    }
+
+    // 해당 채팅방에 실시간 참여중이 아닌 인원수(lastReadMessageId=null인 chatRoomMember 인원수)
+    @Transactional(readOnly = true)
+    public Long countInactiveMembers(Long chatRoomId){
+        return chatRoomMemberRepository.countInActiveMembers(chatRoomId);
+    }
+    
     // 요청 메시지 수 제한
     private void checkPageSize(int pageSize) {
         int maxPageSize = ChatMessagePage.getMaxPageSize();
@@ -177,6 +235,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
                 .memberId(chatMessage.getMember().getId())
                 .nickname(chatMessage.getMember().getNickname())
                 .content(content)
+                .readCount(chatMessage.getReadCount())
                 .createDate(chatMessage.getCreateDate())
                 .build();
     }

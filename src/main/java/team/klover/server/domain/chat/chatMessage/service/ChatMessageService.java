@@ -7,7 +7,7 @@ import team.klover.server.domain.chat.chatMessage.dto.req.ChatMessageForm;
 import team.klover.server.domain.chat.chatMessage.dto.res.ChatMessageDto;
 
 public interface ChatMessageService {
-    // 해당 채팅방의 메시지 조회
+    // 해당 채팅방의 메시지 실시간 조회 시작
     Page<ChatMessageDto> findByChatRoomId(Long currentMemberId, Long chatRoomId, Pageable pageable);
 
     // 해당 채팅방에서 메시지 검색(닉네임/내용)
@@ -21,4 +21,7 @@ public interface ChatMessageService {
 
     // 해당 채팅방의 모든 메시지 삭제
     void deleteAllChatMessages(Long chatRoomId);
+
+    // 해당 채팅방의 메시지 실시간 조회 중단
+    void updateLastReadMessage(Long currentMemberId, Long chatRoomId);
 }

@@ -16,4 +16,7 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
 
     // 해당 채팅방의 메시지 리스트 조회
     List<ChatMessage> findByChatRoom(ChatRoom chatRoom);
+
+    // 가장 최근 메시지 조회
+    ChatMessage findTopByChatRoomIdOrderByIdDesc(Long chatRoomId);
 }
