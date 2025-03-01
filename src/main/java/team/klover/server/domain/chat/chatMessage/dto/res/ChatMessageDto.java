@@ -12,5 +12,6 @@ public class ChatMessageDto {
     private Long memberId;
     private String nickname;
     private String content;
+    private Long readCount;
     private LocalDateTime createDate;
 }

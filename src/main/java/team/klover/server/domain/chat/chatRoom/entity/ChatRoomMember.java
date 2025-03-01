@@ -28,7 +28,5 @@ public class ChatRoomMember extends BaseEntity {
     @JoinColumn(name = "chat_room_id", nullable = false)
     private ChatRoom chatRoom;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "last_read_message_id")
-    private ChatMessage lastReadMessage;
+    private Long lastReadMessageId;
 }

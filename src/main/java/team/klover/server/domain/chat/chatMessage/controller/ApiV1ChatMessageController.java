@@ -20,13 +20,21 @@ import team.klover.server.global.util.AuthUtil;
 public class ApiV1ChatMessageController {
     private final ChatMessageService chatMessageService;
 
-    // 해당 채팅방의 메시지 조회
+    // 해당 채팅방의 메시지 실시간 조회 시작
     // http://localhost:8080/api/v1/chat-room/message/1
     @GetMapping("/{chatRoomId}")
     public ApiResponse<ChatMessageDto> findByChatRoomId(@ModelAttribute ChatMessagePage request, @PathVariable("chatRoomId") Long chatRoomId) {
         Long currentMemberId = AuthUtil.getCurrentMemberId();
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
         return ApiResponse.of(KloverPage.of(chatMessageService.findByChatRoomId(currentMemberId, chatRoomId, pageable)));
+    }
+
+    // 해당 채팅방의 메시지 실시간 조회 중단
+    @PutMapping("/{chatRoomId}")
+    public ApiResponse<String> updateLastReadMessage(@PathVariable("chatRoomId") Long chatRoomId){
+        Long currentMemberId = AuthUtil.getCurrentMemberId();
+        chatMessageService.updateLastReadMessage(currentMemberId, chatRoomId);
+        return ApiResponse.of(ReturnCode.SUCCESS);
     }
 
     // 해당 채팅방에서 메시지 검색(닉네임/내용)
