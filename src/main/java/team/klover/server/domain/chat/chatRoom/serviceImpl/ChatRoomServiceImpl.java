@@ -93,6 +93,8 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                         .chatRoom(chatRoom)
                         .build());
                 addedMemberIds.add(memberId);
+            } else {
+                throw new KloverRequestException(ReturnCode.ALREADY_EXIST);
             }
         }
         chatRoom.setChatRoomMembers(chatRoomMembers);

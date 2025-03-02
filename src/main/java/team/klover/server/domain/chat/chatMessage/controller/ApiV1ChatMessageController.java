@@ -30,6 +30,7 @@ public class ApiV1ChatMessageController {
     }
 
     // 해당 채팅방의 메시지 실시간 조회 중단
+    // http://localhost:8080/api/v1/chat-room/message/1
     @PutMapping("/{chatRoomId}")
     public ApiResponse<String> updateLastReadMessage(@PathVariable("chatRoomId") Long chatRoomId){
         Long currentMemberId = AuthUtil.getCurrentMemberId();

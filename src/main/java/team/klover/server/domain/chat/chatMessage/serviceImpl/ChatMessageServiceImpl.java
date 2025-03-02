@@ -1,6 +1,5 @@
 package team.klover.server.domain.chat.chatMessage.serviceImpl;
 
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -166,8 +165,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     @Override
     @Transactional
     public void deleteAllChatMessages(Long chatRoomId){
-        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
-                .orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
         List<ChatMessage> messages = chatMessageRepository.findByChatRoom(chatRoom);
         chatMessageRepository.deleteAll(messages);
         messages.forEach(message -> messageContentRepository.deleteById(String.valueOf(message.getId())));
