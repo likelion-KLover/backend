@@ -91,7 +91,7 @@ public class ApiV1CommentController {
     @Operation(summary = "댓글 삭제")
     public ApiResponse<String> deleteComment(@PathVariable("commentId") Long commentId){
         Long currentMemberId = AuthUtil.getCurrentMemberId();
-        commentService.deleteComment(commentId, currentMemberId);
+        commentService.deleteComment(currentMemberId, commentId);
         return ApiResponse.of(ReturnCode.SUCCESS);
     }
 }
