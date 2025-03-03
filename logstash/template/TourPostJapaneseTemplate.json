@@ -21,17 +21,15 @@
         "tokenizer": {
           "kuromoji_search_tokenizer": {
             "type": "kuromoji_tokenizer",
-            "mode": "search",
+            "mode": "extended",
             "user_dictionary": "userdict_ja.txt",
-            "discard_compound_token": false,
-            "lenient": true
+            "discard_compound_token": false
           },
           "kuromoji_word_tokenizer": {
             "type": "kuromoji_tokenizer",
-            "mode": "normal",
+            "mode": "extended",
             "user_dictionary": "userdict_ja.txt",
-            "discard_compound_token": false,
-            "lenient": true
+            "discard_compound_token": false
           }
         },
         "analyzer": {
@@ -49,7 +47,8 @@
               "kuromoji_number",
               "kuromoji_stemmer",
               "katakana_filter",
-              "romaji_filter",
+              "katakana_to_latin",
+              "post_symbols_filter",
               "asciifolding",
               "lowercase"
             ]
@@ -58,8 +57,7 @@
             "type": "custom",
             "tokenizer": "kuromoji_search_tokenizer",
             "char_filter": [
-              "remove_korean",
-              "remove_symbols"
+              "remove_korean"
             ],
             "filter": [
               "cjk_width",
@@ -67,6 +65,7 @@
               "kuromoji_stoptags",
               "katakana_filter",
               "katakana_to_latin",
+              "post_symbols_filter",
               "asciifolding",
               "lowercase"
             ]
@@ -82,24 +81,12 @@
               "kuromoji_number",
               "kuromoji_stoptags",
               "katakana_filter",
+              "katakana_to_latin",
+              "post_symbols_filter",
+              "asciifolding",
+              "lowercase",
               "big_ngram",
-              "katakana_to_latin",
-              "asciifolding",
-              "lowercase"
-            ]
-          },
-          "keyword_analyzer": {
-            "type": "custom",
-            "tokenizer": "kuromoji_word_tokenizer",
-            "char_filter": [
-              "remove_korean"
-            ],
-            "filter": [
-              "cjk_width",
-              "katakana_filter",
-              "katakana_to_latin",
-              "asciifolding",
-              "lowercase"
+              "unique"
             ]
           }
         },
@@ -116,10 +103,6 @@
           "katakana_filter": {
             "type": "kuromoji_readingform",
             "use_romaji": false
-          },
-          "any_to_katakana": {
-            "type": "icu_transform",
-            "id":"Any-Katakana"
           }
           ,
           "katakana_to_latin": {
@@ -130,14 +113,9 @@
             "type": "kuromoji_part_of_speech",
             "stoptags": ["記号"]
           },
-          "remove_whitespace_filter": {
+          "post_symbols_filter": {
             "type": "pattern_replace",
-            "pattern": "\\s+",
-            "replacement": ""
-          },
-          "remove_accented_chars": {
-            "type": "pattern_replace",
-            "pattern": "[̀́̂̄̇]",
+            "pattern": "[\\p{P}\\p{S}\\s]",
             "replacement": ""
           }
         }

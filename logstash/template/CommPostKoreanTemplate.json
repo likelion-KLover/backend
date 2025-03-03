@@ -49,18 +49,8 @@
               "remove_symbols"
             ],
             "filter": [
-              "ngram_filter"
-            ]
-          },
-          "keyword_analyzer": {
-            "type": "custom",
-            "tokenizer": "keyword",
-            "char_filter": [
-              "remove_symbols"
-            ],
-            "filter": [
-              "lowercase",
-              "asciifolding"
+              "ngram_filter",
+              "unique"
             ]
           }
         },

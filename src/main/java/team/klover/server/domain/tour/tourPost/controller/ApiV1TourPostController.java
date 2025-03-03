@@ -112,11 +112,10 @@ public class ApiV1TourPostController {
                                          @RequestParam(value = "mapX",defaultValue = "127.1288128231279") Double mapX,
                                          @RequestParam(value = "mapY",defaultValue="34.41101602890987") Double mapY){
         if(page<0 || size<=0) throw new KloverRequestException(ReturnCode.WRONG_PARAMETER);
-        if(area != null && contentType !=null) throw new KloverRequestException(ReturnCode.WRONG_PARAMETER);
 
         //둘 중 하나라도 true가 아니고 keyword가 안 비었다면
         if(!(searchByTitle || searchByOverview) && keyword !=null && !keyword.isBlank()) searchByTitle = true;
-        if(area == null && contentType == null) area = Area.SEOUL;
+//        if(area == null && contentType == null) area = Area.SEOUL;
 
         Pageable pageable = PageRequest.of(page,size);
         Page<TourPostDto> list = tourPostDocService.search(keyword,pageable,mapX,mapY,language,area,contentType,hasExotic,hasHealing,hasTraditional,hasActive,searchByTitle,searchByOverview,sort);

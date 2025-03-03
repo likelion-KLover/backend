@@ -83,17 +83,29 @@ public class CommPostDocService {
         }
 
         BoolQuery boolQuery = boolQueryBuilder.build();
-        System.out.println("My Query:"+boolQuery.toString());
 
         sortOptions.add(SortOptions.of(so -> so.field(f->f.field("create_date").order(SortOrder.Desc))));
         sortOptions.add(SortOptions.of(so -> so.field(f->f.field("id").order(SortOrder.Desc))));
 
         String index;
+        double minScore;
         switch (language) {
-            case KorService1 -> index="commpostkor";
-            case JpnService1 -> index="commpostjpn";
-            case ChsService1 -> index="commpostchs";
-            default -> index="commposteng";
+            case KorService1 -> {
+                index="commpostkor";
+                minScore=13.0;
+            }
+            case JpnService1 -> {
+                index = "commpostjpn";
+                minScore=10.0;
+            }
+            case ChsService1 -> {
+                index="commpostchs";
+                minScore=20.0;
+            }
+            default -> {
+                index="commposteng";
+                minScore=8.0;
+            }
         }
 
 
@@ -103,7 +115,7 @@ public class CommPostDocService {
                     .size(pageable.getPageSize())
                     .sort(sortOptions)
                     .query(q -> q.bool(boolQuery))
-                    .minScore(15.0)
+                    .minScore(minScore)
         );
 
         System.out.println("My Query:"+searchRequest.toString());

@@ -33,7 +33,7 @@
           },
           "chs_word_search_analyzer": {
             "type": "custom",
-            "tokenizer": "whitespace",
+            "tokenizer": "keyword",
             "char_filter": [
               "remove_korean",
               "remove_symbols"
@@ -42,20 +42,8 @@
                 "cjk_width",
                 "ngram_filter",
                 "my_pinyin",
-                "asciifolding"
-            ]
-          },
-          "keyword_analyzer": {
-            "type": "custom",
-            "tokenizer": "keyword",
-            "char_filter": [
-              "remove_korean",
-              "remove_symbols"
-            ],
-            "filter": [
-              "cjk_width",
-              "my_pinyin",
-              "asciifolding"
+                "asciifolding",
+                "unique"
             ]
           },
           "chs_word_analyzer": {
@@ -86,6 +74,10 @@
             "keep_joined_full_pinyin": true,
             "limit_first_letter_length": 0,
             "lowercase": true
+          },
+          "han_to_latin": {
+            "type": "icu_transform",
+            "id": "Han-Latin"
           }
         }
       }

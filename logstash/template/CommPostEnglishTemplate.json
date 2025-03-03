@@ -45,19 +45,8 @@
               "lowercase",
               "asciifolding",
               "my_word_delimiter_graph",
-              "ngram_filter"
-            ]
-          },
-          "keyword_analyzer": {
-            "type": "custom",
-            "tokenizer": "keyword",
-            "char_filter": [
-              "remove_korean",
-              "remove_symbols"
-            ],
-            "filter": [
-              "lowercase",
-              "asciifolding"
+              "ngram_filter",
+              "unique"
             ]
           },
           "normal_analyzer": {

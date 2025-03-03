@@ -73,11 +73,11 @@ public class TourPostDocService {
 
         if(searchByTitle){
             boolQueryBuilder.should(s -> s.matchPhrase(mp -> mp.field("title").query(keyword).boost(30f)));
-            boolQueryBuilder.should(s -> s.match(m -> m.field("title.ngram").query(keyword).boost(2f)));
+            boolQueryBuilder.should(s -> s.match(m -> m.field("title.ngram").query(keyword).boost(3f)));
         }
 
         if(searchByOverview){
-            boolQueryBuilder.should(s -> s.match(m -> m.field("overview").query(keyword).boost(5f)));
+            boolQueryBuilder.should(s -> s.match(m -> m.field("overview").query(keyword).boost(8f)));
 
         }
 
@@ -145,20 +145,30 @@ public class TourPostDocService {
             boolQueryBuilder.filter(f->f.terms(t->t.field("cat3").terms(ts->ts.value(values))));
         }
 
-
-
         BoolQuery boolQuery = boolQueryBuilder.build();
-        System.out.println("My Query:"+boolQuery.toString());
 
         sortOptions.add(SortOptions.of(so -> so.field(f->f.field("create_date").order(SortOrder.Desc))));
         sortOptions.add(SortOptions.of(so -> so.field(f->f.field("content_id").order(SortOrder.Desc))));
 
         String index;
+        double minScore;
         switch (language) {
-            case KorService1 -> index="tourpostkor";
-            case JpnService1 -> index="tourpostjpn";
-            case ChsService1 -> index="tourpostchs";
-            default -> index="tourposteng";
+            case KorService1 -> {
+                index="tourpostkor";
+                minScore=13.0;
+            }
+            case JpnService1 -> {
+                index="tourpostjpn";
+                minScore=10.0;
+            }
+            case ChsService1 -> {
+                index="tourpostchs";
+                minScore=20.0;
+            }
+            default -> {
+                index="tourposteng";
+                minScore=8.0;
+            }
         }
 
 
@@ -169,7 +179,7 @@ public class TourPostDocService {
                         .sort(sortOptions)
                         .query(q -> q
                                 .bool(boolQuery))
-                        .minScore(15.0)
+                        .minScore(minScore)
         );
 
         System.out.println("My Query:"+searchRequest.toString());
