@@ -19,4 +19,7 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
 
     // 가장 최근 메시지 조회
     ChatMessage findTopByChatRoomIdOrderByIdDesc(Long chatRoomId);
+
+    // 해당 채팅방의 해당 메시지 이후에 작성된 메시지 리스트 조회
+    List<ChatMessage> findByChatRoomIdAndIdGreaterThan(Long chatRoomId, Long lastReadMessageId);
 }
