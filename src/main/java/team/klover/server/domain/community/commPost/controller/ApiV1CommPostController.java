@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import team.klover.server.domain.community.commPost.dto.req.CommPostForm;
 import team.klover.server.domain.community.commPost.dto.req.XYForm;
 import team.klover.server.domain.community.commPost.dto.res.CombinedPostResponse;
@@ -18,6 +19,8 @@ import team.klover.server.global.common.response.ApiResponse;
 import team.klover.server.global.common.response.KloverPage;
 import team.klover.server.global.exception.ReturnCode;
 import team.klover.server.global.util.AuthUtil;
+
+import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -118,9 +121,10 @@ public class ApiV1CommPostController {
     // http://localhost:8080/api/v1/comm-post
     @PostMapping
     @Operation(summary = "게시글 생성")
-    public ApiResponse<String> addCommPost(@RequestBody @Valid CommPostForm commPostForm) {
+    public ApiResponse<String> addCommPost(@RequestBody @Valid CommPostForm commPostForm,
+                                           @RequestPart(value = "imageFile") List<MultipartFile> imageFiles) {
         Long currentMemberId = AuthUtil.getCurrentMemberId();
-        commPostService.addCommPost(currentMemberId, commPostForm);
+        commPostService.addCommPost(currentMemberId, commPostForm, imageFiles);
         return ApiResponse.of(ReturnCode.SUCCESS);
     }
 
@@ -128,9 +132,11 @@ public class ApiV1CommPostController {
     // http://localhost:8080/api/v1/comm-post/1
     @PutMapping("/{commPostId}")
     @Operation(summary = "게시글 수정")
-    public ApiResponse<String> updateCommPost(@PathVariable("commPostId") Long commPostId, @RequestBody @Valid CommPostForm commPostForm) {
+    public ApiResponse<String> updateCommPost(@PathVariable("commPostId") Long commPostId,
+                                              @RequestBody @Valid CommPostForm commPostForm,
+                                              @RequestPart(value = "imageFile") List<MultipartFile> imageFiles) {
         Long currentMemberId = AuthUtil.getCurrentMemberId();
-        commPostService.updateCommPost(currentMemberId, commPostId, commPostForm);
+        commPostService.updateCommPost(currentMemberId, commPostId, commPostForm, imageFiles);
         return ApiResponse.of(ReturnCode.SUCCESS);
     }
 

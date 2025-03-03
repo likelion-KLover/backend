@@ -36,7 +36,9 @@ public class CommPost extends BaseEntity {
 
     private Double mapX;
     private Double mapY;
-    private String imageUrl;
+
+    @ElementCollection
+    private List<String> imageUrls;
 
     @Enumerated(EnumType.STRING)
     private Country language;
