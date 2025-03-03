@@ -43,8 +43,8 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         Member member = memberV1Repository.findById(currentMemberId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
         checkPageSize(pageable.getPageSize());
 
-        // 사용자가 참여 중인 채팅방 목록 조회
-        Page<ChatRoom> chatRooms = chatRoomRepository.findByChatRoomMembers_Member(member, pageable);
+        // 사용자가 참여 중인 채팅방 목록을 최신 메시지 순으로 조회
+        Page<ChatRoom> chatRooms = chatRoomRepository.findChatRoomsByMemberOrderByLatestMessage(member, pageable);
         return chatRooms.map(this::convertToChatRoomDto);
     }
 

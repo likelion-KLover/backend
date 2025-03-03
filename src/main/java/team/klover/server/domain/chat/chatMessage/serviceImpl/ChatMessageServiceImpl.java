@@ -176,8 +176,10 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     @Transactional
     public void updateLastReadMessage(Long currentMemberId, Long chatRoomId) {
         ChatRoomMember chatRoomMember = chatRoomMemberRepository.findByMemberIdAndChatRoomId(currentMemberId, chatRoomId);
-        // lastReadMessageId=null로 업데이트
-        chatRoomMember.setLastReadMessageId(null);
+        chatRoomMember.setActive(false);
+
+        ChatMessage lastReadMessage = chatMessageRepository.findTopByChatRoomIdOrderByIdDesc(chatRoomId);
+        chatRoomMember.setLastReadMessageId(lastReadMessage != null ? lastReadMessage.getId() : null);
         chatRoomMemberRepository.save(chatRoomMember);
     }
 
@@ -189,9 +191,17 @@ public class ChatMessageServiceImpl implements ChatMessageService {
                 .findFirst()
                 .orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
 
-        // 처음 들어올 때만 모든 메시지 readCount - 1 처리
-        if (chatRoomMember.getLastReadMessageId() == null) {
-            List<ChatMessage> chatMessages = chatMessageRepository.findByChatRoom(chatRoom);
+        // 채팅방 미참여중인 멤버가 참여 했을때만 실행
+        if (!chatRoomMember.isActive()) {
+            Long lastReadMessageId = chatRoomMember.getLastReadMessageId();
+            List<ChatMessage> chatMessages;
+            if (lastReadMessageId == null) {
+                // 처음 들어오는 경우, 모든 메시지의 readCount -1 처리
+                chatMessages = chatMessageRepository.findByChatRoom(chatRoom);
+            } else {
+                // 마지막으로 읽은 메시지 이후에 생성된 메시지들만 readCount -1 처리
+                chatMessages = chatMessageRepository.findByChatRoomIdAndIdGreaterThan(chatRoomId, lastReadMessageId);
+            }
             List<ChatMessage> updatedMessages = chatMessages.stream()
                     .peek(chatMessage -> {
                         if (chatMessage.getReadCount() > 0) {
@@ -201,14 +211,11 @@ public class ChatMessageServiceImpl implements ChatMessageService {
                     .collect(Collectors.toList());
             chatMessageRepository.saveAll(updatedMessages);
         }
+        chatRoomMember.setActive(true);
         
         // 마지막으로 읽은 메시지ID 초기화
         ChatMessage lastReadMessage = chatMessageRepository.findTopByChatRoomIdOrderByIdDesc(chatRoomId);
-        if (lastReadMessage != null) {
-            chatRoomMember.setLastReadMessageId(lastReadMessage.getId());
-        } else {
-            chatRoomMember.setLastReadMessageId(0L);
-        }
+        chatRoomMember.setLastReadMessageId(lastReadMessage != null ? lastReadMessage.getId() : null);
         chatRoomMemberRepository.save(chatRoomMember);
     }
 
