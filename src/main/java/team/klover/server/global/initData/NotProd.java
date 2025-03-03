@@ -11,12 +11,16 @@ import team.klover.server.domain.auth.dto.SignupRequestDto;
 import team.klover.server.domain.auth.service.AuthV1Service;
 import team.klover.server.domain.community.commPost.dto.req.CommPostForm;
 import team.klover.server.domain.community.commPost.entity.CommPost;
+import team.klover.server.domain.community.commPost.repository.CommPostRepository;
 import team.klover.server.domain.community.commPost.service.CommPostService;
 import team.klover.server.domain.community.comment.dto.req.CommentForm;
 import team.klover.server.domain.community.comment.service.CommentService;
+import team.klover.server.domain.member.v1.dto.MemberUpdateParam;
 import team.klover.server.domain.member.v1.entity.Member;
+import team.klover.server.domain.member.v1.enums.Country;
 import team.klover.server.domain.member.v1.enums.SocialProvider;
 import team.klover.server.domain.member.v1.repository.MemberV1Repository;
+import team.klover.server.domain.member.v1.service.MemberV1Service;
 import team.klover.server.domain.tour.review.dto.req.ReviewForm;
 import team.klover.server.domain.tour.review.service.ReviewService;
 import team.klover.server.domain.tour.tourApi.scheduler.ApisScheduler;
@@ -44,7 +48,9 @@ public class NotProd {
             CommPostService commPostService,
             CommentService commentService,
             ReviewService reviewService,
-            TourPostRepository tourPostRepository
+            TourPostRepository tourPostRepository,
+            CommPostRepository commPostRepository,
+            MemberV1Service memberV1Service
     ) {
         return new ApplicationRunner() {
             @Transactional
@@ -55,30 +61,10 @@ public class NotProd {
                 //
                 //
 
+                /*
                 apisScheduler.getApisApiData();
-                /*
 
 
-                // Member 1,2,3 생성
-                Member Member1 = authV1Service.signup(SignupRequestDto.builder()
-                                .email("test1@test.com")
-                                .nickname("test1")
-                                .password("1234")
-                        .build());
-                Member Member2 = authV1Service.signup(SignupRequestDto.builder()
-                        .email("test2@test.com")
-                        .nickname("test2")
-                        .password("1234")
-                        .build());
-                Member Member3 = authV1Service.signup(SignupRequestDto.builder()
-                        .email("test3@test.com")
-                        .nickname("test3")
-                        .password("1234")
-                        .build());
-
-
-                 */
-                /*
 
                 for(int i=0;i<50;i++){
                     authV1Service.signup(SignupRequestDto.builder()
@@ -140,7 +126,56 @@ public class NotProd {
                         reviewService.addReview(members.get(j).getId(), commonPlaceId, reviewForm);
                     }
                 }
-                */
+
+
+
+                List<CommPost> forUpdate = commPostRepository.findAll();
+                for(CommPost commPost : forUpdate){
+                    Member member = commPost.getMember();
+                    Double newMapX = new Random(System.currentTimeMillis()).nextDouble(126, 130);
+                    Double newMapY = new Random(System.currentTimeMillis()).nextDouble(33,38);
+                    CommPostForm commPostForm= CommPostForm.builder()
+                            .content(commPost.getContent())
+                            .imageUrl(commPost.getImageUrl())
+                            .mapX(newMapX)
+                            .mapY(newMapY)
+                            .build();
+                    commPostService.updateCommPost(member.getId(),commPost.getId(),commPostForm);
+                }
+
+
+                List<Member> memberForUpdate = MemberRepository.findAll();
+                for(Member member:memberForUpdate){
+                    Long memberId = member.getId();
+                    String nickname;
+                    Country country;
+                    int randomIdx = new Random(System.currentTimeMillis()).nextInt(0,4);
+                    switch (randomIdx){
+                        case 0 -> {
+                            nickname=new Faker(Locale.of("zh","CN")).name().fullName();
+                            country=Country.ChsService1;
+                        }
+                        case 1 -> {
+                            nickname= new Faker(Locale.of("ja","JP")).name().fullName();
+                            country=Country.JpnService1;
+                        }
+                        case 2 -> {
+                            nickname=new Faker(Locale.of("ko","KR")).name().fullName();
+                            country=Country.KorService1;
+                        }
+                        default -> {
+                            nickname=new Faker(Locale.of("en","US")).name().fullName();
+                            country=Country.EngService1;
+                        }
+                    }
+                    MemberUpdateParam memberUpdateParam = MemberUpdateParam.builder()
+                            .nickname(nickname)
+                            .country(country)
+                            .build();
+                    memberV1Service.updateMember(memberId,memberUpdateParam,null);
+                }
+
+                 */
 
             }
 

@@ -4,11 +4,29 @@
   ],
   "template": {
     "settings": {
+      "index" : {
+        "max_ngram_diff": 10
+      },
       "analysis": {
+        "char_filter": {
+          "remove_korean": {
+            "type": "pattern_replace",
+            "pattern": "[ㄱ-ㅎ가-힣]",
+            "replacement": ""
+          },
+          "remove_symbols": {
+            "type": "pattern_replace",
+            "pattern": "[\\p{P}\\p{S}\\s]",
+            "replacement": ""
+          }
+        },
         "analyzer": {
           "english_content_analyzer": {
             "type": "custom",
             "tokenizer": "standard",
+            "char_filter": [
+              "remove_korean"
+            ],
             "filter": [
               "lowercase",
               "stop",
@@ -20,21 +38,49 @@
           "english_word_analyzer": {
             "type": "custom",
             "tokenizer": "standard",
+            "char_filter": [
+              "remove_korean"
+            ],
             "filter": [
               "lowercase",
-              "stop",
-              "porter_stem",
               "asciifolding",
-              "word_delimiter_graph",
+              "my_word_delimiter_graph",
               "ngram_filter"
+            ]
+          },
+          "keyword_analyzer": {
+            "type": "custom",
+            "tokenizer": "keyword",
+            "char_filter": [
+              "remove_korean",
+              "remove_symbols"
+            ],
+            "filter": [
+              "lowercase",
+              "asciifolding"
+            ]
+          },
+          "normal_analyzer": {
+            "type": "custom",
+            "tokenizer": "standard",
+            "char_filter": [
+              "remove_korean"
+            ],
+            "filter": [
+              "lowercase",
+              "asciifolding"
             ]
           }
         },
         "filter": {
-          "ngram_filter":{
+          "ngram_filter": {
             "type": "ngram",
-            "min_gram": 2,
-            "max_gram": 3
+            "min_gram": 3,
+            "max_gram": 8
+          },
+          "my_word_delimiter_graph": {
+            "type": "word_delimiter_graph",
+            "preserve_original": true
           }
         }
       }
@@ -61,7 +107,13 @@
         },
         "nickname": {
           "type": "text",
-          "analyzer": "english_word_analyzer"
+          "analyzer": "normal_analyzer",
+          "fields": {
+            "ngram": {
+              "type": "text",
+              "analyzer": "english_word_analyzer"
+            }
+          }
         },
         "comment_count": {
           "type": "long"
@@ -70,6 +122,9 @@
           "type": "long"
         },
         "language": {
+          "type": "keyword"
+        },
+        "image_url": {
           "type": "keyword"
         }
       }

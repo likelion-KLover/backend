@@ -17,6 +17,7 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 @JsonIgnoreProperties({"@timestamp"})
 public class CommPostDoc {
+    private Long id;
     private Long member_id;
     private String content;
 
@@ -30,4 +31,5 @@ public class CommPostDoc {
     private Long comment_count;
     private Long like_count;
     private Country language;
+    private String image_url;
 }

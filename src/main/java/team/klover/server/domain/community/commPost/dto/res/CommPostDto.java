@@ -1,11 +1,13 @@
 package team.klover.server.domain.community.commPost.dto.res;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
+import team.klover.server.global.elasticsearch.commpost.doc.CommPostDoc;
 
 import java.time.LocalDateTime;
 
-@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
 @Builder
 public class CommPostDto {
     private Long memberId;
@@ -14,4 +16,13 @@ public class CommPostDto {
     private Double mapY;
     private String imageUrl;
     private LocalDateTime createDate;
+
+    public CommPostDto(CommPostDoc commPostDoc){
+        memberId = commPostDoc.getMember_id();
+        nickname = commPostDoc.getNickname();
+        mapX = commPostDoc.getLocation().getLon();
+        mapY = commPostDoc.getLocation().getLat();
+        imageUrl = commPostDoc.getImage_url();
+        createDate = commPostDoc.getCreate_date().toLocalDateTime();
+    }
 }

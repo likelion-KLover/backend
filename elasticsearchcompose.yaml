@@ -1,9 +1,6 @@
 services:
   elasticsearch:
-  #meilisearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.17.1
-    #image: getmeili/meilisearch
-    #container_name: meilisearch
     container_name: elasticsearch
     entrypoint: >
       /bin/sh -c "
@@ -16,14 +13,29 @@ services:
       
       if ! bin/elasticsearch-plugin list | grep -q 'analysis-kuromoji'; then
       echo 'start to install analysis-kuromoji';
-      bin/elasticsearch-plugin install analysis-kuromoji;
+      bin/elasticsearch-plugin install --batch analysis-kuromoji;
       else
       echo 'analysis-kuromoji already exists';
       fi;
       
+      
+      if ! bin/elasticsearch-plugin list | grep -q 'analysis-icu'; then
+      echo 'start to install analysis-icu...';
+      bin/elasticsearch-plugin install --batch analysis-icu;
+      else
+      echo 'analysis-icu already exists';
+      fi;
+      
+      if ! bin/elasticsearch-plugin list | grep -q 'analysis-pinyin'; then
+      echo 'start to install analysis-pinyin...';
+      bin/elasticsearch-plugin install --batch file:///downloads/elasticsearch-analysis-pinyin-8.17.1.zip;
+      else
+      echo 'analysis-pinyin already exists';
+      fi;
+      
       if ! bin/elasticsearch-plugin list | grep -q 'analysis-ik'; then
       echo 'start to install analysis-ik...';
-      bin/elasticsearch-plugin install --batch https://get.infini.cloud/elasticsearch/analysis-ik/8.17.1;
+      bin/elasticsearch-plugin install --batch file:///downloads/elasticsearch-analysis-ik-8.17.1.zip;
       else
       echo 'analysis-ik already exists';
       fi;
@@ -33,8 +45,11 @@ services:
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
+    volumes:
+      - ./logstash/analyzer:/downloads
+      - ./logstash/dict/result.txt:/usr/share/elasticsearch/config/userdict_ja.txt
     ports:
-#      - "7700:7700"
+      #      - "7700:7700"
       - "9200:9200"
     networks:
       - elastic
@@ -55,7 +70,7 @@ services:
     container_name: logstash
     environment:
       - LS_JAVA_OPTS=-Xms512m -Xmx512m
-#      - XPACK_MONITORING_ENABLED=false
+    #      - XPACK_MONITORING_ENABLED=false
     volumes:
       - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
       - ./logstash/lib/postgresql-42.3.1.jar:/usr/share/logstash/logstash-core/lib/jars/postgresql-42.3.1.jar:ro
@@ -66,7 +81,7 @@ services:
       - "5001:5001"
       - "5044:5044"
     depends_on:
-#      - meilisearch
+      #      - meilisearch
       - elasticsearch
     networks:
       - elastic
