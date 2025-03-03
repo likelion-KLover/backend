@@ -40,7 +40,7 @@ public class CommentServiceImpl implements CommentService {
     @Transactional(readOnly = true)
     public Page<CommentDto> findByCommPostId(Long commPostId, Pageable pageable){
         checkPageSize(pageable.getPageSize());
-        Page<Comment> comments = commentRepository.findByCommPostId(commPostId, pageable);
+        Page<Comment> comments = commentRepository.findByCommPostIdOrderByCreateDateDesc(commPostId, pageable);
         return comments.map(this::convertToCommentDto);
     }
 

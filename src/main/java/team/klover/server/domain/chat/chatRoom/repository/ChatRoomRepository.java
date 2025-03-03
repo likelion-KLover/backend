@@ -28,4 +28,15 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
             "    )" +
             ")")
     boolean existsOneOnOneChatRoom(@Param("memberId1") Long memberId1, @Param("memberId2") Long memberId2);
+
+    // 사용자가 참여 중인 채팅방 목록을 최신 메시지 순으로 조회
+    @Query("""
+    SELECT cr FROM ChatRoom cr
+    JOIN cr.chatRoomMembers crm
+    LEFT JOIN ChatMessage cm ON cm.chatRoom = cr
+    WHERE crm.member = :member
+    GROUP BY cr, crm
+    ORDER BY COALESCE(MAX(cm.createDate), cr.createDate) DESC
+    """)
+    Page<ChatRoom> findChatRoomsByMemberOrderByLatestMessage(@Param("member") Member member, Pageable pageable);
 }
