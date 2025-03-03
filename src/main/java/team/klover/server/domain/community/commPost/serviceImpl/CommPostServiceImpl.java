@@ -17,6 +17,7 @@ import team.klover.server.domain.community.commPost.entity.*;
 import team.klover.server.domain.community.commPost.event.CommPostLikedEvent;
 import team.klover.server.domain.community.commPost.repository.CommPostRepository;
 import team.klover.server.domain.community.commPost.service.CommPostService;
+import team.klover.server.domain.community.comment.service.CommentService;
 import team.klover.server.domain.member.v1.entity.Member;
 import team.klover.server.domain.member.v1.enums.Country;
 import team.klover.server.domain.member.v1.repository.MemberV1Repository;
@@ -35,6 +36,7 @@ public class CommPostServiceImpl implements CommPostService {
     private final TourPostService tourPostService;
     private final LanguageDetect languageDetect;
     private final ApplicationEventPublisher publisher;
+    private final CommentService commentService;
 
     // 사용자 위치 주변 게시글(관광지&사용자) 조회
     public CombinedPostResponse findPostsWithinRadius(@Valid XYForm xyForm, Pageable pageable){
@@ -77,7 +79,7 @@ public class CommPostServiceImpl implements CommPostService {
     // 사용자 닉네임 & 게시글 내용 검색
     @Override
     @Transactional(readOnly = true)
-    public Page<CommPostDto> searchByNicknameAndContent(String keyword, Pageable pageable){
+    public Page<CommPostDto> searchByKeyword(String keyword, Pageable pageable){
         checkPageSize(pageable.getPageSize());
         Page<CommPost> commPosts = commPostRepository.searchByKeyword(keyword, pageable);
         return commPosts.map(this::convertToCommPostDto);
@@ -205,6 +207,7 @@ public class CommPostServiceImpl implements CommPostService {
         if (!commPost.getMember().getId().equals(member.getId())) {
             throw new KloverRequestException(ReturnCode.NOT_AUTHORIZED);
         }
+        commentService.deleteAllComments(commPostId);
         commPostRepository.delete(commPost);
         member.removeCommPost(commPost);
     }

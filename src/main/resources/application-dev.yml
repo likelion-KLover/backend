@@ -16,6 +16,14 @@ spring:
     redis:
       host: localhost
       port: 6379
+    mongodb:
+      uri: mongodb://admin:admin@localhost:27017/meta_db?authSource=admin
+      database: meta_db
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: admin
+    password: admin
 
 # Swagger 설정 추가
 springdoc:

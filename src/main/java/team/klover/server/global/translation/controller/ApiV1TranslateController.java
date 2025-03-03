@@ -20,7 +20,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
 @RequestMapping(value = "/api/v1/translate",produces =APPLICATION_JSON_VALUE )
-@Tag(name = "ApiV1TranslateController",description = "Translate API")
+@Tag(name = "ApiV1TranslateController",description = "Translate API") //DeepL API를 호출하는 REST 컨트롤러
 public class ApiV1TranslateController {
 
     @Value("${translation.deepl.api-url}")

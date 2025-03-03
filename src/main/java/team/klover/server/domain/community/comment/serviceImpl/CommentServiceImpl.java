@@ -134,6 +134,15 @@ public class CommentServiceImpl implements CommentService {
         member.removeComment(comment);
     }
 
+    // 해당 게시글의 모든 댓글 삭제
+    @Override
+    @Transactional
+    public void deleteAllComments(Long commPostId){
+        CommPost commPost = commPostRepository.findById(commPostId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
+        List<Comment> comments = commentRepository.findByCommPost(commPost);
+        commentRepository.deleteAll(comments);
+    }
+
     // 해당 댓글의 모든 하위 댓글 삭제
     private void deleteChildComments(Long superCommentId) {
         List<Comment> childComments = commentRepository.findBySuperCommentId(superCommentId);

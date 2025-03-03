@@ -7,6 +7,6 @@ import java.util.List;
 
 @Getter
 @Setter
-public class TranslationResponse {
+public class TranslationResponse { //번역 API 응답을 담는 DTO(번역 목록 포함)
     private List<Translation> translations;
 }

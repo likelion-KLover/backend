@@ -27,13 +27,32 @@ services:
     ports:
       - "5672:5672"  # AMQP 포트
       - "15672:15672"  # 관리 UI 포트
+      - "61613:61613"
     environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq
+      - ./dockerProjects/rabbitmq-1/volumes/etc/rabbitmq:/etc/rabbitmq
+      - ./dockerProjects/rabbitmq-1/volumes/var/lib/rabbitmq:/var/lib/rabbitmq
+      - ./dockerProjects/rabbitmq-1/volumes/var/log/rabbitmq:/var/log/rabbitmq
+    command: >
+      sh -c "echo 'loopback_users = none' >> /etc/rabbitmq/rabbitmq.conf && rabbitmq-plugins enable rabbitmq_management && rabbitmq-plugins enable rabbitmq_stomp && rabbitmq-plugins enable rabbitmq_mqtt && rabbitmq-server"
+
+  mongo:
+    image: mongo:latest
+    container_name: my-mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+    volumes:
+      - mongo-data:/data/db
 
 volumes:
   postgres-data:
   redis-data:
   rabbitmq-data:
+  mongo-data:

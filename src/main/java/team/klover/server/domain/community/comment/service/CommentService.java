@@ -24,4 +24,7 @@ public interface CommentService {
 
     // 해당 댓글 삭제
     void deleteComment(Long currentMemberId, Long commentId);
+
+    // 해당 게시글의 모든 댓글 삭제
+    void deleteAllComments(Long commPostId);
 }
