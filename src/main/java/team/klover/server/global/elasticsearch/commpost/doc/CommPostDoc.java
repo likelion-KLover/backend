@@ -8,6 +8,7 @@ import team.klover.server.domain.member.v1.enums.Country;
 import team.klover.server.global.util.CustomZonedDateTimeConverter;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -31,5 +32,5 @@ public class CommPostDoc {
     private Long comment_count;
     private Long like_count;
     private Country language;
-    private String image_url;
+    private List<String> image_url;
 }

@@ -4,6 +4,7 @@ import lombok.*;
 import team.klover.server.global.elasticsearch.commpost.doc.CommPostDoc;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -14,7 +15,7 @@ public class CommPostDto {
     private String nickname;
     private Double mapX;
     private Double mapY;
-    private String imageUrl;
+    private List<String> imageUrls;
     private LocalDateTime createDate;
 
     public CommPostDto(CommPostDoc commPostDoc){
@@ -22,7 +23,7 @@ public class CommPostDto {
         nickname = commPostDoc.getNickname();
         mapX = commPostDoc.getLocation().getLon();
         mapY = commPostDoc.getLocation().getLat();
-        imageUrl = commPostDoc.getImage_url();
+        imageUrls = commPostDoc.getImage_url();
         createDate = commPostDoc.getCreate_date().toLocalDateTime();
     }
 }

@@ -3,12 +3,14 @@ package team.klover.server.domain.community.commPost.service;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 import team.klover.server.domain.community.commPost.dto.req.CommPostForm;
 import team.klover.server.domain.community.commPost.dto.req.XYForm;
 import team.klover.server.domain.community.commPost.dto.res.CombinedPostResponse;
 import team.klover.server.domain.community.commPost.dto.res.CommPostDto;
 import team.klover.server.domain.community.commPost.dto.res.DetailCommPostDto;
-import team.klover.server.domain.community.commPost.entity.CommPost;
+
+import java.util.List;
 
 public interface CommPostService {
     // 사용자 위치 주변 게시글(관광지&사용자) 조회
@@ -39,10 +41,10 @@ public interface CommPostService {
     void deleteCommPostLike(Long currentMemberId, Long commPostId);
 
     // 게시글 생성
-    CommPost addCommPost(Long memberId, @Valid CommPostForm commPostForm);
+    void addCommPost(Long currentMemberId, @Valid CommPostForm commPostForm, List<MultipartFile> imageFiles);
 
     // 해당 게시글 수정
-    void updateCommPost(Long currentMemberId, Long commPostId, @Valid CommPostForm commPostForm);
+    void updateCommPost(Long currentMemberId, Long commPostId, @Valid CommPostForm commPostForm, List<MultipartFile> imageFiles);
 
     // 해당 게시글 삭제
     void deleteCommPost(Long currentMemberId, Long commPostId);
