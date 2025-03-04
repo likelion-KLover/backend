@@ -13,5 +13,4 @@ public class CommPostForm {
     private Double mapX;
     private Double mapY;
     private String content;
-    private String imageUrl;
 }

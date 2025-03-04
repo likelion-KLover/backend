@@ -20,7 +20,8 @@ import team.klover.server.global.util.AuthUtil;
 public class ApiV1ChatMessageController {
     private final ChatMessageService chatMessageService;
 
-    // 해당 채팅방의 메시지 조회
+    // 해당 채팅방의 메시지 실시간 조회 시작
+    // http://localhost:8080/api/v1/chat-room/message/1
     @GetMapping("/{chatRoomId}")
     public ApiResponse<ChatMessageDto> findByChatRoomId(@ModelAttribute ChatMessagePage request, @PathVariable("chatRoomId") Long chatRoomId) {
         Long currentMemberId = AuthUtil.getCurrentMemberId();
@@ -28,7 +29,17 @@ public class ApiV1ChatMessageController {
         return ApiResponse.of(KloverPage.of(chatMessageService.findByChatRoomId(currentMemberId, chatRoomId, pageable)));
     }
 
+    // 해당 채팅방의 메시지 실시간 조회 중단
+    // http://localhost:8080/api/v1/chat-room/message/1
+    @PutMapping("/{chatRoomId}")
+    public ApiResponse<String> updateLastReadMessage(@PathVariable("chatRoomId") Long chatRoomId){
+        Long currentMemberId = AuthUtil.getCurrentMemberId();
+        chatMessageService.updateLastReadMessage(currentMemberId, chatRoomId);
+        return ApiResponse.of(ReturnCode.SUCCESS);
+    }
+
     // 해당 채팅방에서 메시지 검색(닉네임/내용)
+    // http://localhost:8080/api/v1/chat-room/message/1/keyword?keyword=테스트
     @GetMapping("/{chatRoomId}/keyword")
     public ApiResponse<ChatMessageDto> searchChatMessage(@ModelAttribute ChatMessagePage request, @PathVariable("chatRoomId") Long chatRoomId,
                                                          @RequestParam("keyword") String keyword) {
@@ -38,6 +49,7 @@ public class ApiV1ChatMessageController {
     }
 
     // 해당 채팅방에서 메시지 생성
+    // http://localhost:8080/api/v1/chat-room/message/1
     @PostMapping("/{chatRoomId}")
     public ApiResponse<String> writeChatMessage(@PathVariable("chatRoomId") Long chatRoomId, @RequestBody @Valid ChatMessageForm chatMessageForm){
         Long currentMemberId = AuthUtil.getCurrentMemberId();
@@ -46,6 +58,7 @@ public class ApiV1ChatMessageController {
     }
 
     // 해당 메시지 삭제
+    // http://localhost:8080/api/v1/chat-room/message/1
     @DeleteMapping("/{messageId}")
     public ApiResponse<String> deleteChatMessage(@PathVariable("messageId") Long messageId){
         Long currentMemberId = AuthUtil.getCurrentMemberId();

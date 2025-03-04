@@ -38,7 +38,7 @@ public class ReviewServiceImpl implements ReviewService {
     @Transactional(readOnly = true)
     public Page<ReviewDto> findByCommonPlaceId(String commonPlaceId, Pageable pageable) {
         checkPageSize(pageable.getPageSize());
-        Page<Review> reviews = reviewRepository.findByCommonPlaceId(commonPlaceId, pageable);
+        Page<Review> reviews = reviewRepository.findByCommonPlaceIdOrderByCreateDateDesc(commonPlaceId, pageable);
         return reviews.map(this::convertToReviewDto);
     }
 

@@ -6,7 +6,7 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     show-sql: true      # SQL 쿼리 로깅 (개발 중에만 true)
     properties:
       hibernate:
@@ -16,6 +16,14 @@ spring:
     redis:
       host: localhost
       port: 6379
+    mongodb:
+      uri: mongodb://admin:admin@localhost:27017/meta_db?authSource=admin
+      database: meta_db
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: admin
+    password: admin
 
 # Swagger 설정 추가
 springdoc:

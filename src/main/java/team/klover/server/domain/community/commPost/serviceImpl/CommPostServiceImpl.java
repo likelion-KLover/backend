@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import team.klover.server.domain.community.commPost.dto.req.CommPostForm;
 import team.klover.server.domain.community.commPost.dto.req.XYForm;
 import team.klover.server.domain.community.commPost.dto.res.CombinedPostResponse;
@@ -17,14 +18,21 @@ import team.klover.server.domain.community.commPost.entity.*;
 import team.klover.server.domain.community.commPost.event.CommPostLikedEvent;
 import team.klover.server.domain.community.commPost.repository.CommPostRepository;
 import team.klover.server.domain.community.commPost.service.CommPostService;
+import team.klover.server.domain.community.comment.service.CommentService;
 import team.klover.server.domain.member.v1.entity.Member;
 import team.klover.server.domain.member.v1.enums.Country;
 import team.klover.server.domain.member.v1.repository.MemberV1Repository;
 import team.klover.server.domain.tour.tourPost.dto.res.TourPostDto;
 import team.klover.server.domain.tour.tourPost.service.TourPostService;
+import team.klover.server.global.exception.KloverException;
 import team.klover.server.global.exception.KloverRequestException;
 import team.klover.server.global.exception.ReturnCode;
+import team.klover.server.global.s3.S3Service;
 import team.klover.server.global.util.LanguageDetect;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -35,6 +43,8 @@ public class CommPostServiceImpl implements CommPostService {
     private final TourPostService tourPostService;
     private final LanguageDetect languageDetect;
     private final ApplicationEventPublisher publisher;
+    private final CommentService commentService;
+    private final S3Service s3Service;
 
     // 사용자 위치 주변 게시글(관광지&사용자) 조회
     public CombinedPostResponse findPostsWithinRadius(@Valid XYForm xyForm, Pageable pageable){
@@ -149,17 +159,27 @@ public class CommPostServiceImpl implements CommPostService {
     // 게시글 생성
     @Override
     @Transactional
-    public void addCommPost(Long currentMemberId, @Valid CommPostForm commPostForm){
+    public void addCommPost(Long currentMemberId, @Valid CommPostForm commPostForm, List<MultipartFile> imageFiles) {
         // 현재 로그인한 사용자의 member 객체를 가져오는 메서드
         Member member = memberV1Repository.findById(currentMemberId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
 
+        // 입력 받은 이미지들 S3에 저장
+        List<String> imageUrls = new ArrayList<>();
+        for (MultipartFile imageFile : imageFiles) {
+            try {
+                String imageUrl = s3Service.uploadFile(imageFile, "commPost-images");
+                imageUrls.add(imageUrl);
+            } catch (IOException e) {
+                throw new KloverRequestException(ReturnCode.INTERNAL_ERROR);
+            }
+        }
         Country country = languageDetect.execute(commPostForm.getContent());
         CommPost commPost = CommPost.builder()
                 .member(member)
                 .content(commPostForm.getContent())
                 .mapX(commPostForm.getMapX())
                 .mapY(commPostForm.getMapY())
-                .imageUrl(commPostForm.getImageUrl())
+                .imageUrls(imageUrls)
                 .language(country)
                 .build();
         commPostRepository.save(commPost);
@@ -168,7 +188,7 @@ public class CommPostServiceImpl implements CommPostService {
     // 해당 게시글 수정
     @Override
     @Transactional
-    public void updateCommPost(Long currentMemberId, Long commPostId, @Valid CommPostForm commPostForm){
+    public void updateCommPost(Long currentMemberId, Long commPostId, @Valid CommPostForm commPostForm, List<MultipartFile> imageFiles) {
         CommPost commPost = commPostRepository.findById(commPostId)
                 .orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
 
@@ -177,10 +197,22 @@ public class CommPostServiceImpl implements CommPostService {
         if (!commPost.getMember().getId().equals(member.getId())) {
             throw new KloverRequestException(ReturnCode.NOT_AUTHORIZED);
         }
+
+        // 기존 이미지들 삭제 후 입력 받은 이미지들 S3에 저장
+        s3Service.deleteAllFile(commPost.getImageUrls());
+        List<String> imageUrls = new ArrayList<>();
+        for (MultipartFile imageFile : imageFiles) {
+            try {
+                String imageUrl = s3Service.uploadFile(imageFile, "commPost-images");
+                imageUrls.add(imageUrl);
+            } catch (IOException e) {
+                throw new KloverRequestException(ReturnCode.INTERNAL_ERROR);
+            }
+        }
         commPost.setMapX(commPostForm.getMapX());
         commPost.setMapY(commPostForm.getMapY());
         commPost.setContent(commPostForm.getContent());
-        commPost.setImageUrl(commPostForm.getImageUrl());
+        commPost.setImageUrls(imageUrls);
         //language는 작성 당시의 language만을 따라갑니다.
         commPostRepository.save(commPost);
     }
@@ -197,6 +229,8 @@ public class CommPostServiceImpl implements CommPostService {
         if (!commPost.getMember().getId().equals(member.getId())) {
             throw new KloverRequestException(ReturnCode.NOT_AUTHORIZED);
         }
+        commentService.deleteAllComments(commPostId);
+        s3Service.deleteAllFile(commPost.getImageUrls());
         commPostRepository.delete(commPost);
     }
 
@@ -215,7 +249,7 @@ public class CommPostServiceImpl implements CommPostService {
                 .nickname(commPost.getMember().getNickname())
                 .mapX(commPost.getMapX())
                 .mapY(commPost.getMapY())
-                .imageUrl(commPost.getImageUrl())
+                .imageUrls(commPost.getImageUrls())
                 .createDate(commPost.getCreateDate())
                 .build();
     }
@@ -229,7 +263,7 @@ public class CommPostServiceImpl implements CommPostService {
                 .mapX(commPost.getMapX())
                 .mapY(commPost.getMapY())
                 .content(commPost.getContent())
-                .imageUrl(commPost.getImageUrl())
+                .imageUrls(commPost.getImageUrls())
                 .createDate(commPost.getCreateDate())
                 .build();
     }

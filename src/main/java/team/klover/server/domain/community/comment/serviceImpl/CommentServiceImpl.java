@@ -40,7 +40,7 @@ public class CommentServiceImpl implements CommentService {
     @Transactional(readOnly = true)
     public Page<CommentDto> findByCommPostId(Long commPostId, Pageable pageable){
         checkPageSize(pageable.getPageSize());
-        Page<Comment> comments = commentRepository.findByCommPostId(commPostId, pageable);
+        Page<Comment> comments = commentRepository.findByCommPostIdOrderByCreateDateDesc(commPostId, pageable);
         return comments.map(this::convertToCommentDto);
     }
 
@@ -127,6 +127,15 @@ public class CommentServiceImpl implements CommentService {
         deleteChildComments(commentId);
         commentRepository.save(comment); // 답글 삭제 후 더티 체킹
         commentRepository.delete(comment);
+    }
+
+    // 해당 게시글의 모든 댓글 삭제
+    @Override
+    @Transactional
+    public void deleteAllComments(Long commPostId){
+        CommPost commPost = commPostRepository.findById(commPostId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
+        List<Comment> comments = commentRepository.findByCommPost(commPost);
+        commentRepository.deleteAll(comments);
     }
 
     // 해당 댓글의 모든 하위 댓글 삭제

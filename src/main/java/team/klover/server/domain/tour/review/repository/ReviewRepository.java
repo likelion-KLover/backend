@@ -16,11 +16,9 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Query("SELECT DISTINCT r FROM Review r " +
             "JOIN r.reviewTourPosts rtp " +
             "JOIN rtp.tourPost tp " +
-            "WHERE tp.commonPlaceId = :commonPlaceId")
-    Page<Review> findByCommonPlaceId(@Param("commonPlaceId") String commonPlaceId, Pageable pageable);
-
-    // 본인이 작성한 리뷰 조회
-    Review findByMemberId(Long currentMemberId);
+            "WHERE tp.commonPlaceId = :commonPlaceId " +
+            "ORDER BY r.createDate DESC")
+    Page<Review> findByCommonPlaceIdOrderByCreateDateDesc(@Param("commonPlaceId") String commonPlaceId, Pageable pageable);
 
     // 해당 관광지의 리뷰 평점 구하기 (ReviewTourPost 경유)
     @Query("SELECT COALESCE(AVG(r.rating), 0) " +
