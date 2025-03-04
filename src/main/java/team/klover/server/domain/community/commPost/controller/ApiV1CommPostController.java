@@ -157,7 +157,8 @@ public class ApiV1CommPostController {
     }
 
     //http://localhost:8080/api/v1/comm-post/test
-    @GetMapping("/test")
+    @GetMapping("/search")
+    @Operation(summary = "게시글 검색(엘라스틱서치)")
     public ApiResponse<CommPostDto> test(@RequestParam(value = "page",defaultValue = "0") int page,
                                                @RequestParam(value = "size",defaultValue = "20") int size,
                                                @RequestParam(value = "keyword",defaultValue = "")String keyword,

@@ -95,7 +95,7 @@ public class ApiV1TourPostController {
 
 
     // http://localhost:8080/api/v1/tour-post/test
-    @GetMapping("/test")
+    @GetMapping("/search")
     public ApiResponse<TourPostDto> test(@RequestParam(value = "page",defaultValue = "0") int page,
                                          @RequestParam(value = "size",defaultValue = "20") int size,
                                          @RequestParam(value = "keyword",defaultValue = "")String keyword,
