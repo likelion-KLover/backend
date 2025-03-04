@@ -2,37 +2,82 @@
   "index_patterns": ["tourpostchs*"],
   "template": {
     "settings": {
+      "index" : {
+        "max_ngram_diff": 10
+      },
       "analysis": {
+        "char_filter": {
+          "remove_korean": {
+            "type": "pattern_replace",
+            "pattern": "[ㄱ-ㅎ가-힣]",
+            "replacement": ""
+          },
+          "remove_symbols": {
+            "type": "pattern_replace",
+            "pattern": "[\\p{P}\\p{S}\\s]",
+            "replacement": ""
+          }
+        },
         "analyzer": {
-          "chs_content_analyzer": {
+          "chs_content_search_analyzer": {
             "type": "custom",
             "tokenizer": "ik_smart",
+            "char_filter": [
+              "remove_korean"
+            ],
             "filter": [
-              "lowercase",
-              "stop",
-              "porter_stem",
-              "asciifolding",
-              "word_delimiter_graph"
+              "cjk_width",
+              "my_pinyin",
+              "asciifolding"
+            ]
+          },
+          "chs_word_search_analyzer": {
+            "type": "custom",
+            "tokenizer": "keyword",
+            "char_filter": [
+              "remove_korean",
+              "remove_symbols"
+            ],
+            "filter": [
+                "cjk_width",
+                "ngram_filter",
+                "my_pinyin",
+                "asciifolding",
+                "unique"
             ]
           },
           "chs_word_analyzer": {
             "type": "custom",
-            "tokenizer": "ik_max_word",
+            "tokenizer": "ik_smart",
+            "char_filter": [
+              "remove_korean"
+            ],
             "filter": [
-              "lowercase",
-              "ngram_filter",
-              "stop",
-              "porter_stem",
-              "asciifolding",
-              "word_delimiter_graph"
+              "cjk_width",
+              "my_pinyin",
+              "asciifolding"
             ]
           }
         },
         "filter": {
-          "ngram_filter":{
+          "ngram_filter": {
             "type": "ngram",
             "min_gram": 2,
-            "max_gram": 3
+            "max_gram": 4
+          },
+          "my_pinyin": {
+            "type": "pinyin",
+            "keep_first_letter": false,
+            "keep_separate_first_letter": false,
+            "keep_full_pinyin": true,
+            "keep_original": false,
+            "keep_joined_full_pinyin": false,
+            "limit_first_letter_length": 0,
+            "lowercase": true
+          },
+          "han_to_latin": {
+            "type": "icu_transform",
+            "id": "Han-Latin"
           }
         }
       }
@@ -43,7 +88,7 @@
           "type": "long"
         },
         "common_place_id": {
-          "type": "keyword"
+          "type": "long"
         },
         "first_image":{
           "type": "keyword"
@@ -53,11 +98,17 @@
         },
         "title": {
           "type": "text",
-          "analyzer": "chs_word_analyzer"
+          "analyzer": "chs_word_analyzer",
+          "fields": {
+            "ngram": {
+              "type": "text",
+              "analyzer": "chs_word_search_analyzer"
+            }
+          }
         },
         "overview": {
           "type": "text",
-          "analyzer": "chs_content_analyzer"
+          "analyzer": "chs_content_search_analyzer"
         },
         "location": {
           "type": "geo_point"
@@ -85,8 +136,11 @@
           "type": "long"
         },
         "rating_average": {
-          "type": "float",
+          "type": "scaled_float",
           "scaling_factor": 10
+        },
+        "language": {
+          "type": "keyword"
         }
       }
     }

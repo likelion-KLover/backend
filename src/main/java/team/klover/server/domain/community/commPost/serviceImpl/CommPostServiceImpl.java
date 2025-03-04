@@ -102,12 +102,13 @@ public class CommPostServiceImpl implements CommPostService {
 
         boolean alreadySaved = commPost.getSavedMembers()
                 .stream()
-                .anyMatch(savedMember -> savedMember.getId().equals(member.getId()));
+                .anyMatch(commPostSave -> commPostSave.getMember() !=null && commPostSave.getMember().getId().equals(member.getId()));
         if (alreadySaved) {
             throw new KloverRequestException(ReturnCode.ALREADY_EXIST);
         }
         CommPostSave commPostSave = new CommPostSave(member, commPost);
         commPost.getSavedMembers().add(commPostSave);
+        member.addSavedCommPost(commPostSave);
     }
 
     // 해당 게시글 저장 취소
@@ -115,12 +116,14 @@ public class CommPostServiceImpl implements CommPostService {
     @Transactional
     public void deleteCollectionCommPost(Long currentMemberId, Long commPostId){
         CommPost commPost = commPostRepository.findById(commPostId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
+        Member member = memberV1Repository.findById(currentMemberId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
         CommPostSave commPostSave = commPost.getSavedMembers()
                 .stream()
-                .filter(m -> m.getMember().getId().equals(currentMemberId))
+                .filter(m -> m.getMember() != null && m.getMember().getId().equals(currentMemberId))
                 .findFirst()
                 .orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
         commPost.getSavedMembers().remove(commPostSave);
+        member.removeSavedCommPost(commPostSave);
     }
 
     // 게시글 좋아요
@@ -132,12 +135,13 @@ public class CommPostServiceImpl implements CommPostService {
 
         boolean alreadySaved = commPost.getLikedMembers()
                 .stream()
-                .anyMatch(savedMember -> savedMember.getId().equals(member.getId()));
+                .anyMatch(commPostLike -> commPostLike.getMember() != null && commPostLike.getMember().getId().equals(member.getId()));
         if (alreadySaved) {
             throw new KloverRequestException(ReturnCode.ALREADY_EXIST);
         }
         CommPostLike commPostLike = new CommPostLike(member, commPost);
         commPost.getLikedMembers().add(commPostLike);
+        member.addLikedCommPost(commPostLike);
 
         // 이벤트 발행 및 생성
         publisher.publishEvent(new CommPostLikedEvent(this, commPost, member));
@@ -148,12 +152,14 @@ public class CommPostServiceImpl implements CommPostService {
     @Transactional
     public void deleteCommPostLike(Long currentMemberId, Long commPostId){
         CommPost commPost = commPostRepository.findById(commPostId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
+        Member member = memberV1Repository.findById(currentMemberId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
         CommPostLike commPostLike = commPost.getLikedMembers()
                 .stream()
-                .filter(m -> m.getMember().getId().equals(currentMemberId))
+                .filter(m -> m.getMember()!=null && m.getMember().getId().equals(currentMemberId))
                 .findFirst()
                 .orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
         commPost.getLikedMembers().remove(commPostLike);
+        member.removeLikedCommPost(commPostLike);
     }
 
     // 게시글 생성
@@ -186,7 +192,8 @@ public class CommPostServiceImpl implements CommPostService {
                 .imageUrls(imageUrls)
                 .language(country)
                 .build();
-        commPostRepository.save(commPost);
+        CommPost post = commPostRepository.save(commPost);
+        member.addCommPost(post);
     }
 
     // 해당 게시글 수정
@@ -236,6 +243,7 @@ public class CommPostServiceImpl implements CommPostService {
         commentService.deleteAllComments(commPostId);
         s3Service.deleteAllFile(commPost.getImageUrls());
         commPostRepository.delete(commPost);
+        member.removeCommPost(commPost);
     }
 
     // 요청 페이지 수 제한
