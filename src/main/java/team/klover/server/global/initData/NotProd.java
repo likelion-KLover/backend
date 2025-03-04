@@ -25,9 +25,11 @@ import java.util.Locale;
 @Profile("!prod")
 public class NotProd {
     private final MemberV1Repository MemberRepository;
+    private final MemberV1Repository memberV1Repository;
 
-    public NotProd(MemberV1Repository MemberRepository) {
+    public NotProd(MemberV1Repository MemberRepository, MemberV1Repository memberV1Repository) {
         this.MemberRepository = MemberRepository;
+        this.memberV1Repository = memberV1Repository;
     }
 
     @Bean
@@ -48,26 +50,32 @@ public class NotProd {
                 //
 
 //                apisScheduler.getApisApiData();
-//
-//
-//
-//                // Member 1,2,3 생성
-//                Member Member1 = authV1Service.signup(SignupRequestDto.builder()
-//                                .email("test1@test.com")
-//                                .nickname("test1")
-//                                .password("1234")
-//                        .build());
-//                Member Member2 = authV1Service.signup(SignupRequestDto.builder()
-//                        .email("test2@test.com")
-//                        .nickname("test2")
-//                        .password("1234")
-//                        .build());
-//                Member Member3 = authV1Service.signup(SignupRequestDto.builder()
-//                        .email("test3@test.com")
-//                        .nickname("test3")
-//                        .password("1234")
-//                        .build());
-//
+
+                 /*
+
+                // Member 1,2,3 생성
+                Member member1 = authV1Service.signup(SignupRequestDto.builder()
+                        .email("test1@test.com")
+                        .nickname("test1")
+                        .password("1234")
+                        .build());
+                memberV1Repository.save(member1);
+                Member member2 = authV1Service.signup(SignupRequestDto.builder()
+                        .email("test2@test.com")
+                        .nickname("test2")
+                        .password("1234")
+                        .build());
+                memberV1Repository.save(member2);
+                Member member3 = authV1Service.signup(SignupRequestDto.builder()
+                        .email("test3@test.com")
+                        .nickname("test3")
+                        .password("1234")
+                        .build());
+                memberV1Repository.save(member3);
+
+                 */
+
+
 //                // 번역api리뷰
 //                Long commonPlaceId = 1L;
 //                // 한국어 리뷰

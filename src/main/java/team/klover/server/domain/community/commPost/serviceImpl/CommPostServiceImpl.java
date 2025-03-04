@@ -165,12 +165,16 @@ public class CommPostServiceImpl implements CommPostService {
 
         // 입력 받은 이미지들 S3에 저장
         List<String> imageUrls = new ArrayList<>();
-        for (MultipartFile imageFile : imageFiles) {
-            try {
-                String imageUrl = s3Service.uploadFile(imageFile, "commPost-images");
-                imageUrls.add(imageUrl);
-            } catch (IOException e) {
-                throw new KloverRequestException(ReturnCode.INTERNAL_ERROR);
+        if (imageFiles.size() > 4 || imageFiles.isEmpty()) {
+            throw new KloverRequestException(ReturnCode.WRONG_PARAMETER);
+        } else{
+            for (MultipartFile imageFile : imageFiles) {
+                try {
+                    String imageUrl = s3Service.uploadFile(imageFile, "commPost-images");
+                    imageUrls.add(imageUrl);
+                } catch (IOException e) {
+                    throw new KloverRequestException(ReturnCode.INTERNAL_ERROR);
+                }
             }
         }
         Country country = languageDetect.execute(commPostForm.getContent());
