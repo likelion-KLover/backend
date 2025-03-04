@@ -86,6 +86,9 @@
     },
     "mappings": {
       "properties": {
+        "id": {
+          "type": "long"
+        },
         "member_id": {
           "type": "long"
         },
@@ -123,7 +126,7 @@
         "language": {
           "type": "keyword"
         },
-        "image_url": {
+        "image_urls": {
           "type": "keyword"
         }
       }

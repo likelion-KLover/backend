@@ -155,19 +155,19 @@ public class TourPostDocService {
         switch (language) {
             case KorService1 -> {
                 index="tourpostkor";
-                minScore=13.0;
+                minScore=!keyword.isBlank()?13.0:0;
             }
             case JpnService1 -> {
                 index="tourpostjpn";
-                minScore=10.0;
+                minScore=!keyword.isBlank()?10.0:0;
             }
             case ChsService1 -> {
                 index="tourpostchs";
-                minScore=20.0;
+                minScore=!keyword.isBlank()?20.0:0;
             }
             default -> {
                 index="tourposteng";
-                minScore=8.0;
+                minScore=!keyword.isBlank()?8.0:0;
             }
         }
 

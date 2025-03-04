@@ -32,5 +32,5 @@ public class CommPostDoc {
     private Long comment_count;
     private Long like_count;
     private Country language;
-    private List<String> image_url;
+    private String image_urls;
 }

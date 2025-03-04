@@ -92,19 +92,19 @@ public class CommPostDocService {
         switch (language) {
             case KorService1 -> {
                 index="commpostkor";
-                minScore=13.0;
+                minScore=!keyword.isBlank()?13.0:0;
             }
             case JpnService1 -> {
                 index = "commpostjpn";
-                minScore=10.0;
+                minScore=!keyword.isBlank()?10.0:0;
             }
             case ChsService1 -> {
                 index="commpostchs";
-                minScore=20.0;
+                minScore=!keyword.isBlank()?20.0:0;
             }
             default -> {
                 index="commposteng";
-                minScore=8.0;
+                minScore=!keyword.isBlank()?8.0:0;
             }
         }
 

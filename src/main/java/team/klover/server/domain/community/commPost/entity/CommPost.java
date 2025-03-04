@@ -1,9 +1,11 @@
 package team.klover.server.domain.community.commPost.entity;
 
+import com.vladmihalcea.hibernate.type.json.JsonType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.Type;
 import team.klover.server.domain.member.v1.entity.Member;
 import team.klover.server.domain.member.v1.enums.Country;
 import team.klover.server.global.jpa.BaseEntity;
@@ -37,7 +39,8 @@ public class CommPost extends BaseEntity {
     private Double mapX;
     private Double mapY;
 
-    @ElementCollection
+    @Type(JsonType.class) // Hibernate JSON 타입 적용
+    @Column(columnDefinition = "jsonb") // PostgreSQL의 jsonb 타입 사용
     private List<String> imageUrls;
 
     @Enumerated(EnumType.STRING)
