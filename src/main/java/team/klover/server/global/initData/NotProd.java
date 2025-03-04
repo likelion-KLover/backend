@@ -14,6 +14,8 @@ import team.klover.server.domain.community.commPost.service.CommPostService;
 import team.klover.server.domain.member.v1.entity.Member;
 import team.klover.server.domain.member.v1.enums.SocialProvider;
 import team.klover.server.domain.member.v1.repository.MemberV1Repository;
+import team.klover.server.domain.tour.review.dto.req.ReviewForm;
+import team.klover.server.domain.tour.review.service.ReviewService;
 import team.klover.server.domain.tour.tourApi.scheduler.ApisScheduler;
 import team.klover.server.domain.tour.tourApi.service.TourApiService;
 
@@ -34,7 +36,8 @@ public class NotProd {
             ApisScheduler apisScheduler,
             TourApiService tourApiService,
             AuthV1Service authV1Service,
-            CommPostService commPostService
+            CommPostService commPostService,
+            ReviewService reviewService
     ) {
         return new ApplicationRunner() {
             @Transactional
@@ -45,8 +48,8 @@ public class NotProd {
                 //
                 //
 
-//                apisScheduler.getApisApiData();
-                /*
+                apisScheduler.getApisApiData();
+
 
 
                 // Member 1,2,3 생성
@@ -66,8 +69,41 @@ public class NotProd {
                         .password("1234")
                         .build());
 
+                // 번역api리뷰
+                Long commonPlaceId = 1L;
+                // 한국어 리뷰
+                ReviewForm koreanReview = ReviewForm.builder()
+                        .content("이 장소는 정말 아름다웠어요. 특히 봄에 방문하면 벚꽃이 만발해서 더욱 좋습니다.")
+                        .rating(5)
+                        .build();
+                reviewService.addReview(Member1.getId(), commonPlaceId, koreanReview);
 
-                 */
+                // 영어 리뷰
+                ReviewForm englishReview = ReviewForm.builder()
+                        .content("This place was truly beautiful. Especially if you visit in spring, it's even better with the cherry blossoms in full bloom.")
+                        .rating(4)
+                        .build();
+                reviewService.addReview(Member2.getId(), commonPlaceId, englishReview);
+
+                // 일본어 리뷰
+                ReviewForm japaneseReview = ReviewForm.builder()
+                        .content("この場所は本当に美しかったです。特に春に訪れると、桜が満開でさらに良いです。")
+                        .rating(5)
+                        .build();
+                reviewService.addReview(Member3.getId(), commonPlaceId, japaneseReview);
+
+                // 중국어 리뷰
+                ReviewForm chineseReview = ReviewForm.builder()
+                        .content("这个地方真的很漂亮。尤其是在春天访问时，樱花盛开，更加美丽。")
+                        .rating(4)
+                        .build();
+                reviewService.addReview(Member1.getId(), commonPlaceId, chineseReview);
+
+                System.out.println("Test review data for translation has been created!");
+            }
+
+
+
 
 
 //                long start = System.currentTimeMillis();
@@ -98,7 +134,7 @@ public class NotProd {
 
 
 
-            }
+
 
         };
 

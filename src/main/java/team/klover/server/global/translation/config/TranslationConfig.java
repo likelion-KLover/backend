@@ -19,6 +19,7 @@ public class TranslationConfig implements WebMvcConfigurer {
                 // 커뮤니티 게시글 및 댓글 API
                 .addPathPatterns("/api/v1/comm-post/**")
                 // 투어 리뷰 API
-                .addPathPatterns("/api/v1/tour-post/review/**");
+                .addPathPatterns("/api/v1/tour-post/review/**")
+                .addPathPatterns("/api/v1/translate/**");
     }
 }
