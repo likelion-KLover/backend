@@ -2,11 +2,25 @@
   "index_patterns": ["tourpostkor*"],
   "template": {
     "settings": {
+      "index" : {
+        "max_ngram_diff": 10
+      },
       "analysis": {
+        "char_filter": {
+          "remove_symbols": {
+            "type": "pattern_replace",
+            "pattern": "[\\p{P}\\p{S}\\s]",
+            "replacement": ""
+          }
+        },
         "tokenizer": {
           "nori_mixed": {
             "type": "nori_tokenizer",
             "decompound_mode": "mixed"
+          },
+          "nori_none": {
+            "type": "nori_tokenizer",
+            "decompound_mode": "none"
           }
         },
         "analyzer": {
@@ -14,29 +28,27 @@
             "type": "custom",
             "tokenizer": "nori_mixed",
             "filter": [
-              "nori_part_of_speech",
-              "nori_posfilter",
               "nori_readingform",
-              "lowercase",
-              "stop",
-              "porter_stem",
-              "asciifolding",
-              "word_delimiter_graph"
+              "nori_part_of_speech"
             ]
           },
           "korean_word": {
             "type": "custom",
             "tokenizer": "nori_mixed",
             "filter": [
-              "nori_part_of_speech",
-              "nori_posfilter",
               "nori_readingform",
+              "nori_stoptags"
+            ]
+          },
+          "korean_partial": {
+            "type": "custom",
+            "tokenizer": "keyword",
+            "char_filter": [
+              "remove_symbols"
+            ],
+            "filter": [
               "ngram_filter",
-              "lowercase",
-              "stop",
-              "porter_stem",
-              "asciifolding",
-              "word_delimiter_graph"
+              "unique"
             ]
           }
         },
@@ -44,15 +56,11 @@
           "ngram_filter":{
             "type": "ngram",
             "min_gram": 2,
-            "max_gram": 3
+            "max_gram": 5
           },
-          "nori_posfilter": {
-            "type": "nori_part_of_speech",
-            "stoptags": [
-              "E", "IC", "J", "MAG", "MAJ", "MM", "SP",
-              "SSC", "SSO", "SC", "SE", "XPN", "XSA",
-              "XSN", "XSV", "UNA", "NA", "VSV"
-            ]
+          "nori_stoptags": {
+              "type": "nori_part_of_speech",
+              "stoptags": ["SP"]
           }
         }
       }
@@ -73,7 +81,13 @@
         },
         "title": {
           "type": "text",
-          "analyzer": "korean_word"
+          "analyzer": "korean_word",
+          "fields": {
+            "ngram": {
+              "type": "text",
+              "analyzer": "korean_partial"
+            }
+          }
         },
         "location": {
           "type": "geo_point"
@@ -105,8 +119,11 @@
           "type": "long"
         },
         "rating_average": {
-          "type": "float",
+          "type": "scaled_float",
           "scaling_factor": 10
+        },
+        "language": {
+          "type": "keyword"
         }
       }
     }

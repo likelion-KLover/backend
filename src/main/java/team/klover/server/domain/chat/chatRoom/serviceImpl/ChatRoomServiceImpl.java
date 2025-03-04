@@ -141,6 +141,14 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .peek(newMember -> newMember.setChatRoom(chatRoom)) // chatRoom 설정
                 .collect(Collectors.toList());
         chatRoom.getChatRoomMembers().addAll(newMembers);
+
+        for(ChatRoomMember chatRoomMember : newMembers){
+            Member member = chatRoomMember.getMember();
+
+            if(!member.getEnteredChatRoom().contains(chatRoomMember)) {
+                member.addEnteredChatRoom(chatRoomMember);
+            }
+        }
     }
 
     // 채팅방에서 강퇴(그룹) / 방장권한

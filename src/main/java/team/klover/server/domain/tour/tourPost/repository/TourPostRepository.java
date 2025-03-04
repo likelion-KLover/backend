@@ -76,4 +76,5 @@ public interface TourPostRepository extends JpaRepository<TourPost, Long> {
         ORDER BY create_date DESC
         """, nativeQuery = true)
     Page<TourPost> findPostsWithinRadius(@Param("mapX") Double mapX, @Param("mapY") Double mapY, @Param("radius") Integer radius, Pageable pageable);
+
 }
