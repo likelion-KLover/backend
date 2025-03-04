@@ -10,20 +10,26 @@ import org.springframework.transaction.annotation.Transactional;
 import team.klover.server.domain.auth.dto.SignupRequestDto;
 import team.klover.server.domain.auth.service.AuthV1Service;
 import team.klover.server.domain.community.commPost.dto.req.CommPostForm;
+import team.klover.server.domain.community.commPost.entity.CommPost;
 import team.klover.server.domain.community.commPost.repository.CommPostRepository;
 import team.klover.server.domain.community.commPost.service.CommPostService;
+import team.klover.server.domain.community.comment.dto.req.CommentForm;
 import team.klover.server.domain.community.comment.service.CommentService;
+import team.klover.server.domain.member.v1.dto.MemberUpdateParam;
 import team.klover.server.domain.member.v1.entity.Member;
+import team.klover.server.domain.member.v1.enums.Country;
 import team.klover.server.domain.member.v1.enums.SocialProvider;
 import team.klover.server.domain.member.v1.repository.MemberV1Repository;
 import team.klover.server.domain.member.v1.service.MemberV1Service;
+import team.klover.server.domain.tour.review.dto.req.ReviewForm;
 import team.klover.server.domain.tour.review.service.ReviewService;
 import team.klover.server.domain.tour.tourApi.scheduler.ApisScheduler;
 import team.klover.server.domain.tour.tourApi.service.TourApiService;
+import team.klover.server.domain.tour.tourPost.entity.TourPost;
 import team.klover.server.domain.tour.tourPost.repository.TourPostRepository;
+import team.klover.server.global.util.ChineseLoremGenerator;
 
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 @Configuration
 @Profile("!prod")
@@ -57,9 +63,27 @@ public class NotProd {
                 //
                 //
 
-                /*
-                apisScheduler.getApisApiData();
 
+//                apisScheduler.getApisApiData();
+
+
+                // 테스트용 회원 생성
+//                List<SignupRequestDto> testUsers = List.of(
+//                        SignupRequestDto.builder().email("member1@test.com").nickname("member1").password("1234").build(),
+//                        SignupRequestDto.builder().email("member2@test.com").nickname("member2").password("1234").build(),
+//                        SignupRequestDto.builder().email("member3@test.com").nickname("member3").password("1234").build()
+//                );
+//
+//                for (SignupRequestDto user : testUsers) {
+//                    try {
+//                        authV1Service.signup(user);
+//                    } catch (Exception e) {
+//                        System.out.println("User " + user.getEmail() + " already exists or encountered an error.");
+//                    }
+//                }
+
+
+                /*
 
 
                 for(int i=0;i<50;i++){
@@ -149,7 +173,7 @@ public class NotProd {
                     switch (randomIdx){
                         case 0 -> {
                             nickname=new Faker(Locale.of("zh","CN")).name().fullName();
-                            country=Country.ChsService1;
+                            country= Country.ChsService1;
                         }
                         case 1 -> {
                             nickname= new Faker(Locale.of("ja","JP")).name().fullName();
