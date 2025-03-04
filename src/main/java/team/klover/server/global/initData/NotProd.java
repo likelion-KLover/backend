@@ -1,17 +1,25 @@
 package team.klover.server.global.initData;
 
+import net.datafaker.Faker;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.transaction.annotation.Transactional;
+import team.klover.server.domain.auth.dto.SignupRequestDto;
 import team.klover.server.domain.auth.service.AuthV1Service;
+import team.klover.server.domain.community.commPost.dto.req.CommPostForm;
 import team.klover.server.domain.community.commPost.service.CommPostService;
+import team.klover.server.domain.member.v1.entity.Member;
+import team.klover.server.domain.member.v1.enums.SocialProvider;
 import team.klover.server.domain.member.v1.repository.MemberV1Repository;
 import team.klover.server.domain.tour.review.service.ReviewService;
 import team.klover.server.domain.tour.tourApi.scheduler.ApisScheduler;
 import team.klover.server.domain.tour.tourApi.service.TourApiService;
+
+import java.util.List;
+import java.util.Locale;
 
 @Configuration
 @Profile("!prod")
@@ -121,11 +129,11 @@ public class NotProd {
 //                System.out.println("elapsed time(ms):"+elapsed);
 
 
+
+
             }
 
-
-
         };
+
     }
 }
-

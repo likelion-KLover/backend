@@ -121,7 +121,7 @@ public class ApiV1CommPostController {
     // http://localhost:8080/api/v1/comm-post
     @PostMapping
     @Operation(summary = "게시글 생성")
-    public ApiResponse<String> addCommPost(@RequestBody @Valid CommPostForm commPostForm,
+    public ApiResponse<String> addCommPost(@RequestPart(value = "commPostForm") @Valid CommPostForm commPostForm,
                                            @RequestPart(value = "imageFile") List<MultipartFile> imageFiles) {
         Long currentMemberId = AuthUtil.getCurrentMemberId();
         commPostService.addCommPost(currentMemberId, commPostForm, imageFiles);
@@ -133,7 +133,7 @@ public class ApiV1CommPostController {
     @PutMapping("/{commPostId}")
     @Operation(summary = "게시글 수정")
     public ApiResponse<String> updateCommPost(@PathVariable("commPostId") Long commPostId,
-                                              @RequestBody @Valid CommPostForm commPostForm,
+                                              @RequestPart(value = "commPostForm") @Valid CommPostForm commPostForm,
                                               @RequestPart(value = "imageFile") List<MultipartFile> imageFiles) {
         Long currentMemberId = AuthUtil.getCurrentMemberId();
         commPostService.updateCommPost(currentMemberId, commPostId, commPostForm, imageFiles);
