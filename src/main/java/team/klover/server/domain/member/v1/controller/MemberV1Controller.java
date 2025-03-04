@@ -44,6 +44,15 @@ public class MemberV1Controller {
         return ApiResponse.of(ReturnCode.SUCCESS);
     }
 
+    @DeleteMapping("/image")
+    @Operation(summary = "프로픨 이미지 초기화")
+    public ApiResponse resetProfile(){
+        Long memberId = AuthUtil.getCurrentMemberId();
+        memberService.resetImage(memberId);
+
+        return ApiResponse.of(ReturnCode.SUCCESS);
+    }
+
     @DeleteMapping
     @Operation(summary = "회원 탈퇴")
     public ApiResponse deleteAccount(){

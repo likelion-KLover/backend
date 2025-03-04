@@ -85,8 +85,8 @@ public class Member extends BaseEntity {
     @Builder.Default
     List<Review> myReviewList = new ArrayList<>();
 
-    public void update(MemberUpdateParam param) {
-        profileUrl = param.getProfileUrl();
+    public void update(MemberUpdateParam param,String imageUrl) {
+        if(imageUrl!=null) profileUrl = imageUrl;
 
         if(param.getNickname()!=null && !param.getNickname().isBlank() && !param.getNickname().equals(nickname)) {
             nickname = param.getNickname();

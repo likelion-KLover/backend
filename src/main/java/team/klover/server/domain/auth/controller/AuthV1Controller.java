@@ -135,7 +135,7 @@ public class AuthV1Controller {
 
     @PostMapping("/refresh")
     @Operation(summary="엑세스토큰 재발급")
-    public ApiResponse<JwtResponse> refresh(@RequestBody RefreshRequest refreshRequest) {
+    public ApiResponse<RefreshResponse> refresh(@RequestBody RefreshRequest refreshRequest) {
 
         String refreshToken = refreshRequest.getRefreshToken();
         if (refreshToken == null) {

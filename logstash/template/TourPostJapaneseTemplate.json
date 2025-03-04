@@ -21,13 +21,13 @@
         "tokenizer": {
           "kuromoji_search_tokenizer": {
             "type": "kuromoji_tokenizer",
-            "mode": "extended",
+            "mode": "search",
             "user_dictionary": "userdict_ja.txt",
             "discard_compound_token": false
           },
           "kuromoji_word_tokenizer": {
             "type": "kuromoji_tokenizer",
-            "mode": "extended",
+            "mode": "search",
             "user_dictionary": "userdict_ja.txt",
             "discard_compound_token": false
           }
