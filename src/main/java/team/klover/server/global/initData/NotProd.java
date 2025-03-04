@@ -10,34 +10,30 @@ import org.springframework.transaction.annotation.Transactional;
 import team.klover.server.domain.auth.dto.SignupRequestDto;
 import team.klover.server.domain.auth.service.AuthV1Service;
 import team.klover.server.domain.community.commPost.dto.req.CommPostForm;
-import team.klover.server.domain.community.commPost.entity.CommPost;
 import team.klover.server.domain.community.commPost.repository.CommPostRepository;
 import team.klover.server.domain.community.commPost.service.CommPostService;
-import team.klover.server.domain.community.comment.dto.req.CommentForm;
 import team.klover.server.domain.community.comment.service.CommentService;
-import team.klover.server.domain.member.v1.dto.MemberUpdateParam;
 import team.klover.server.domain.member.v1.entity.Member;
-import team.klover.server.domain.member.v1.enums.Country;
 import team.klover.server.domain.member.v1.enums.SocialProvider;
 import team.klover.server.domain.member.v1.repository.MemberV1Repository;
 import team.klover.server.domain.member.v1.service.MemberV1Service;
-import team.klover.server.domain.tour.review.dto.req.ReviewForm;
 import team.klover.server.domain.tour.review.service.ReviewService;
 import team.klover.server.domain.tour.tourApi.scheduler.ApisScheduler;
 import team.klover.server.domain.tour.tourApi.service.TourApiService;
-import team.klover.server.domain.tour.tourPost.entity.TourPost;
 import team.klover.server.domain.tour.tourPost.repository.TourPostRepository;
-import team.klover.server.global.util.ChineseLoremGenerator;
 
-import java.util.*;
+import java.util.List;
+import java.util.Locale;
 
 @Configuration
 @Profile("!prod")
 public class NotProd {
     private final MemberV1Repository MemberRepository;
+    private final MemberV1Repository memberV1Repository;
 
-    public NotProd(MemberV1Repository MemberRepository) {
+    public NotProd(MemberV1Repository MemberRepository, MemberV1Repository memberV1Repository) {
         this.MemberRepository = MemberRepository;
+        this.memberV1Repository = memberV1Repository;
     }
 
     @Bean

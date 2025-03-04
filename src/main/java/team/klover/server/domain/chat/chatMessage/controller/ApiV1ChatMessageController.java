@@ -5,6 +5,7 @@ import lombok.*;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import team.klover.server.domain.chat.chatMessage.dto.req.ChatMessageForm;
 import team.klover.server.domain.chat.chatMessage.dto.res.ChatMessageDto;
 import team.klover.server.domain.chat.chatMessage.entity.ChatMessagePage;
@@ -13,6 +14,8 @@ import team.klover.server.global.common.response.ApiResponse;
 import team.klover.server.global.common.response.KloverPage;
 import team.klover.server.global.exception.ReturnCode;
 import team.klover.server.global.util.AuthUtil;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/chat-room/message")
@@ -51,9 +54,11 @@ public class ApiV1ChatMessageController {
     // 해당 채팅방에서 메시지 생성
     // http://localhost:8080/api/v1/chat-room/message/1
     @PostMapping("/{chatRoomId}")
-    public ApiResponse<String> writeChatMessage(@PathVariable("chatRoomId") Long chatRoomId, @RequestBody @Valid ChatMessageForm chatMessageForm){
+    public ApiResponse<String> writeChatMessage(@PathVariable("chatRoomId") Long chatRoomId,
+                                                @RequestPart(value ="chatMessageForm") ChatMessageForm chatMessageForm,
+                                                @RequestPart(value = "imageFile") List<MultipartFile> imageFiles) {
         Long currentMemberId = AuthUtil.getCurrentMemberId();
-        chatMessageService.writeChatMessage(currentMemberId, chatRoomId, chatMessageForm);
+        chatMessageService.writeChatMessage(currentMemberId, chatRoomId, chatMessageForm, imageFiles);
         return ApiResponse.of(ReturnCode.SUCCESS);
     }
 

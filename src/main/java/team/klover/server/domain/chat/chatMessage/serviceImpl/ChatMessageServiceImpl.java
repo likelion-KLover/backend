@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import team.klover.server.domain.chat.chatMessage.dto.req.ChatMessageForm;
 import team.klover.server.domain.chat.chatMessage.dto.res.ChatMessageDto;
 import team.klover.server.domain.chat.chatMessage.entity.ChatMessage;
@@ -25,9 +26,13 @@ import team.klover.server.domain.member.v1.entity.Member;
 import team.klover.server.domain.member.v1.repository.MemberV1Repository;
 import team.klover.server.global.exception.KloverRequestException;
 import team.klover.server.global.exception.ReturnCode;
+import team.klover.server.global.s3.S3Service;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -40,6 +45,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     private final RabbitTemplate rabbitTemplate;
     private final MessageContentRepository messageContentRepository;
     private final ChatRoomMemberRepository chatRoomMemberRepository;
+    private final S3Service s3Service;
 
     // 해당 채팅방의 메시지 실시간 조회 시작
     @Override
@@ -62,8 +68,13 @@ public class ChatMessageServiceImpl implements ChatMessageService {
         List<String> stringMessageIds = chatMessages.stream()
                 .map(chatMessage -> String.valueOf(chatMessage.getId()))
                 .collect(Collectors.toList());
-        Map<Long, String> messageContentMap = messageContentRepository.findByIdIn(stringMessageIds).stream()
-                .collect(Collectors.toMap(message -> Long.parseLong(message.getId()), MessageContent::getContent));
+        Map<Long, String> messageContentMap = messageContentRepository.findByIdIn(stringMessageIds)
+                .stream()
+                .filter(Objects::nonNull) // null 값 필터링
+                .collect(Collectors.toMap(
+                        message -> Long.parseLong(message.getId()),
+                        message -> Objects.requireNonNullElse(message.getContent(), "") // null이면 빈 문자열 처리
+                ));
 
         return chatMessages.map(chatMessage -> {
             String content = messageContentMap.getOrDefault(chatMessage.getId(), ""); // 없으면 빈 문자열
@@ -117,7 +128,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     // 해당 채팅방에서 메시지 생성
     @Override
     @Transactional
-    public void writeChatMessage(Long currentMemberId, Long chatRoomId, @Valid ChatMessageForm chatMessageForm) {
+    public void writeChatMessage(Long currentMemberId, Long chatRoomId, ChatMessageForm chatMessageForm, List<MultipartFile> imageFiles) {
         // 현재 로그인한 사용자의 member 객체를 가져오는 메서드
         Member member = memberV1Repository.findById(currentMemberId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
@@ -128,19 +139,41 @@ public class ChatMessageServiceImpl implements ChatMessageService {
         if (!memberExists) {
             throw new KloverRequestException(ReturnCode.NOT_AUTHORIZED);
         }
-        Long inactiveMemberNum = countInactiveMembers(chatRoomId);
 
+        // 입력 받은 이미지들 S3에 저장
+        List<String> imageUrls = new ArrayList<>();
+        if (imageFiles.size() > 4) {
+            throw new KloverRequestException(ReturnCode.WRONG_PARAMETER);
+        } else {
+            if (!imageFiles.isEmpty()) {
+                for (MultipartFile imageFile : imageFiles) {
+                    if (!imageFile.isEmpty()) {  // 파일이 비어 있는지 확인
+                        try {
+                            String imageUrl = s3Service.uploadFile(imageFile, "commPost-images");
+                            imageUrls.add(imageUrl);
+                        } catch (IOException e) {
+                            throw new KloverRequestException(ReturnCode.INTERNAL_ERROR);
+                        }
+                    } else {
+                        log.warn("Empty file received, skipping upload.");
+                    }
+                }
+            }
+        }
+        Long inactiveMemberNum = countInactiveMembers(chatRoomId);
         ChatMessage chatMessage = ChatMessage.builder()
                 .member(member)
                 .chatRoom(chatRoom)
+                .imageUrls(imageUrls)
                 .readCount(inactiveMemberNum)
                 .build();
         chatMessageRepository.save(chatMessage);
 
         // MongoDB에 메시지 본문 저장
+        String content = (chatMessageForm != null) ? chatMessageForm.getContent() : "";
         MessageContent messageContent = MessageContent.builder()
                 .id(String.valueOf(chatMessage.getId())) // ChatMessage의 ID를 키로 사용
-                .content(chatMessageForm.getContent())
+                .content(content)
                 .build();
         messageContentRepository.save(messageContent);
         rabbitTemplate.convertAndSend("amq.topic", "chatRoomId: " + chatRoomId + "MessageCreated: ",
@@ -157,6 +190,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
         if (!chatMessage.getMember().getId().equals(currentMemberId)) {
             throw new KloverRequestException(ReturnCode.NOT_AUTHORIZED);
         }
+        s3Service.deleteAllFile(chatMessage.getImageUrls());
         messageContentRepository.deleteById(String.valueOf(messageId));
         chatMessageRepository.delete(chatMessage);
     }
@@ -167,8 +201,9 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     public void deleteAllChatMessages(Long chatRoomId){
         ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
         List<ChatMessage> messages = chatMessageRepository.findByChatRoom(chatRoom);
-        chatMessageRepository.deleteAll(messages);
+        messages.forEach(message -> s3Service.deleteAllFile(message.getImageUrls()));
         messages.forEach(message -> messageContentRepository.deleteById(String.valueOf(message.getId())));
+        chatMessageRepository.deleteAll(messages);
     }
 
     // 해당 채팅방의 메시지 실시간 조회 중단
@@ -240,6 +275,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
                 .memberId(chatMessage.getMember().getId())
                 .nickname(chatMessage.getMember().getNickname())
                 .content(content)
+                .imageUrls(chatMessage.getImageUrls())
                 .readCount(chatMessage.getReadCount())
                 .createDate(chatMessage.getCreateDate())
                 .build();
