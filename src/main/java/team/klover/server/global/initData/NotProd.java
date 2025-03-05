@@ -39,7 +39,7 @@ import java.util.*;
 import java.util.List;
 
 @Configuration
-@Profile("prod")
+@Profile("!prod")
 public class NotProd {
     private final MemberV1Repository MemberRepository;
     private final MemberV1Repository memberV1Repository;
@@ -70,9 +70,10 @@ public class NotProd {
                 //
                 //
 
+                /*
 
+//                apisScheduler.getApisApiData();
 
-                apisScheduler.getApisApiData();
 
 
 
@@ -147,7 +148,7 @@ public class NotProd {
                 List<MultipartFile> dummy = new ArrayList<>();
                 dummy.add(imageFile);
 
-                for (int i = 0; i < 20; i++) {
+                for (int i = 0; i < 200; i++) {
                     String content = "";
                     for (int j = 0; j < 5; j++) {
                         if ((i % 4) != 3) {
