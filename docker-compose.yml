@@ -1,68 +1,17 @@
-#version: '3.8'
-#services:
-#  postgres:
-#    image: postgres:latest
-#    container_name: my-postgres
-#    environment:
-#      POSTGRES_USER: postgres
-#      POSTGRES_PASSWORD: postgres
-#      POSTGRES_DB: meta_db
-#    ports:
-#      - "5432:5432"
-#    volumes:
-#      - postgres-data:/var/lib/postgresql/data
-#
-#  redis:
-#    image: redis:latest
-#    container_name: my-redis
-#    ports:
-#      - "6379:6379"
-#    volumes:
-#      - redis-data:/data
-#
-#  rabbitmq:
-#    image: rabbitmq:3-management
-#    container_name: my-rabbitmq
-#    restart: always
-#    ports:
-#      - "5672:5672"  # AMQP 포트
-#      - "15672:15672"  # 관리 UI 포트
-#      - "61613:61613"
-#    environment:
-#      RABBITMQ_DEFAULT_USER: admin
-#      RABBITMQ_DEFAULT_PASS: admin
-#    volumes:
-#      - rabbitmq-data:/var/lib/rabbitmq
-#      - ./dockerProjects/rabbitmq-1/volumes/etc/rabbitmq:/etc/rabbitmq
-#      - ./dockerProjects/rabbitmq-1/volumes/var/lib/rabbitmq:/var/lib/rabbitmq
-#      - ./dockerProjects/rabbitmq-1/volumes/var/log/rabbitmq:/var/log/rabbitmq
-#    command: >
-#      sh -c "echo 'loopback_users = none' >> /etc/rabbitmq/rabbitmq.conf && rabbitmq-plugins enable rabbitmq_management && rabbitmq-plugins enable rabbitmq_stomp && rabbitmq-plugins enable rabbitmq_mqtt && rabbitmq-server"
-#
-#  mongo:
-#    image: mongo:latest
-#    container_name: my-mongo
-#    restart: always
-#    ports:
-#      - "27017:27017"
-#    environment:
-#      MONGO_INITDB_ROOT_USERNAME: admin
-#      MONGO_INITDB_ROOT_PASSWORD: admin
-#    volumes:
-#      - mongo-data:/data/db
-#
-#volumes:
-#  postgres-data:
-#  redis-data:
-#  rabbitmq-data:
-#  mongo-data:
-
-
-
-# prod
-
 version: '3.8'
 services:
+  postgres:
+    image: postgres:latest
+    container_name: my-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: meta_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
   redis:
     image: redis:latest
     container_name: my-redis
@@ -70,23 +19,74 @@ services:
       - "6379:6379"
     volumes:
       - redis-data:/data
-    healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
-      interval: 5s
-      timeout: 3s
-      retries: 5
-      start_period: 3s
 
-  app:
-    image: junhui9789/my-app:latest
-    container_name: my-app
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: my-rabbitmq
+    restart: always
     ports:
-      - "8080:8080"
+      - "5672:5672"  # AMQP 포트
+      - "15672:15672"  # 관리 UI 포트
+      - "61613:61613"
     environment:
-      - SPRING_PROFILES_ACTIVE=prod
-    depends_on:
-      redis:
-        condition: service_healthy  # Redis가 정상 작동할 때까지 대기
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+      - ./dockerProjects/rabbitmq-1/volumes/etc/rabbitmq:/etc/rabbitmq
+      - ./dockerProjects/rabbitmq-1/volumes/var/lib/rabbitmq:/var/lib/rabbitmq
+      - ./dockerProjects/rabbitmq-1/volumes/var/log/rabbitmq:/var/log/rabbitmq
+    command: >
+      sh -c "echo 'loopback_users = none' >> /etc/rabbitmq/rabbitmq.conf && rabbitmq-plugins enable rabbitmq_management && rabbitmq-plugins enable rabbitmq_stomp && rabbitmq-plugins enable rabbitmq_mqtt && rabbitmq-server"
+
+  mongo:
+    image: mongo:latest
+    container_name: my-mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+    volumes:
+      - mongo-data:/data/db
 
 volumes:
+  postgres-data:
   redis-data:
+  rabbitmq-data:
+  mongo-data:
+
+
+
+# prod
+
+#version: '3.8'
+#services:
+#  redis:
+#    image: redis:latest
+#    container_name: my-redis
+#    ports:
+#      - "6379:6379"
+#    volumes:
+#      - redis-data:/data
+#    healthcheck:
+#      test: [ "CMD", "redis-cli", "ping" ]
+#      interval: 5s
+#      timeout: 3s
+#      retries: 5
+#      start_period: 3s
+#
+#  app:
+#    image: junhui9789/my-app:latest
+#    container_name: my-app
+#    ports:
+#      - "8080:8080"
+#    environment:
+#      - SPRING_PROFILES_ACTIVE=prod
+#    depends_on:
+#      redis:
+#        condition: service_healthy  # Redis가 정상 작동할 때까지 대기
+#
+#volumes:
+#  redis-data:
