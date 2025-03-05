@@ -74,6 +74,9 @@ dependencies {
 
 	// MongoDB
 	implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
+
+	// FCM (Firebase CLoud Messaging)
+	implementation("com.google.firebase:firebase-admin:9.4.3")
 }
 
 tasks.withType<Test> {
