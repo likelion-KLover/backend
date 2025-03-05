@@ -56,3 +56,35 @@ volumes:
   redis-data:
   rabbitmq-data:
   mongo-data:
+
+
+# prod
+#version: '3.8'
+#services:
+#  redis:
+#    image: redis:latest
+#    container_name: my-redis
+#    ports:
+#      - "6379:6379"
+#    volumes:
+#      - redis-data:/data
+#    healthcheck:
+#      test: [ "CMD", "redis-cli", "ping" ]
+#      interval: 5s
+#      timeout: 3s
+#      retries: 5
+#      start_period: 3s
+#
+#  app:
+#    image: junhui9789/my-app:latest
+#    container_name: my-app
+#    ports:
+#      - "8080:8080"
+#    environment:
+#      - SPRING_PROFILES_ACTIVE=prod
+#    depends_on:
+#      redis:
+#        condition: service_healthy  # Redis가 정상 작동할 때까지 대기
+#
+#volumes:
+#  redis-data:
