@@ -64,7 +64,7 @@ public class NotProd {
                 //
 
 
-//                apisScheduler.getApisApiData();
+                apisScheduler.getApisApiData();
 
 
                 // 테스트용 회원 생성

@@ -190,14 +190,14 @@ sudo swapon /swapfile
 sudo sh -c 'echo "/swapfile swap swap defaults 0 0" >> /etc/fstab'
 
 # Docker Hub에서 최신 애플리케이션 컨테이너 가져오기
-docker pull mydockerhubusername/my-app:latest
+docker pull junhui9789/my-app:latest
 
 # docker-compose.yml 파일 생성
 cat <<EOF > /home/ec2-user/docker-compose.yml
 version: '3.8'
 services:
   app:
-    image: mydockerhubusername/my-app:latest
+    image: junhui9789/my-app:latest
     container_name: my-app
     ports:
       - "8080:8080"
