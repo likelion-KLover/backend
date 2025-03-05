@@ -44,6 +44,15 @@ public class MemberV1Controller {
         return ApiResponse.of(ReturnCode.SUCCESS);
     }
 
+    @DeleteMapping("/image")
+    @Operation(summary = "프로픨 이미지 초기화")
+    public ApiResponse resetProfile(){
+        Long memberId = AuthUtil.getCurrentMemberId();
+        memberService.resetImage(memberId);
+
+        return ApiResponse.of(ReturnCode.SUCCESS);
+    }
+
     @DeleteMapping
     @Operation(summary = "회원 탈퇴")
     public ApiResponse deleteAccount(){
@@ -60,13 +69,13 @@ public class MemberV1Controller {
 
 
     @GetMapping("/{memberId}")
-    @Operation(summary="유저정보 조회")
+    @Operation(summary="유저정보 조회 - 유저 정보만")
     public ApiResponse<MemberInfo> getOtherUserPage(@PathVariable("memberId")Long memberId){
         return ApiResponse.of(memberService.getMemberInfo(memberId));
     }
 
     @GetMapping
-    @Operation(summary="나의정보 조회")
+    @Operation(summary="나의정보 조회 - 유저 정보만")
     public ApiResponse<MemberInfo> getMyPage(){
        Long memberId = AuthUtil.getCurrentMemberId();
        return ApiResponse.of(memberService.getMemberInfo(memberId));

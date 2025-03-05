@@ -2,49 +2,121 @@
   "index_patterns": ["tourpostjpn*"],
   "template": {
     "settings": {
+      "index" : {
+        "max_ngram_diff": 10
+      },
       "analysis": {
+        "char_filter": {
+          "remove_korean": {
+            "type": "pattern_replace",
+            "pattern": "[ㄱ-ㅎ가-힣]",
+            "replacement": ""
+          },
+          "remove_symbols":{
+            "type": "pattern_replace",
+            "pattern": "[\\p{P}\\p{S}\\s]",
+            "replacement": ""
+          }
+        },
         "tokenizer": {
           "kuromoji_search_tokenizer": {
             "type": "kuromoji_tokenizer",
-            "mode": "search"
+            "mode": "search",
+            "user_dictionary": "userdict_ja.txt",
+            "discard_compound_token": false
+          },
+          "kuromoji_word_tokenizer": {
+            "type": "kuromoji_tokenizer",
+            "mode": "search",
+            "user_dictionary": "userdict_ja.txt",
+            "discard_compound_token": false
           }
         },
         "analyzer": {
-          "japanese_content_search": {
+          "japanese_content_romaji_search": {
             "type": "custom",
             "tokenizer": "kuromoji_search_tokenizer",
+            "char_filter": [
+              "remove_korean"
+            ],
             "filter": [
-              "kuromoji_baseform",
-              "kuromoji_part_of_speech",
               "cjk_width",
-              "lowercase",
-              "stop",
-              "porter_stem",
+              "kuromoji_baseform",
+              "ja_stop",
+              "kuromoji_part_of_speech",
+              "kuromoji_number",
+              "kuromoji_stemmer",
+              "katakana_filter",
+              "katakana_to_latin",
+              "post_symbols_filter",
               "asciifolding",
-              "word_delimiter_graph"
+              "lowercase"
             ]
           },
-          "japanese_word_search": {
+          "japanese_simple_word_romaji": {
             "type": "custom",
             "tokenizer": "kuromoji_search_tokenizer",
+            "char_filter": [
+              "remove_korean"
+            ],
             "filter": [
-              "kuromoji_baseform",
-              "kuromoji_part_of_speech",
               "cjk_width",
-              "ngram_filter",
-              "lowercase",
-              "stop",
-              "porter_stem",
+              "kuromoji_number",
+              "kuromoji_stoptags",
+              "katakana_filter",
+              "katakana_to_latin",
+              "post_symbols_filter",
               "asciifolding",
-              "word_delimiter_graph"
+              "lowercase"
+            ]
+          },
+          "japanese_word_romaji_search": {
+            "type": "custom",
+            "tokenizer": "kuromoji_word_tokenizer",
+            "char_filter": [
+              "remove_korean"
+            ],
+            "filter": [
+              "cjk_width",
+              "kuromoji_number",
+              "kuromoji_stoptags",
+              "katakana_filter",
+              "katakana_to_latin",
+              "post_symbols_filter",
+              "asciifolding",
+              "lowercase",
+              "big_ngram",
+              "unique"
             ]
           }
         },
         "filter": {
-          "ngram_filter": {
+          "big_ngram": {
             "type": "ngram",
             "min_gram": 2,
-            "max_gram": 3
+            "max_gram": 6
+          },
+          "romaji_filter": {
+            "type": "kuromoji_readingform",
+            "use_romaji": true
+          },
+          "katakana_filter": {
+            "type": "kuromoji_readingform",
+            "use_romaji": false
+          }
+          ,
+          "katakana_to_latin": {
+            "type": "icu_transform",
+            "id": "Katakana-Latin"
+          },
+          "kuromoji_stoptags": {
+            "type": "kuromoji_part_of_speech",
+            "stoptags": ["記号"]
+          },
+          "post_symbols_filter": {
+            "type": "pattern_replace",
+            "pattern": "[\\p{P}\\p{S}\\s]",
+            "replacement": ""
           }
         }
       }
@@ -65,11 +137,17 @@
         },
         "title": {
           "type": "text",
-          "analyzer": "japanese_word_search"
+          "analyzer": "japanese_simple_word_romaji",
+          "fields": {
+            "ngram": {
+              "type": "text",
+              "analyzer": "japanese_word_romaji_search"
+            }
+          }
         },
         "overview": {
           "type": "text",
-          "analyzer": "japanese_content_search"
+          "analyzer": "japanese_content_romaji_search"
         },
         "location": {
           "type": "geo_point"
@@ -97,8 +175,11 @@
           "type": "long"
         },
         "rating_average": {
-          "type": "float",
+          "type": "scaled_float",
           "scaling_factor": 10
+        },
+        "language": {
+          "type": "keyword"
         }
       }
     }

@@ -1,25 +1,45 @@
 package team.klover.server.global.initData;
 
+import net.datafaker.Faker;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.transaction.annotation.Transactional;
+import team.klover.server.domain.auth.dto.SignupRequestDto;
 import team.klover.server.domain.auth.service.AuthV1Service;
+import team.klover.server.domain.community.commPost.dto.req.CommPostForm;
+import team.klover.server.domain.community.commPost.entity.CommPost;
+import team.klover.server.domain.community.commPost.repository.CommPostRepository;
 import team.klover.server.domain.community.commPost.service.CommPostService;
+import team.klover.server.domain.community.comment.dto.req.CommentForm;
+import team.klover.server.domain.community.comment.service.CommentService;
+import team.klover.server.domain.member.v1.dto.MemberUpdateParam;
+import team.klover.server.domain.member.v1.entity.Member;
+import team.klover.server.domain.member.v1.enums.Country;
+import team.klover.server.domain.member.v1.enums.SocialProvider;
 import team.klover.server.domain.member.v1.repository.MemberV1Repository;
+import team.klover.server.domain.member.v1.service.MemberV1Service;
+import team.klover.server.domain.tour.review.dto.req.ReviewForm;
 import team.klover.server.domain.tour.review.service.ReviewService;
 import team.klover.server.domain.tour.tourApi.scheduler.ApisScheduler;
 import team.klover.server.domain.tour.tourApi.service.TourApiService;
+import team.klover.server.domain.tour.tourPost.entity.TourPost;
+import team.klover.server.domain.tour.tourPost.repository.TourPostRepository;
+import team.klover.server.global.util.ChineseLoremGenerator;
+
+import java.util.*;
 
 @Configuration
 @Profile("!prod")
 public class NotProd {
     private final MemberV1Repository MemberRepository;
+    private final MemberV1Repository memberV1Repository;
 
-    public NotProd(MemberV1Repository MemberRepository) {
+    public NotProd(MemberV1Repository MemberRepository, MemberV1Repository memberV1Repository) {
         this.MemberRepository = MemberRepository;
+        this.memberV1Repository = memberV1Repository;
     }
 
     @Bean
@@ -28,7 +48,11 @@ public class NotProd {
             TourApiService tourApiService,
             AuthV1Service authV1Service,
             CommPostService commPostService,
-            ReviewService reviewService
+            CommentService commentService,
+            ReviewService reviewService,
+            TourPostRepository tourPostRepository,
+            CommPostRepository commPostRepository,
+            MemberV1Service memberV1Service
     ) {
         return new ApplicationRunner() {
             @Transactional
@@ -39,93 +63,143 @@ public class NotProd {
                 //
                 //
 
+
 //                apisScheduler.getApisApiData();
-//
-//
-//
-//                // Member 1,2,3 생성
-//                Member Member1 = authV1Service.signup(SignupRequestDto.builder()
-//                                .email("test1@test.com")
-//                                .nickname("test1")
-//                                .password("1234")
-//                        .build());
-//                Member Member2 = authV1Service.signup(SignupRequestDto.builder()
-//                        .email("test2@test.com")
-//                        .nickname("test2")
-//                        .password("1234")
-//                        .build());
-//                Member Member3 = authV1Service.signup(SignupRequestDto.builder()
-//                        .email("test3@test.com")
-//                        .nickname("test3")
-//                        .password("1234")
-//                        .build());
-//
-//                // 번역api리뷰
-//                Long commonPlaceId = 1L;
-//                // 한국어 리뷰
-//                ReviewForm koreanReview = ReviewForm.builder()
-//                        .content("이 장소는 정말 아름다웠어요. 특히 봄에 방문하면 벚꽃이 만발해서 더욱 좋습니다.")
-//                        .rating(5)
-//                        .build();
-//                reviewService.addReview(Member1.getId(), commonPlaceId, koreanReview);
-//
-//                // 영어 리뷰
-//                ReviewForm englishReview = ReviewForm.builder()
-//                        .content("This place was truly beautiful. Especially if you visit in spring, it's even better with the cherry blossoms in full bloom.")
-//                        .rating(4)
-//                        .build();
-//                reviewService.addReview(Member2.getId(), commonPlaceId, englishReview);
-//
-//                // 일본어 리뷰
-//                ReviewForm japaneseReview = ReviewForm.builder()
-//                        .content("この場所は本当に美しかったです。特に春に訪れると、桜が満開でさらに良いです。")
-//                        .rating(5)
-//                        .build();
-//                reviewService.addReview(Member3.getId(), commonPlaceId, japaneseReview);
-//
-//                // 중국어 리뷰
-//                ReviewForm chineseReview = ReviewForm.builder()
-//                        .content("这个地方真的很漂亮。尤其是在春天访问时，樱花盛开，更加美丽。")
-//                        .rating(4)
-//                        .build();
-//                reviewService.addReview(Member1.getId(), commonPlaceId, chineseReview);
-//
-//                System.out.println("Test review data for translation has been created!");
-//            }
-//
 
 
-//                long start = System.currentTimeMillis();
-//                List<Member> members =  MemberRepository.findAll();
-//                Locale[] locales = {Locale.of("ko","KR"), Locale.of("en", "US"),  Locale.of("ja", "JP"), Locale.of("zh", "CN")};
-//                for(Locale locale: locales){
-//                    System.out.println("Locale:"+locale);
-//                }
-//                for(int i=0;i<200;i++){
-//                    System.out.println("idx of faker:"+(i%4));
-//                    System.out.println("value of locale:"+locales[(i%4)]);
-//                    String content="";
-//                    for(int j=0;j<5;j++){
-//                        content += new Faker(locales[i%4]).ancient().hero()+" ";
+                // 테스트용 회원 생성
+//                List<SignupRequestDto> testUsers = List.of(
+//                        SignupRequestDto.builder().email("member1@test.com").nickname("member1").password("1234").build(),
+//                        SignupRequestDto.builder().email("member2@test.com").nickname("member2").password("1234").build(),
+//                        SignupRequestDto.builder().email("member3@test.com").nickname("member3").password("1234").build()
+//                );
+//
+//                for (SignupRequestDto user : testUsers) {
+//                    try {
+//                        authV1Service.signup(user);
+//                    } catch (Exception e) {
+//                        System.out.println("User " + user.getEmail() + " already exists or encountered an error.");
 //                    }
-//                    System.out.println("content:"+content);
-//                    CommPostForm commPostForm = CommPostForm.builder()
-//                            .mapX(0.0)
-//                            .mapY(0.0)
-//                            .content(content)
-//                            .build();
-//                    Member member = members.get((i%3));
-//                    commPostService.addCommPost(member.getId(), commPostForm);
 //                }
-//                long elapsed = System.currentTimeMillis() - start;
-//                System.out.println("elapsed time(ms):"+elapsed);
 
+
+                /*
+
+
+                for(int i=0;i<50;i++){
+                    authV1Service.signup(SignupRequestDto.builder()
+                            .email("test"+(i+1)+"@test.com")
+                            .nickname("test"+(i+1))
+                            .password("1234")
+                            .build()
+                    );
+                }
+
+                long start = System.currentTimeMillis();
+                List<Member> members = MemberRepository.findAll();
+                Locale[] locales = {Locale.of("ko", "KR"), Locale.of("en", "US"), Locale.of("ja", "JP"), Locale.of("zh", "CN")};
+                for (int i = 0; i < 200; i++) {
+                    String content = "";
+                    for (int j = 0; j < 5; j++) {
+                        if ((i % 4) != 3) {
+                            content = String.join(" ", new Faker(locales[i % 4]).lorem().sentences(2));
+                        } else {
+                            content = ChineseLoremGenerator.generate(8);
+                        }
+                    }
+                    System.out.println("content:" + content);
+                    CommPostForm commPostForm = CommPostForm.builder()
+                            .mapX(0.0)
+                            .mapY(0.0)
+                            .content(content)
+                            .build();
+                    Member member = members.get((i % members.size()));
+                    CommPost post = commPostService.addCommPost(member.getId(), commPostForm);
+
+                    int randomCount = new Random(System.currentTimeMillis()).nextInt(1, members.size());
+                    for (int j = 0; j <= randomCount; j++) {
+                        int memberIdx = j%members.size();
+                        commPostService.addCommPostLike(members.get(memberIdx).getId(), post.getId());
+                        CommentForm commentForm = CommentForm.builder()
+                                .content("테에스트으으")
+                                .build();
+                        commentService.addComment(members.get(memberIdx).getId(), post.getId(), commentForm);
+                    }
+                }
+                long elapsed = System.currentTimeMillis() - start;
+                System.out.println("elapsed time(ms):" + elapsed);
+
+
+                List<TourPost> tourPostList = tourPostRepository.findAll();
+                Set<Long> commonPlaceList = new HashSet<>();
+                for(TourPost tourPost : tourPostList){
+                    commonPlaceList.add(tourPost.getCommonPlaceId());
+                }
+
+                for (Long commonPlaceId : commonPlaceList) {
+                    int randomCount = new Random(System.currentTimeMillis()).nextInt(0, 6);
+                    for (int j = 0; j <= randomCount; j++) {
+                        ReviewForm reviewForm = ReviewForm.builder()
+                                .content("테에에스트")
+                                .rating(new Random(System.currentTimeMillis()).nextInt(6))
+                                .build();
+                        reviewService.addReview(members.get(j).getId(), commonPlaceId, reviewForm);
+                    }
+                }
+
+
+
+                List<CommPost> forUpdate = commPostRepository.findAll();
+                for(CommPost commPost : forUpdate){
+                    Member member = commPost.getMember();
+                    Double newMapX = new Random(System.currentTimeMillis()).nextDouble(126, 130);
+                    Double newMapY = new Random(System.currentTimeMillis()).nextDouble(33,38);
+                    CommPostForm commPostForm= CommPostForm.builder()
+                            .content(commPost.getContent())
+                            .imageUrl(commPost.getImageUrl())
+                            .mapX(newMapX)
+                            .mapY(newMapY)
+                            .build();
+                    commPostService.updateCommPost(member.getId(),commPost.getId(),commPostForm);
+                }
+
+
+                List<Member> memberForUpdate = MemberRepository.findAll();
+                for(Member member:memberForUpdate){
+                    Long memberId = member.getId();
+                    String nickname;
+                    Country country;
+                    int randomIdx = new Random(System.currentTimeMillis()).nextInt(0,4);
+                    switch (randomIdx){
+                        case 0 -> {
+                            nickname=new Faker(Locale.of("zh","CN")).name().fullName();
+                            country= Country.ChsService1;
+                        }
+                        case 1 -> {
+                            nickname= new Faker(Locale.of("ja","JP")).name().fullName();
+                            country=Country.JpnService1;
+                        }
+                        case 2 -> {
+                            nickname=new Faker(Locale.of("ko","KR")).name().fullName();
+                            country=Country.KorService1;
+                        }
+                        default -> {
+                            nickname=new Faker(Locale.of("en","US")).name().fullName();
+                            country=Country.EngService1;
+                        }
+                    }
+                    MemberUpdateParam memberUpdateParam = MemberUpdateParam.builder()
+                            .nickname(nickname)
+                            .country(country)
+                            .build();
+                    memberV1Service.updateMember(memberId,memberUpdateParam,null);
+                }
+
+                 */
 
             }
 
-
-
         };
+
     }
 }
-

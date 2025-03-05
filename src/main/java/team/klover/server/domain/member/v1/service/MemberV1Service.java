@@ -53,7 +53,6 @@ public class MemberV1Service {
 
                 System.out.println("업로드를 하는 중입니다.");
                 imageUrl = s3Service.uploadFile(imageFile, "profile-images");
-                param.changeProfileUrl(imageUrl);
             }
         } catch (IOException e) {
             throw new KloverLogicException(ReturnCode.INTERNAL_ERROR);
@@ -61,7 +60,17 @@ public class MemberV1Service {
 
         String prevNickname = member.getNickname();
 
-        member.update(param);
+        member.update(param, imageUrl);
+    }
+
+    @Transactional
+    public void resetImage(Long currentMemberId){
+        Member member = memberRepository.findById(currentMemberId)
+                .orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
+
+        if(member.getProfileUrl() != null) s3Service.deleteFile(member.getProfileUrl());
+
+        member.setProfileUrl(null);
     }
 
     public MemberDto getMyInfo() {

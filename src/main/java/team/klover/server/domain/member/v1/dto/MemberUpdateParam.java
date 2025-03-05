@@ -10,11 +10,6 @@ import team.klover.server.domain.member.v1.enums.Country;
 @ToString
 public class MemberUpdateParam {
     private String nickname; //new nickname
-    private String profileUrl; //oldProfileUrl
     private Country country;
-
-    public void changeProfileUrl(String newUrl) {
-        this.profileUrl = newUrl;
-    }
 
 }

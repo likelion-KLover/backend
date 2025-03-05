@@ -1,27 +1,13 @@
-- pipeline.id: log_pipeline
-  path.config: "/usr/share/logstash/pipeline/logpipeline.conf"
-
 - pipeline.id: commpost_pipeline
-  path.config: "/usr/share/logstash/pipeline/commpost/commpostkoreanpipeline.conf"
+  path.config: "/usr/share/logstash/pipeline/commpost/loadrow/commpostpipeline.conf"
 - pipeline.id: commpost_update_pipeline
-  path.config: "/usr/share/logstash/pipeline/commpost/commpostkoreanupdatepipeline.conf"
+  path.config: "/usr/share/logstash/pipeline/commpost/updaterow/commpostupdatepipeline.conf"
+- pipeline.id: commpost_count_update_pipeline
+  path.config: "/usr/share/logstash/pipeline/commpost/updatecount/commpostcountupdatepipeline.conf"
 
-- pipeline.id: tourpost_korean_pipeline
-  path.config: "/usr/share/logstash/pipeline/tourpost/korean/tourpostkoreanpipeline.conf"
-- pipeline.id: tourpost_korean_update_pipeline
-  path.config: "/usr/share/logstash/pipeline/tourpost/korean/tourpostkoreanupdatepipeline.conf"
-
-- pipeline.id: tourpost_chinese_pipeline
-  path.config: "/usr/share/logstash/pipeline/tourpost/chinese/tourpostchinesepipeline.conf"
-- pipeline.id: tourpost_chinese_update_pipeline
-  path.config: "/usr/share/logstash/pipeline/tourpost/chinese/tourpostchineseupdatepipeline.conf"
-
-- pipeline.id: tourpost_japanese_pipeline
-  path.config: "/usr/share/logstash/pipeline/japanese/tourpostjapanesepipeline.conf"
-- pipeline.id: tourpost_japanese_update_pipeline
-  path.config: "/usr/share/logstash/pipeline/japanese/tourpostjapaneseupdatepipeline.conf"
-
-- pipeline.id: tourpost_english_pipeline
-  path.config: "/usr/share/logstash/pipeline/english/tourpostenglishpipeline.conf"
-- pipeline.id: tourpost_english_update_pipeline
-  path.config: "/usr/share/logstash/pipeline/english/tourpostenglishupdatepipeline.conf"
+- pipeline.id: tourpost_pipeline
+  path.config: "/usr/share/logstash/pipeline/tourpost/loadrow/tourpostpipeline.conf"
+- pipeline.id: tourpost_update_pipeline
+  path.config: "/usr/share/logstash/pipeline/tourpost/updaterow/tourpostupdatepipeline.conf"
+- pipeline.id: tourpost_review_pipeline
+  path.config: "/usr/share/logstash/pipeline/tourpost/updatereview/tourpostreviewpipeline.conf"

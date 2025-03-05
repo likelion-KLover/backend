@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
@@ -14,9 +15,13 @@ import team.klover.server.domain.community.commPost.dto.res.CombinedPostResponse
 import team.klover.server.domain.community.commPost.dto.res.CommPostDto;
 import team.klover.server.domain.community.commPost.dto.res.DetailCommPostDto;
 import team.klover.server.domain.community.commPost.entity.CommPostPage;
+import team.klover.server.domain.community.commPost.enums.CommPostSort;
 import team.klover.server.domain.community.commPost.service.CommPostService;
+import team.klover.server.domain.member.v1.enums.Country;
 import team.klover.server.global.common.response.ApiResponse;
 import team.klover.server.global.common.response.KloverPage;
+import team.klover.server.global.elasticsearch.commpost.service.CommPostDocService;
+import team.klover.server.global.exception.KloverRequestException;
 import team.klover.server.global.exception.ReturnCode;
 import team.klover.server.global.util.AuthUtil;
 
@@ -30,6 +35,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequiredArgsConstructor
 public class ApiV1CommPostController {
     private final CommPostService commPostService;
+    private final CommPostDocService commPostDocService;
 
     // 사용자 위치 주변 게시글(관광지&사용자) 조회
     // http://localhost:8080/api/v1/comm-post/surroundings
@@ -121,7 +127,7 @@ public class ApiV1CommPostController {
     // http://localhost:8080/api/v1/comm-post
     @PostMapping
     @Operation(summary = "게시글 생성")
-    public ApiResponse<String> addCommPost(@RequestBody @Valid CommPostForm commPostForm,
+    public ApiResponse<String> addCommPost(@RequestPart(value = "commPostForm") @Valid CommPostForm commPostForm,
                                            @RequestPart(value = "imageFile") List<MultipartFile> imageFiles) {
         Long currentMemberId = AuthUtil.getCurrentMemberId();
         commPostService.addCommPost(currentMemberId, commPostForm, imageFiles);
@@ -133,8 +139,8 @@ public class ApiV1CommPostController {
     @PutMapping("/{commPostId}")
     @Operation(summary = "게시글 수정")
     public ApiResponse<String> updateCommPost(@PathVariable("commPostId") Long commPostId,
-                                              @RequestBody @Valid CommPostForm commPostForm,
-                                              @RequestPart(value = "imageFile") List<MultipartFile> imageFiles) {
+                                              @RequestPart(value = "commPostForm") @Valid CommPostForm commPostForm,
+                                              @RequestPart(value = "imageFile", required = false) List<MultipartFile> imageFiles) {
         Long currentMemberId = AuthUtil.getCurrentMemberId();
         commPostService.updateCommPost(currentMemberId, commPostId, commPostForm, imageFiles);
         return ApiResponse.of(ReturnCode.SUCCESS);
@@ -148,5 +154,30 @@ public class ApiV1CommPostController {
         Long currentMemberId = AuthUtil.getCurrentMemberId();
         commPostService.deleteCommPost(currentMemberId, commPostId);
         return ApiResponse.of(ReturnCode.SUCCESS);
+    }
+
+    //http://localhost:8080/api/v1/comm-post/test
+    @GetMapping("/search")
+    @Operation(summary = "게시글 검색(엘라스틱서치)")
+    public ApiResponse<CommPostDto> test(@RequestParam(value = "page",defaultValue = "0") int page,
+                                               @RequestParam(value = "size",defaultValue = "20") int size,
+                                               @RequestParam(value = "keyword",defaultValue = "")String keyword,
+                                               @RequestParam(value = "sort", required = false)CommPostSort sort,
+                                               @RequestParam(value = "language",defaultValue = "KorService1")Country language,
+                                               @RequestParam(value = "content", defaultValue = "false") boolean searchByContent,
+                                               @RequestParam(value = "nickname", defaultValue = "false") boolean searchByNickname,
+                                               @RequestParam(value = "mapX",defaultValue = "127.1288128231279") Double mapX,
+                                               @RequestParam(value = "mapY",defaultValue="34.41101602890987") Double mapY){
+        if(page < 0 || size <= 0){
+            throw new KloverRequestException(ReturnCode.WRONG_PARAMETER);
+        }
+
+        Pageable pageable = PageRequest.of(page, size);
+        //둘 중 하나라도 true가 아니고 keyword가 안 비었다면
+        if(!(searchByContent || searchByNickname) && keyword !=null && !keyword.isBlank()) searchByContent = true;
+
+        Page<CommPostDto> list = commPostDocService.search(keyword,pageable,mapX,mapY,language,searchByContent,searchByNickname,sort);
+        KloverPage<CommPostDto> kloverPage = KloverPage.of(list);
+        return ApiResponse.of(kloverPage);
     }
 }

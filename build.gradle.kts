@@ -56,6 +56,7 @@ dependencies {
 	// aws s3
 	implementation(platform("software.amazon.awssdk:bom:2.24.0"))
 	implementation("software.amazon.awssdk:s3")
+	implementation("com.vladmihalcea:hibernate-types-60:2.21.1")
 
 	// elastic search
 	implementation("org.springframework.boot:spring-boot-starter-data-elasticsearch")

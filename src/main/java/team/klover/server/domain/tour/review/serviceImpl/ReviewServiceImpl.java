@@ -23,6 +23,7 @@ import team.klover.server.global.exception.KloverRequestException;
 import team.klover.server.global.exception.ReturnCode;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -49,16 +50,21 @@ public class ReviewServiceImpl implements ReviewService {
         // 현재 로그인한 사용자의 member 객체를 가져오는 메서드
         Member member = memberV1Repository.findById(currentMemberId).orElseThrow(() ->
                 new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
+
         List<TourPost> tourPosts = tourPostRepository.findByCommonPlaceId(commonPlaceId);
         if (tourPosts.isEmpty()) {
             throw new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY);
         }
         // 첫 번째 TourPost에서 사용자가 이미 리뷰를 남겼는지 확인
+        Optional<Review> reviewWrittenByMember = reviewRepository.findCommonPlaceReviewReviewWrittenByMember(currentMemberId, commonPlaceId);
+        /*
         boolean alreadyReviewed = tourPosts.get(0).getReviewTourPosts().stream()
                 .anyMatch(rt -> rt.getReview().getMember().getId().equals(currentMemberId));
         if (alreadyReviewed) {
             throw new KloverRequestException(ReturnCode.ALREADY_EXIST);
         }
+        */
+         if(reviewWrittenByMember.isPresent()) throw new KloverRequestException(ReturnCode.ALREADY_EXIST);
 
         // 평점은(1,2,3,4,5)만 가능
         if (reviewForm.getRating() > 5 || reviewForm.getRating() < 0) {
@@ -70,6 +76,8 @@ public class ReviewServiceImpl implements ReviewService {
                 .rating(reviewForm.getRating())
                 .build();
         reviewRepository.save(review);
+
+        member.addReview(review);
 
         // 모든 TourPost에 대해 ReviewTourPost 저장
         for (TourPost tourPost : tourPosts) {
@@ -114,6 +122,7 @@ public class ReviewServiceImpl implements ReviewService {
         }
         reviewTourPostRepository.deleteByReviewId(reviewId);
         reviewRepository.delete(review);
+        review.getMember().removeReview(review);
     }
 
     // 요청 페이지 수 제한

@@ -3,8 +3,11 @@ package team.klover.server.domain.chat.chatMessage.service;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 import team.klover.server.domain.chat.chatMessage.dto.req.ChatMessageForm;
 import team.klover.server.domain.chat.chatMessage.dto.res.ChatMessageDto;
+
+import java.util.List;
 
 public interface ChatMessageService {
     // 해당 채팅방의 메시지 실시간 조회 시작
@@ -14,7 +17,7 @@ public interface ChatMessageService {
     Page<ChatMessageDto> searchByKeyword(Long currentMemberId, Long chatRoomId, String keyword, Pageable pageable);
 
     // 해당 채팅방에서 메시지 생성
-    void writeChatMessage(Long currentMemberId, Long chatRoomId, @Valid ChatMessageForm chatMessageForm);
+    void writeChatMessage(Long currentMemberId, Long chatRoomId, ChatMessageForm chatMessageForm, List<MultipartFile> imageFiles);
 
     // 해당 메시지 삭제
     void deleteChatMessage(Long currentMemberId, Long messageId);

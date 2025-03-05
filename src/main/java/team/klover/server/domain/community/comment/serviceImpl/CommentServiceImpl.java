@@ -53,12 +53,13 @@ public class CommentServiceImpl implements CommentService {
 
         boolean alreadySaved = comment.getLikedMembers()
                 .stream()
-                .anyMatch(savedMember -> savedMember.getId().equals(member.getId()));
+                .anyMatch(savedMember -> savedMember.getMember() != null && savedMember.getMember().getId().equals(member.getId()));
         if (alreadySaved) {
             throw new KloverRequestException(ReturnCode.ALREADY_EXIST);
         }
         CommentLike commentLike = new CommentLike(member, comment);
         comment.getLikedMembers().add(commentLike);
+        member.addLikedComment(commentLike);
 
         // 이벤트 생성 및 발행
         publisher.publishEvent(new CommentLikedEvent(this, comment, member));
@@ -69,12 +70,14 @@ public class CommentServiceImpl implements CommentService {
     @Transactional
     public void deleteCommentLike(Long currentMemberId, Long commentId) {
         Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
+        Member member = memberV1Repository.findById(currentMemberId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
         CommentLike commentLike = comment.getLikedMembers()
                 .stream()
-                .filter(m -> m.getMember().getId().equals(currentMemberId))
+                .filter(m -> m.getMember()!=null && m.getMember().getId().equals(currentMemberId))
                 .findFirst()
                 .orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
         comment.getLikedMembers().remove(commentLike);
+        member.removeLikedComment(commentLike);
     }
 
     // 해당 게시글에 댓글 생성
@@ -92,6 +95,7 @@ public class CommentServiceImpl implements CommentService {
                 .superCommentId(commentForm.getSuperCommentId())
                 .build();
         commentRepository.save(comment);
+        member.addComment(comment);
 
         // 이벤트 생성 및 발행
         publisher.publishEvent(new CommentCreatedEvent(this, commPost, comment));
@@ -127,6 +131,7 @@ public class CommentServiceImpl implements CommentService {
         deleteChildComments(commentId);
         commentRepository.save(comment); // 답글 삭제 후 더티 체킹
         commentRepository.delete(comment);
+        member.removeComment(comment);
     }
 
     // 해당 게시글의 모든 댓글 삭제
@@ -144,6 +149,8 @@ public class CommentServiceImpl implements CommentService {
         for (Comment childComment : childComments) {
             deleteChildComments(childComment.getId()); // 재귀 호출
             commentRepository.delete(childComment);
+            Member member = childComment.getMember();
+            member.removeComment(childComment);
         }
     }
 
