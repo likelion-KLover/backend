@@ -16,15 +16,15 @@ public class CommPostModificationMessage {
     Country language;
     List<String> image_urls;
     String content;
-    Double mapX;
-    Double mapY;
+    Double mapx;
+    Double mapy;
 
     public CommPostModificationMessage(CommPost commPost){
         id = commPost.getId();
         language = commPost.getLanguage();
         image_urls = commPost.getImageUrls();
         content = commPost.getContent();
-        mapX = commPost.getMapX();
-        mapY = commPost.getMapY();
+        mapx = commPost.getMapX();
+        mapy = commPost.getMapY();
     }
 }

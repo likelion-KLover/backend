@@ -25,7 +25,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     List<Comment> findAllByMember(Member member);
 
     @Query("""
-select count(c) from Comment c
+select coalesce(count(c.id),0) from Comment c
 where c.commPost.id = :commpostId
 """)
     long countCommPostComment(Long commpostId);
