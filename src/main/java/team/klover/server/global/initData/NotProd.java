@@ -72,28 +72,14 @@ public class NotProd {
 
 
 
-                //apisScheduler.getApisApiData();
-          /*
-
-                // 테스트용 회원 생성
-//                List<SignupRequestDto> testUsers = List.of(
-//                        SignupRequestDto.builder().email("member1@test.com").nickname("member1").password("1234").build(),
-//                        SignupRequestDto.builder().email("member2@test.com").nickname("member2").password("1234").build(),
-//                        SignupRequestDto.builder().email("member3@test.com").nickname("member3").password("1234").build()
-//                );
-//
-//                for (SignupRequestDto user : testUsers) {
-//                    try {
-//                        authV1Service.signup(user);
-//                    } catch (Exception e) {
-//                        System.out.println("User " + user.getEmail() + " already exists or encountered an error.");
-//                    }
-//                }
+//                apisScheduler.getApisApiData();
 
 
-*/
 
-/*
+
+                /*
+
+
                 for(int i=0;i<50;i++){
                     authV1Service.signup(SignupRequestDto.builder()
                             .email("test"+(i+1)+"@test.com")
@@ -104,12 +90,7 @@ public class NotProd {
                 }
 
                 long start = System.currentTimeMillis();
-
- */
-                /*
                 List<Member> members = MemberRepository.findAll();
-
-
                 Locale[] locales = {Locale.of("ko", "KR"), Locale.of("en", "US"), Locale.of("ja", "JP"), Locale.of("zh", "CN")};
 
                 // 1. 10x10 흑백 이미지 생성
@@ -166,9 +147,8 @@ public class NotProd {
 
                 List<MultipartFile> dummy = new ArrayList<>();
                 dummy.add(imageFile);
-                */
-/*
-                for (int i = 0; i < 20; i++) {
+
+                for (int i = 0; i < 200; i++) {
                     String content = "";
                     for (int j = 0; j < 5; j++) {
                         if ((i % 4) != 3) {
@@ -203,8 +183,7 @@ public class NotProd {
 
                 long elapsed = System.currentTimeMillis() - start;
                 System.out.println("elapsed time(ms):" + elapsed);
-*/
-                /*
+
 
                 List<TourPost> tourPostList = tourPostRepository.findAll();
                 Set<Long> commonPlaceList = new HashSet<>();
@@ -237,7 +216,7 @@ public class NotProd {
                             .build();
                     commPostService.updateCommPost(member.getId(),commPost.getId(),commPostForm,dummy);
                 }
-/*
+
 
                 List<Member> memberForUpdate = MemberRepository.findAll();
                 for(Member member:memberForUpdate){
@@ -269,7 +248,10 @@ public class NotProd {
                             .build();
                     memberV1Service.updateMember(memberId,memberUpdateParam,null);
                 }
-*/
+
+
+                 */
+
             }
 
         };
