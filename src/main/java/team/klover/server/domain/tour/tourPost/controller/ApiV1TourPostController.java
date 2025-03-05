@@ -94,13 +94,13 @@ public class ApiV1TourPostController {
     }
 
 
-    // http://localhost:8080/api/v1/tour-post/test
+    // http://localhost:8080/api/v1/tour-post/search
     @GetMapping("/search")
-    public ApiResponse<TourPostDto> test(@RequestParam(value = "page",defaultValue = "0") int page,
+    public ApiResponse<TourPostDto> search(@RequestParam(value = "page",defaultValue = "0") int page,
                                          @RequestParam(value = "size",defaultValue = "20") int size,
                                          @RequestParam(value = "keyword",defaultValue = "")String keyword,
                                          @RequestParam(value = "sort", required = false) TourPostSort sort,
-                                         @RequestParam(value = "language",defaultValue = "KorService1") Country language,
+                                         @RequestParam(value = "language") Country language,
                                          @RequestParam(value = "area",required = false) Area area,
                                          @RequestParam(value = "contenttype",required = false) ContentType contentType,
                                          @RequestParam(value = "title", defaultValue = "false") boolean searchByTitle,
@@ -109,8 +109,8 @@ public class ApiV1TourPostController {
                                          @RequestParam(value = "healing", defaultValue = "false") boolean hasHealing,
                                          @RequestParam(value = "active", defaultValue = "false") boolean hasActive,
                                          @RequestParam(value = "traditional", defaultValue = "false") boolean hasTraditional,
-                                         @RequestParam(value = "mapX",defaultValue = "127.1288128231279") Double mapX,
-                                         @RequestParam(value = "mapY",defaultValue="34.41101602890987") Double mapY){
+                                         @RequestParam(value = "mapX") Double mapX,
+                                         @RequestParam(value = "mapY") Double mapY){
         if(page<0 || size<=0) throw new KloverRequestException(ReturnCode.WRONG_PARAMETER);
 
         //둘 중 하나라도 true가 아니고 keyword가 안 비었다면

@@ -23,14 +23,13 @@
         "tokenizer": {
           "kuromoji_search_tokenizer": {
             "type": "kuromoji_tokenizer",
-            "mode": "extended",
+            "mode": "search",
             "user_dictionary": "userdict_ja.txt",
             "discard_compound_token": false
           },
           "kuromoji_word_tokenizer": {
             "type": "kuromoji_tokenizer",
-            "mode": "extended",
-            "user_dictionary": "userdict_ja.txt",
+            "mode": "search",
             "discard_compound_token": false
           }
         },
@@ -57,7 +56,7 @@
           },
           "japanese_simple_word_romaji": {
             "type": "custom",
-            "tokenizer": "kuromoji_search_tokenizer",
+            "tokenizer": "kuromoji_word_tokenizer",
             "char_filter": [
               "remove_korean"
             ],

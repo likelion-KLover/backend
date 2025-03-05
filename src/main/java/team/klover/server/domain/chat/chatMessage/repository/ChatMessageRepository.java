@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import team.klover.server.domain.chat.chatMessage.entity.ChatMessage;
 import team.klover.server.domain.chat.chatRoom.entity.ChatRoom;
+import team.klover.server.domain.member.v1.entity.Member;
 
 import java.util.List;
 
@@ -22,4 +23,6 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
 
     // 해당 채팅방의 해당 메시지 이후에 작성된 메시지 리스트 조회
     List<ChatMessage> findByChatRoomIdAndIdGreaterThan(Long chatRoomId, Long lastReadMessageId);
+
+    List<ChatMessage> findAllByMember(Member member);
 }

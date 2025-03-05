@@ -3,6 +3,7 @@ package team.klover.server.domain.tour.review.serviceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,8 @@ import team.klover.server.domain.tour.review.repository.ReviewTourPostRepository
 import team.klover.server.domain.tour.review.service.ReviewService;
 import team.klover.server.domain.tour.tourPost.entity.TourPost;
 import team.klover.server.domain.tour.tourPost.repository.TourPostRepository;
+import team.klover.server.global.elasticsearch.tourpost.rabbitmq.event.ReviewCountEvent;
+import team.klover.server.global.elasticsearch.tourpost.rabbitmq.event.ReviewRatingEvent;
 import team.klover.server.global.exception.KloverRequestException;
 import team.klover.server.global.exception.ReturnCode;
 
@@ -33,6 +36,7 @@ public class ReviewServiceImpl implements ReviewService {
     private final TourPostRepository tourPostRepository;
     private final MemberV1Repository memberV1Repository;
     private final ReviewTourPostRepository reviewTourPostRepository;
+    private final ApplicationEventPublisher publisher;
 
     // 해당 관광지 게시글에 작성된 리뷰 조회
     @Override
@@ -77,8 +81,8 @@ public class ReviewServiceImpl implements ReviewService {
                 .build();
         reviewRepository.save(review);
 
-        member.addReview(review);
-
+        long reviewCount = reviewRepository.countTourPostReview(commonPlaceId);
+        double ratingAverage = reviewRepository.getTourPostAvgRating(commonPlaceId);
         // 모든 TourPost에 대해 ReviewTourPost 저장
         for (TourPost tourPost : tourPosts) {
             ReviewTourPost reviewTourPost = ReviewTourPost.builder()
@@ -86,6 +90,9 @@ public class ReviewServiceImpl implements ReviewService {
                     .tourPost(tourPost)
                     .build();
             reviewTourPostRepository.save(reviewTourPost);
+            //리뷰 업데이트 이벤트
+            publisher.publishEvent(new ReviewCountEvent(this, tourPost, reviewCount));
+            publisher.publishEvent(new ReviewRatingEvent(this, tourPost, ratingAverage));
         }
     }
 
@@ -104,9 +111,23 @@ public class ReviewServiceImpl implements ReviewService {
         if (reviewForm.getRating() > 5 || reviewForm.getRating() < 0) {
             throw new KloverRequestException(ReturnCode.WRONG_PARAMETER);
         }
+        int prevRating = review.getRating();
+
         review.setContent(reviewForm.getContent());
         review.setRating(reviewForm.getRating());
         reviewRepository.save(review);
+
+        int afterRating = review.getRating();
+        if(prevRating != afterRating){
+            List<ReviewTourPost> rtps =  reviewTourPostRepository.findAllByReview(review);
+            ReviewTourPost reviewTourPost = rtps.stream().findFirst().orElseThrow(()->new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
+            double ratingAverage = reviewRepository.getTourPostAvgRating(reviewTourPost.getTourPost().getCommonPlaceId());
+
+            for(ReviewTourPost rtp : rtps){
+                TourPost tourPost = rtp.getTourPost();
+                publisher.publishEvent(new ReviewRatingEvent(this, tourPost, ratingAverage));
+            }
+        }
     }
 
     // 본인 리뷰 삭제
@@ -120,9 +141,25 @@ public class ReviewServiceImpl implements ReviewService {
         if (!review.getMember().getId().equals(currentMemberId)) {
             throw new KloverRequestException(ReturnCode.NOT_AUTHORIZED);
         }
+
+        List<ReviewTourPost> tourPostsPerReview = reviewTourPostRepository.findAllByReview(review);
+        Long commonPlaceId = 0L;
+        if(!tourPostsPerReview.isEmpty()){
+            commonPlaceId = tourPostsPerReview.stream().findFirst().get().getTourPost().getCommonPlaceId();
+        }
+
         reviewTourPostRepository.deleteByReviewId(reviewId);
         reviewRepository.delete(review);
-        review.getMember().removeReview(review);
+
+        if(commonPlaceId > 0) {
+            //각 언어별 관광 정보에 대한 리뷰 처리 이벤트
+            long count = reviewRepository.countTourPostReview(commonPlaceId);
+            double average = reviewRepository.getTourPostAvgRating(commonPlaceId);
+            tourPostsPerReview.forEach(reviewTourPost -> {
+                publisher.publishEvent(new ReviewCountEvent(this, reviewTourPost.getTourPost(), count));
+                publisher.publishEvent(new ReviewRatingEvent(this, reviewTourPost.getTourPost(), average));
+            });
+        }
     }
 
     // 요청 페이지 수 제한

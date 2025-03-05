@@ -192,6 +192,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
         }
         s3Service.deleteAllFile(chatMessage.getImageUrls());
         messageContentRepository.deleteById(String.valueOf(messageId));
+
         chatMessageRepository.delete(chatMessage);
     }
 
@@ -203,6 +204,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
         List<ChatMessage> messages = chatMessageRepository.findByChatRoom(chatRoom);
         messages.forEach(message -> s3Service.deleteAllFile(message.getImageUrls()));
         messages.forEach(message -> messageContentRepository.deleteById(String.valueOf(message.getId())));
+        
         chatMessageRepository.deleteAll(messages);
     }
 

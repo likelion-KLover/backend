@@ -77,10 +77,12 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .build();
         // 본인을 맨 앞에 추가
         List<ChatRoomMember> chatRoomMembers = new ArrayList<>();
-        chatRoomMembers.add(ChatRoomMember.builder()
+
+        ChatRoomMember enterChatRoomMyself = ChatRoomMember.builder()
                 .member(member)
                 .chatRoom(chatRoom)
-                .build());
+                .build();
+        chatRoomMembers.add(enterChatRoomMyself);
 
         // 추가하려는 멤버들 중 중복되지 않는 멤버만 추가
         Set<Long> addedMemberIds = new HashSet<>();
@@ -88,10 +90,12 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         for (ChatRoomMember chatRoomMember : chatRoomForm.getChatRoomMembers()) {
             Long memberId = chatRoomMember.getMember().getId();
             if (!addedMemberIds.contains(memberId)) { // 중복 방지
-                chatRoomMembers.add(ChatRoomMember.builder()
+                ChatRoomMember memberInChatRoom = ChatRoomMember.builder()
                         .member(chatRoomMember.getMember())
                         .chatRoom(chatRoom)
-                        .build());
+                        .build();
+                chatRoomMembers.add(memberInChatRoom);
+                //중복 체크용
                 addedMemberIds.add(memberId);
             } else {
                 throw new KloverRequestException(ReturnCode.ALREADY_EXIST);
@@ -142,13 +146,6 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .collect(Collectors.toList());
         chatRoom.getChatRoomMembers().addAll(newMembers);
 
-        for(ChatRoomMember chatRoomMember : newMembers){
-            Member member = chatRoomMember.getMember();
-
-            if(!member.getEnteredChatRoom().contains(chatRoomMember)) {
-                member.addEnteredChatRoom(chatRoomMember);
-            }
-        }
     }
 
     // 채팅방에서 강퇴(그룹) / 방장권한
@@ -170,12 +167,14 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         if (kickMemberIds.contains(currentMemberId)) {
             throw new KloverRequestException(ReturnCode.INVALID_REQUEST);
         }
+
         chatRoom.getChatRoomMembers().removeIf(existingMember ->
                 kickMemberIds.contains(existingMember.getMember().getId()));
 
         // 강퇴 후 남은 인원이 2명 미만이면 채팅방 삭제
         if (chatRoom.getChatRoomMembers().size() < 2) {
             chatRoomRepository.delete(chatRoom);
+
         } else {
             chatRoomRepository.save(chatRoom);
         }
@@ -193,6 +192,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .findFirst()
                 .orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
         chatRoom.getChatRoomMembers().remove(chatRoomMember);  // ChatRoomMember 제거
+
 
         // 방장인지 확인
         if (chatRoom.getMember().getId().equals(currentMemberId)) {
