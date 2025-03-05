@@ -1,6 +1,7 @@
 package team.klover.server.domain.member.v1.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -38,6 +39,10 @@ import team.klover.server.domain.tour.review.service.ReviewService;
 import team.klover.server.domain.tour.tourPost.entity.TourPostSave;
 import team.klover.server.domain.tour.tourPost.repository.TourPostSaveRepository;
 import team.klover.server.domain.tour.tourPost.service.TourPostService;
+import team.klover.server.global.elasticsearch.commpost.rabbitmq.event.CommPostDeleteEvent;
+import team.klover.server.global.elasticsearch.commpost.rabbitmq.event.CommentCountEvent;
+import team.klover.server.global.elasticsearch.commpost.rabbitmq.event.LikeCountEvent;
+import team.klover.server.global.elasticsearch.commpost.rabbitmq.event.NicknameUpdateEvent;
 import team.klover.server.global.exception.KloverException;
 import team.klover.server.global.exception.KloverLogicException;
 import team.klover.server.global.exception.KloverRequestException;
@@ -45,8 +50,10 @@ import team.klover.server.global.exception.ReturnCode;
 import team.klover.server.global.s3.S3Service;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -76,6 +83,7 @@ public class MemberV1Service {
     private final ChatMessageRepository chatMessageRepository;
     private final ChatMessageService chatMessageService;
 
+    private final ApplicationEventPublisher publisher;
     @Transactional
     public void updateMember(Long memberId, MemberUpdateParam param
                                      , MultipartFile imageFile
@@ -98,8 +106,13 @@ public class MemberV1Service {
         }
 
         String prevNickname = member.getNickname();
-
         member.update(param, imageUrl);
+        String curNickname = member.getNickname();
+
+        if(!prevNickname.equals(curNickname)) {
+            List<CommPost> commPosts = commPostRepository.findAllByMember(member);
+            commPosts.forEach(commPost -> publisher.publishEvent(new NicknameUpdateEvent(this, commPost, curNickname)));
+        }
     }
 
     @Transactional
@@ -143,23 +156,51 @@ public class MemberV1Service {
         enteredChatRoom.forEach(chatRoomMember -> chatRoomService.leaveChatRoomMember(chatRoomMember.getChatRoom().getId(),memberId));
 
         //댓글 처리
+        Set<CommPost> updateList = new HashSet<>();
         List<CommentLike> commentLikes = commentLikeRepository.findAllByMember(member);
         List<Comment> comments = commentRepository.findAllByMember(member);
         commentLikes.forEach(commentLike -> commentService.deleteCommentLike(memberId,commentLike.getId()));
-        comments.forEach(comment -> commentService.deleteComment(memberId,comment.getId()));
+        comments.forEach(comment -> {
+            updateList.add(comment.getCommPost());
+            commentService.deleteComment(memberId,comment.getId());
+        });
+
+        if(!updateList.isEmpty()){
+            updateList.forEach(commPost -> {
+                long count = commentRepository.countCommPostComment(commPost.getId());
+                publisher.publishEvent(new CommentCountEvent(this, commPost,count));
+            });
+        }
 
         //게시물 처리
         List<CommPostLike> commPostLikes = commPostLikeRepository.findAllByMember(member);
         List<CommPostSave> commPostSaves = commPostSaveRepository.findAllByMember(member);
         List<CommPost> commPosts = commPostRepository.findAllByMember(member);
-        commPostLikes.forEach(commPostLike -> commPostService.deleteCommPostLike(memberId, commPostLike.getCommPost().getId()));
+
+        Set<CommPost> likeUpdateList = new HashSet<>();
+        commPostLikes.forEach(commPostLike -> {
+            likeUpdateList.add(commPostLike.getCommPost());
+            commPostService.deleteCommPostLike(memberId, commPostLike.getCommPost().getId());
+        });
+
+        if(!likeUpdateList.isEmpty()){
+            likeUpdateList.forEach(commPost -> {
+                long count = commPostLikeRepository.countCommPostLike(commPost.getId());
+                publisher.publishEvent(new LikeCountEvent(this, commPost, count));
+            });
+        }
         commPostSaves.forEach(commPostSave -> commPostService.deleteCollectionCommPost(memberId, commPostSave.getCommPost().getId()));
-        commPosts.forEach(commPost -> commPostService.deleteCommPost(memberId, commPost.getId()));
+        commPosts.forEach(commPost -> {
+            commPostService.deleteCommPost(memberId, commPost.getId());
+            publisher.publishEvent(new CommPostDeleteEvent(this, commPost));
+        });
 
         //관광 정보 관련(리뷰, 저장) 처리
         List<Review> reviews = reviewRepository.findAllByMember(member);
         List<TourPostSave> tourPostSaves = tourPostSaveRepository.findAllByMember(member);
-        reviews.forEach(review -> reviewService.deleteReview(memberId, review.getId()));
+        reviews.forEach(review -> {
+            reviewService.deleteReview(memberId, review.getId());
+        });
         tourPostSaves.forEach(tourPostSave -> tourPostService.deleteCollectionTourPost(memberId, tourPostSave.getTourPost().getContentId()));
 
         if(member.getProfileUrl()!=null) {

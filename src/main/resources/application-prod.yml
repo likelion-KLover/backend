@@ -6,38 +6,35 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
-      ddl-auto: update
-    show-sql: false      # 운영 환경에서는 보통 false로 설정
-    properties:
-      hibernate:
-        format_sql: false
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+      ddl-auto: create
   data:
-    redis:
-      host: localhost
-      port: 6379
     mongodb:
       uri: mongodb://admin:admin@43.203.244.12:27017/meta_db?authSource=admin
       database: meta_db
+    redis:
+      host: localhost
+      port: 6379
   rabbitmq:
     host: 13.125.235.125
     port: 5672
     username: admin
     password: admin
 
-# Swagger 비활성화 (운영 환경에서는 보통 사용 안 함)
-springdoc:
-  api-docs:
-    enabled: false
-  swagger-ui:
-    enabled: false
-
 logging:
   level:
-    org.springframework.web: INFO
-    team.klover: INFO
-    org.hibernate.SQL: WARN
-    org.hibernate.type.descriptor.sql: ERROR
+    root: INFO
+    org.springframework.web: WARN
+    team.klover: DEBUG  # 내 애플리케이션 패키지는 DEBUG 유지 가능
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/app.log
+  logback:
+    rolling policy:
+      file-name-pattern: logs/app-%d{yyyy-MM-dd}.log
+      max-history: 7
+      total-size-cap: 100MB
 
 es:
   host: "es.tmdgjsdl1.site"
