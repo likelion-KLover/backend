@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import team.klover.server.domain.member.v1.entity.Member;
 import team.klover.server.domain.tour.review.entity.Review;
 
 import java.util.List;
@@ -41,4 +42,20 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     where r.member.id = :memberId and rtp.tourPost.commonPlaceId = :commonPlaceId
     """)
     Optional<Review> findCommonPlaceReviewReviewWrittenByMember(Long memberId, Long commonPlaceId);
+
+    List<Review> findAllByMember(Member member);
+
+    @Query("""
+select count(distinct r) from Review r
+left join ReviewTourPost rtp on r.id = rtp.review.id
+where rtp.tourPost.commonPlaceId = :commonPlaceId
+""")
+    long countTourPostReview(Long commonPlaceId);
+
+    @Query("""
+select avg(distinct r.rating) from Review r
+left join ReviewTourPost rtp on r.id = rtp.review.id
+where rtp.tourPost.commonPlaceId = :commonPlaceId
+""")
+    double getTourPostAvgRating(Long commonPlaceId);
 }

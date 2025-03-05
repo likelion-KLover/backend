@@ -5,6 +5,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import team.klover.server.domain.chat.chatRoom.entity.ChatRoomMember;
+import team.klover.server.domain.member.v1.entity.Member;
+
+import java.util.List;
 
 @Repository
 public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMember, Long> {
@@ -14,4 +17,6 @@ public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMember, 
 
     // memberId, chatRoomID로 ChatRoomMember 찾기
     ChatRoomMember findByMemberIdAndChatRoomId(Long currentMemberId, Long chatRoomId);
+
+    List<ChatRoomMember> findAllByMember(Member member);
 }

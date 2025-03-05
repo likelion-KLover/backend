@@ -86,7 +86,6 @@ public class TourPostServiceImpl implements TourPostService {
         }
         TourPostSave tourPostSave = new TourPostSave(Member, tourPost);
         tourPost.getSavedMembers().add(tourPostSave);
-        Member.addSavedTourPost(tourPostSave);
     }
 
     // 해당 관광지 저장 취소
@@ -102,7 +101,6 @@ public class TourPostServiceImpl implements TourPostService {
                 .findFirst()
                 .orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
         tourPost.getSavedMembers().remove(tourPostSave);
-        member.removeSavedTourPost(tourPostSave);
     }
 
     // 요청 페이지 수 제한

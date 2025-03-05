@@ -101,25 +101,25 @@ public class TourPostDocService {
             switch (contentType) {
                 case ACCOMMODATION ->
                         boolQueryBuilder.filter(f -> f.term(t -> t.field("content_type_id")
-                                .value(language.equals(Country.KorService1)?SearchConstant.ACCOMMODATION_KOREAN:SearchConstant.ACCOMMODATION_FOREIGN)));
+                                .value(language.equals(Country.KO)?SearchConstant.ACCOMMODATION_KOREAN:SearchConstant.ACCOMMODATION_FOREIGN)));
                 case CULTURAL_FACILITY ->
                         boolQueryBuilder.filter(f -> f.term(t -> t.field("content_type_id")
-                                .value(language.equals(Country.KorService1)?SearchConstant.CULTURAL_FACILITY_KOREAN:SearchConstant.CULTURAL_FACILITY_FOREIGN)));
+                                .value(language.equals(Country.KO)?SearchConstant.CULTURAL_FACILITY_KOREAN:SearchConstant.CULTURAL_FACILITY_FOREIGN)));
                 case ACTIVITY ->
                         boolQueryBuilder.filter(f -> f.term(t -> t.field("content_type_id")
-                                .value(language.equals(Country.KorService1)?SearchConstant.ACTIVITY_KOREAN:SearchConstant.ACTIVITY_FOREIGN)));
+                                .value(language.equals(Country.KO)?SearchConstant.ACTIVITY_KOREAN:SearchConstant.ACTIVITY_FOREIGN)));
                 case DINING ->
                         boolQueryBuilder.filter(f -> f.term(t -> t.field("content_type_id")
-                                .value(language.equals(Country.KorService1)?SearchConstant.DINING_KOREAN:SearchConstant.DINING_FOREIGN)));
+                                .value(language.equals(Country.KO)?SearchConstant.DINING_KOREAN:SearchConstant.DINING_FOREIGN)));
                 case SHOPPING ->
                         boolQueryBuilder.filter(f -> f.term(t -> t.field("content_type_id")
-                                .value(language.equals(Country.KorService1)?SearchConstant.SHOPPING_KOREAN:SearchConstant.SHOPPING_FOREIGN)));
+                                .value(language.equals(Country.KO)?SearchConstant.SHOPPING_KOREAN:SearchConstant.SHOPPING_FOREIGN)));
                 case  ATTRACTION->
                         boolQueryBuilder.filter(f -> f.term(t -> t.field("content_type_id")
-                                .value(language.equals(Country.KorService1)?SearchConstant.ATTRACTION_KOREAN:SearchConstant.ATTRACTION_FOREIGN)));
+                                .value(language.equals(Country.KO)?SearchConstant.ATTRACTION_KOREAN:SearchConstant.ATTRACTION_FOREIGN)));
 
                 case  EVENT -> boolQueryBuilder.filter(f -> f.term(t -> t.field("content_type_id")
-                        .value(language.equals(Country.KorService1)?SearchConstant.EVENT_KOREAN:SearchConstant.EVENT_FOREIGN)));
+                        .value(language.equals(Country.KO)?SearchConstant.EVENT_KOREAN:SearchConstant.EVENT_FOREIGN)));
             }
         }
 
@@ -153,15 +153,15 @@ public class TourPostDocService {
         String index;
         double minScore;
         switch (language) {
-            case KorService1 -> {
+            case KO -> {
                 index="tourpostkor";
                 minScore=!keyword.isBlank()?13.0:0;
             }
-            case JpnService1 -> {
+            case JA -> {
                 index="tourpostjpn";
                 minScore=!keyword.isBlank()?10.0:0;
             }
-            case ChsService1 -> {
+            case ZH -> {
                 index="tourpostchs";
                 minScore=!keyword.isBlank()?20.0:0;
             }

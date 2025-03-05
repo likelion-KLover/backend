@@ -16,10 +16,10 @@ public class LanguageDetect {
         Language result = detector.detectLanguageOf(text);
 
         switch (result){
-            case KOREAN -> {return Country.KorService1;}
-            case ENGLISH -> {return Country.EngService1;}
-            case CHINESE -> {return Country.ChsService1;}
-            default -> {return Country.JpnService1;}
+            case KOREAN -> {return Country.KO;}
+            case ENGLISH -> {return Country.EN;}
+            case CHINESE -> {return Country.ZH;}
+            default -> {return Country.JA;}
         }
     }
 }

@@ -156,18 +156,18 @@ public class ApiV1CommPostController {
         return ApiResponse.of(ReturnCode.SUCCESS);
     }
 
-    //http://localhost:8080/api/v1/comm-post/test
+    //http://localhost:8080/api/v1/comm-post/search
     @GetMapping("/search")
     @Operation(summary = "게시글 검색(엘라스틱서치)")
-    public ApiResponse<CommPostDto> test(@RequestParam(value = "page",defaultValue = "0") int page,
+    public ApiResponse<CommPostDto> search(@RequestParam(value = "page",defaultValue = "0") int page,
                                                @RequestParam(value = "size",defaultValue = "20") int size,
                                                @RequestParam(value = "keyword",defaultValue = "")String keyword,
                                                @RequestParam(value = "sort", required = false)CommPostSort sort,
-                                               @RequestParam(value = "language",defaultValue = "KorService1")Country language,
+                                               @RequestParam(value = "language")Country language,
                                                @RequestParam(value = "content", defaultValue = "false") boolean searchByContent,
                                                @RequestParam(value = "nickname", defaultValue = "false") boolean searchByNickname,
-                                               @RequestParam(value = "mapX",defaultValue = "127.1288128231279") Double mapX,
-                                               @RequestParam(value = "mapY",defaultValue="34.41101602890987") Double mapY){
+                                               @RequestParam(value = "mapX") Double mapX,
+                                               @RequestParam(value = "mapY") Double mapY){
         if(page < 0 || size <= 0){
             throw new KloverRequestException(ReturnCode.WRONG_PARAMETER);
         }

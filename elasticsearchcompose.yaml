@@ -48,7 +48,6 @@ services:
     volumes:
       - ./logstash/analyzer:/downloads
       - ./logstash/dict/result.txt:/usr/share/elasticsearch/config/userdict_ja.txt
-      - ./logstash/dict/test.txt:/usr/share/elasticsearch/config/gana_ja.txt
     ports:
       #      - "7700:7700"
       - "9200:9200"

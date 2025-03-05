@@ -21,6 +21,7 @@ import team.klover.server.domain.community.comment.repository.CommentRepository;
 import team.klover.server.domain.community.comment.service.CommentService;
 import team.klover.server.domain.member.v1.entity.Member;
 import team.klover.server.domain.member.v1.repository.MemberV1Repository;
+import team.klover.server.global.elasticsearch.commpost.rabbitmq.event.CommentCountEvent;
 import team.klover.server.global.exception.KloverRequestException;
 import team.klover.server.global.exception.ReturnCode;
 
@@ -59,7 +60,6 @@ public class CommentServiceImpl implements CommentService {
         }
         CommentLike commentLike = new CommentLike(member, comment);
         comment.getLikedMembers().add(commentLike);
-        member.addLikedComment(commentLike);
 
         // 이벤트 생성 및 발행
         publisher.publishEvent(new CommentLikedEvent(this, comment, member));
@@ -77,7 +77,6 @@ public class CommentServiceImpl implements CommentService {
                 .findFirst()
                 .orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
         comment.getLikedMembers().remove(commentLike);
-        member.removeLikedComment(commentLike);
     }
 
     // 해당 게시글에 댓글 생성
@@ -95,10 +94,12 @@ public class CommentServiceImpl implements CommentService {
                 .superCommentId(commentForm.getSuperCommentId())
                 .build();
         commentRepository.save(comment);
-        member.addComment(comment);
 
-        // 이벤트 생성 및 발행
+        // 이벤트 생성 및 발행 (알림 + 엘라스틱서치)
         publisher.publishEvent(new CommentCreatedEvent(this, commPost, comment));
+
+        long commentCount = commentRepository.countCommPostComment(commPostId);
+        publisher.publishEvent(new CommentCountEvent(this, commPost,commentCount));
     }
 
     // 해당 댓글 수정
@@ -131,7 +132,9 @@ public class CommentServiceImpl implements CommentService {
         deleteChildComments(commentId);
         commentRepository.save(comment); // 답글 삭제 후 더티 체킹
         commentRepository.delete(comment);
-        member.removeComment(comment);
+        //댓글 삭제 이벤트(갯수 정산은 삭제 종료 후 발생해도 되므로)
+        long commentCount = commentRepository.countCommPostComment(comment.getCommPost().getId());
+        publisher.publishEvent(new CommentCountEvent(this, comment.getCommPost(), commentCount));
     }
 
     // 해당 게시글의 모든 댓글 삭제
@@ -140,7 +143,11 @@ public class CommentServiceImpl implements CommentService {
     public void deleteAllComments(Long commPostId){
         CommPost commPost = commPostRepository.findById(commPostId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
         List<Comment> comments = commentRepository.findByCommPost(commPost);
+        //댓글 삭제 이벤트
         commentRepository.deleteAll(comments);
+
+        long commentCount = commentRepository.countCommPostComment(commPostId);
+        publisher.publishEvent(new CommentCountEvent(this, commPost, commentCount));
     }
 
     // 해당 댓글의 모든 하위 댓글 삭제
@@ -149,8 +156,6 @@ public class CommentServiceImpl implements CommentService {
         for (Comment childComment : childComments) {
             deleteChildComments(childComment.getId()); // 재귀 호출
             commentRepository.delete(childComment);
-            Member member = childComment.getMember();
-            member.removeComment(childComment);
         }
     }
 

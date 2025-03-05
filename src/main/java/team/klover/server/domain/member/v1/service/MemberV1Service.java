@@ -6,11 +6,26 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import team.klover.server.domain.chat.chatMessage.entity.ChatMessage;
+import team.klover.server.domain.chat.chatMessage.repository.ChatMessageRepository;
+import team.klover.server.domain.chat.chatMessage.service.ChatMessageService;
+import team.klover.server.domain.chat.chatRoom.entity.ChatRoom;
+import team.klover.server.domain.chat.chatRoom.entity.ChatRoomMember;
+import team.klover.server.domain.chat.chatRoom.repository.ChatRoomMemberRepository;
+import team.klover.server.domain.chat.chatRoom.repository.ChatRoomRepository;
+import team.klover.server.domain.chat.chatRoom.service.ChatRoomService;
 import team.klover.server.domain.community.commPost.entity.CommPost;
+import team.klover.server.domain.community.commPost.entity.CommPostLike;
+import team.klover.server.domain.community.commPost.entity.CommPostSave;
+import team.klover.server.domain.community.commPost.repository.CommPostLikeRepository;
 import team.klover.server.domain.community.commPost.repository.CommPostRepository;
+import team.klover.server.domain.community.commPost.repository.CommPostSaveRepository;
 import team.klover.server.domain.community.commPost.service.CommPostService;
 import team.klover.server.domain.community.comment.entity.Comment;
+import team.klover.server.domain.community.comment.entity.CommentLike;
+import team.klover.server.domain.community.comment.repository.CommentLikeRepository;
 import team.klover.server.domain.community.comment.repository.CommentRepository;
+import team.klover.server.domain.community.comment.service.CommentService;
 import team.klover.server.domain.member.v1.dto.MemberDto;
 import team.klover.server.domain.member.v1.dto.MemberInfo;
 import team.klover.server.domain.member.v1.dto.MemberUpdateParam;
@@ -19,6 +34,10 @@ import team.klover.server.domain.member.v1.enums.SocialProvider;
 import team.klover.server.domain.member.v1.repository.MemberV1Repository;
 import team.klover.server.domain.tour.review.entity.Review;
 import team.klover.server.domain.tour.review.repository.ReviewRepository;
+import team.klover.server.domain.tour.review.service.ReviewService;
+import team.klover.server.domain.tour.tourPost.entity.TourPostSave;
+import team.klover.server.domain.tour.tourPost.repository.TourPostSaveRepository;
+import team.klover.server.domain.tour.tourPost.service.TourPostService;
 import team.klover.server.global.exception.KloverException;
 import team.klover.server.global.exception.KloverLogicException;
 import team.klover.server.global.exception.KloverRequestException;
@@ -34,8 +53,28 @@ import java.util.Optional;
 public class MemberV1Service {
     private final MemberV1Repository memberRepository;
     private final S3Service s3Service;
+
     private final CommPostRepository commPostRepository;
+    private final CommPostLikeRepository commPostLikeRepository;
+    private final CommPostSaveRepository commPostSaveRepository;
+    private final CommPostService commPostService;
+
     private final CommentRepository commentRepository;
+    private final CommentLikeRepository commentLikeRepository;
+    private final CommentService commentService;
+
+    private final ReviewRepository reviewRepository;
+    private final ReviewService reviewService;
+    private final TourPostSaveRepository tourPostSaveRepository;
+    private final TourPostService tourPostService;
+
+    private final ChatRoomRepository chatRoomRepository;
+    private final ChatRoomService chatRoomService;
+
+    private final ChatRoomMemberRepository chatRoomMemberRepository;
+
+    private final ChatMessageRepository chatMessageRepository;
+    private final ChatMessageService chatMessageService;
 
     @Transactional
     public void updateMember(Long memberId, MemberUpdateParam param
@@ -92,6 +131,40 @@ public class MemberV1Service {
         Optional<Member> target = memberRepository.findById(memberId);
         if(target.isEmpty()) throw new KloverException(ReturnCode.NOT_FOUND_ENTITY);
 
+        //관련된 친구들은 여기서 싹 다 삭제를 갈기고 떠난다.
+
+        Member member = target.get();
+
+        //채팅 메시지 먼저 삭제, 채팅방 입장 기록을 삭제
+        List<ChatMessage> messages = chatMessageRepository.findAllByMember(member);
+        List<ChatRoomMember> enteredChatRoom = chatRoomMemberRepository.findAllByMember(member);
+
+        messages.forEach(message -> chatMessageService.deleteChatMessage(memberId, message.getId()));;
+        enteredChatRoom.forEach(chatRoomMember -> chatRoomService.leaveChatRoomMember(chatRoomMember.getChatRoom().getId(),memberId));
+
+        //댓글 처리
+        List<CommentLike> commentLikes = commentLikeRepository.findAllByMember(member);
+        List<Comment> comments = commentRepository.findAllByMember(member);
+        commentLikes.forEach(commentLike -> commentService.deleteCommentLike(memberId,commentLike.getId()));
+        comments.forEach(comment -> commentService.deleteComment(memberId,comment.getId()));
+
+        //게시물 처리
+        List<CommPostLike> commPostLikes = commPostLikeRepository.findAllByMember(member);
+        List<CommPostSave> commPostSaves = commPostSaveRepository.findAllByMember(member);
+        List<CommPost> commPosts = commPostRepository.findAllByMember(member);
+        commPostLikes.forEach(commPostLike -> commPostService.deleteCommPostLike(memberId, commPostLike.getCommPost().getId()));
+        commPostSaves.forEach(commPostSave -> commPostService.deleteCollectionCommPost(memberId, commPostSave.getCommPost().getId()));
+        commPosts.forEach(commPost -> commPostService.deleteCommPost(memberId, commPost.getId()));
+
+        //관광 정보 관련(리뷰, 저장) 처리
+        List<Review> reviews = reviewRepository.findAllByMember(member);
+        List<TourPostSave> tourPostSaves = tourPostSaveRepository.findAllByMember(member);
+        reviews.forEach(review -> reviewService.deleteReview(memberId, review.getId()));
+        tourPostSaves.forEach(tourPostSave -> tourPostService.deleteCollectionTourPost(memberId, tourPostSave.getTourPost().getContentId()));
+
+        if(member.getProfileUrl()!=null) {
+            s3Service.deleteFile(member.getProfileUrl());
+        }
         memberRepository.deleteById(memberId);
     }
 
