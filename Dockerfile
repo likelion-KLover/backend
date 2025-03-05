@@ -1,5 +1,5 @@
 # 베이스 이미지 설정 (OpenJDK 사용)
-FROM openjdk:17-jdk-slim
+FROM openjdk:21-jdk-slim
 
 # Java 버전 확인 (확인 후 적절한 버전 설치)
 RUN java -version

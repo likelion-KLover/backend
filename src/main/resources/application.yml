@@ -9,7 +9,7 @@ spring:
   application:
     name: my-application
   profiles:
-    active: dev
+    active: prod
     include: secret
 aws:
   bucket_name: klover-bucket-lshkw0315-1

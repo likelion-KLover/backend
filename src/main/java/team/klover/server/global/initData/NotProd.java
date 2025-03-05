@@ -39,7 +39,7 @@ import java.util.*;
 import java.util.List;
 
 @Configuration
-@Profile("!prod")
+@Profile("prod")
 public class NotProd {
     private final MemberV1Repository MemberRepository;
     private final MemberV1Repository memberV1Repository;
@@ -70,28 +70,13 @@ public class NotProd {
                 //
                 //
 
+
+
+                apisScheduler.getApisApiData();
+
+
+
                 /*
-
-//                apisScheduler.getApisApiData();
-
-
-                // 테스트용 회원 생성
-//                List<SignupRequestDto> testUsers = List.of(
-//                        SignupRequestDto.builder().email("member1@test.com").nickname("member1").password("1234").build(),
-//                        SignupRequestDto.builder().email("member2@test.com").nickname("member2").password("1234").build(),
-//                        SignupRequestDto.builder().email("member3@test.com").nickname("member3").password("1234").build()
-//                );
-//
-//                for (SignupRequestDto user : testUsers) {
-//                    try {
-//                        authV1Service.signup(user);
-//                    } catch (Exception e) {
-//                        System.out.println("User " + user.getEmail() + " already exists or encountered an error.");
-//                    }
-//                }
-
-
-*/
 
 
                 for(int i=0;i<50;i++){
@@ -162,7 +147,7 @@ public class NotProd {
                 List<MultipartFile> dummy = new ArrayList<>();
                 dummy.add(imageFile);
 
-                for (int i = 0; i < 200; i++) {
+                for (int i = 0; i < 20; i++) {
                     String content = "";
                     for (int j = 0; j < 5; j++) {
                         if ((i % 4) != 3) {
@@ -262,6 +247,9 @@ public class NotProd {
                             .build();
                     memberV1Service.updateMember(memberId,memberUpdateParam,null);
                 }
+
+
+                 */
 
             }
 
