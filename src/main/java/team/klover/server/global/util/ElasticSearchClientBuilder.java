@@ -9,10 +9,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
+import org.springframework.beans.factory.annotation.Value;
 
 
 //Repository가 아니라 REST API로 호출을 시도해야할 상황이라면
 public class ElasticSearchClientBuilder {
+
+    @Value("${es.host}")
+    private String host;
+
     public static ElasticsearchClient build() {
 
         // JacksonJsonpMapper 생성 (ObjectMapper 포함)

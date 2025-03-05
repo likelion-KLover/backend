@@ -39,3 +39,5 @@ logging:
     org.hibernate.SQL: WARN
     org.hibernate.type.descriptor.sql: ERROR
 
+es:
+  host: "es.tmdgjsdl1.site"
