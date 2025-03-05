@@ -24,6 +24,17 @@ spring:
     port: 5672
     username: admin
     password: admin
+  messaging:
+    stomp:
+      broker-relay:
+        host: 13.125.235.125  # RabbitMQ 서버 IP
+        port: 61613           # STOMP 기본 포트
+        system-login: admin   # RabbitMQ 로그인 계정
+        system-passcode: admin
+        relay-host: 13.125.235.125
+        relay-port: 61613
+        client-login: admin
+        client-passcode: admin
 
 # Swagger 비활성화 (운영 환경에서는 보통 사용 안 함)
 springdoc:
@@ -34,8 +45,16 @@ springdoc:
 
 logging:
   level:
-    org.springframework.web: INFO
-    team.klover: INFO
-    org.hibernate.SQL: WARN
-    org.hibernate.type.descriptor.sql: ERROR
-
+    root: INFO
+    org.springframework.web: WARN
+    team.klover: DEBUG  # 내 애플리케이션 패키지는 DEBUG 유지 가능
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/app.log
+  logback:
+    rolling policy:
+      file-name-pattern: logs/app-%d{yyyy-MM-dd}.log
+      max-history: 7
+      total-size-cap: 100MB
