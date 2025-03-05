@@ -44,9 +44,13 @@ public class ApisScheduler {
             int contentTypeId = 12;    // 관광지(12) 문화시설(14) 축제/공연/행사(15) 여행코스(25) 레포츠(28) 숙박(32) 쇼핑(38) 음식(39)
             List<String> areaCodeList = Arrays.asList("1", "2", "6", "39");   // 서울(1) 인천(2) 부산(6) 제주(39)
             List<String> languageList = Arrays.asList("KorService1", "EngService1", "JpnService1", "ChsService1"); // 언어 선택
+            List<String> saveLanguageList = Arrays.asList("KO", "EN", "JA", "ZH");
 
             // 개요 제외 기본 관광지 데이터 선별 및 저장
-            for(String language : languageList) {
+            for (int i = 0; i < languageList.size(); i++) {
+                String language = languageList.get(i);
+                String saveLanguage = saveLanguageList.get(i);
+
                 for (String areaCode : areaCodeList) {
                     try {
                         String apiUrl = String.format(
@@ -76,7 +80,7 @@ public class ApisScheduler {
 
                         if (response.startsWith("{")) {
                             try {
-                                tourApiService.saveApis(response, language);
+                                tourApiService.saveApis(response, saveLanguage); // 수정된 부분: saveLanguage를 전달
                             } catch (Exception e) {
                                 log.error("Apis 기본 데이터 저장 중 에러 발생", e);
                             }
