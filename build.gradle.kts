@@ -8,6 +8,8 @@ group = "team.klover"
 version = "0.0.1-SNAPSHOT"
 
 java {
+	sourceCompatibility = JavaVersion.VERSION_21 // 빌드 자바 버전
+	targetCompatibility = JavaVersion.VERSION_21 //
 	toolchain {
 		languageVersion = JavaLanguageVersion.of(21)
 	}
@@ -74,6 +76,9 @@ dependencies {
 
 	// MongoDB
 	implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
+
+	// FCM (Firebase CLoud Messaging)
+	implementation("com.google.firebase:firebase-admin:9.4.3")
 }
 
 tasks.withType<Test> {

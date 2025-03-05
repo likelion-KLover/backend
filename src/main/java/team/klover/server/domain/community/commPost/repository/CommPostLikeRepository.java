@@ -12,8 +12,8 @@ public interface CommPostLikeRepository extends JpaRepository<CommPostLike, Long
     List<CommPostLike> findAllByMember(Member member);
 
     @Query("""
-select coalesce(count(cl),0) from CommPostLike cl
-where cl.commPost.id = :commpostId
+select count(cl) from CommPostLike cl
+where cl.commPost.id = :commPostId
 """)
-    long countCommPostLike(@Param("commpostId") Long commpostId);
+    long countCommPostLike(@Param("commPostId") Long commPostId);
 }

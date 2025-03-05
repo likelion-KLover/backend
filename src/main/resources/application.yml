@@ -12,4 +12,4 @@ spring:
     active: dev
     include: secret
 aws:
-  bucket_name: klover-bucket-lshkw0315-1
+  bucket_name: klover-bucket-jun2-1

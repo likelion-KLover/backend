@@ -23,7 +23,7 @@ public class StompRabbitMqBrokerConfig implements WebSocketMessageBrokerConfigur
         registry
                 .setApplicationDestinationPrefixes("/app")
                 .enableStompBrokerRelay("/topic")
-                .setRelayHost("localhost")
+                .setRelayHost("13.125.235.125")
                 .setRelayPort(61613)
                 .setClientLogin("admin")
                 .setClientPasscode("admin")
@@ -35,4 +35,5 @@ public class StompRabbitMqBrokerConfig implements WebSocketMessageBrokerConfigur
     public MessageConverter messageConverter() {
         return new Jackson2JsonMessageConverter();
     }
+
 }
