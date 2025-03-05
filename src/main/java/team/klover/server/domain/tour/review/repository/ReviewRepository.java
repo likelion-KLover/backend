@@ -41,21 +41,21 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     join ReviewTourPost rtp on r.id = rtp.review.id
     where r.member.id = :memberId and rtp.tourPost.commonPlaceId = :commonPlaceId
     """)
-    Optional<Review> findCommonPlaceReviewReviewWrittenByMember(Long memberId, Long commonPlaceId);
+    Optional<Review> findCommonPlaceReviewReviewWrittenByMember(@Param("memberId") Long memberId, @Param("commonPlaceId") Long commonPlaceId);
 
     List<Review> findAllByMember(Member member);
 
     @Query("""
-select count(distinct r) from Review r
+select coalesce(count(distinct r.id),0) from Review r
 left join ReviewTourPost rtp on r.id = rtp.review.id
 where rtp.tourPost.commonPlaceId = :commonPlaceId
 """)
-    long countTourPostReview(Long commonPlaceId);
+    Long countTourPostReview(@Param("commonPlaceId") Long commonPlaceId);
 
     @Query("""
-select avg(distinct r.rating) from Review r
+select coalesce(avg(distinct r.rating),0) from Review r
 left join ReviewTourPost rtp on r.id = rtp.review.id
 where rtp.tourPost.commonPlaceId = :commonPlaceId
 """)
-    double getTourPostAvgRating(Long commonPlaceId);
+    Double getTourPostAvgRating(@Param("commonPlaceId") Long commonPlaceId);
 }

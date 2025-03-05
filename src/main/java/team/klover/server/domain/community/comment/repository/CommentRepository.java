@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import team.klover.server.domain.community.commPost.entity.CommPost;
 import team.klover.server.domain.community.comment.entity.Comment;
@@ -25,8 +26,8 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     List<Comment> findAllByMember(Member member);
 
     @Query("""
-select count(c) from Comment c
+select coalesce(count(c.id),0) from Comment c
 where c.commPost.id = :commpostId
 """)
-    long countCommPostComment(Long commpostId);
+    long countCommPostComment(@Param("commpostId") Long commpostId);
 }
