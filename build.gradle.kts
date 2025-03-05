@@ -8,6 +8,8 @@ group = "team.klover"
 version = "0.0.1-SNAPSHOT"
 
 java {
+	sourceCompatibility = JavaVersion.VERSION_17 // 빌드 자바 버전
+	targetCompatibility = JavaVersion.VERSION_17 //
 	toolchain {
 		languageVersion = JavaLanguageVersion.of(21)
 	}
