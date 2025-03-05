@@ -1,5 +1,6 @@
 package team.klover.server.domain.member.v1.service;
 
+import co.elastic.clients.elasticsearch.rollup.Groupings;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.Authentication;
@@ -34,8 +35,11 @@ import team.klover.server.domain.member.v1.entity.Member;
 import team.klover.server.domain.member.v1.enums.SocialProvider;
 import team.klover.server.domain.member.v1.repository.MemberV1Repository;
 import team.klover.server.domain.tour.review.entity.Review;
+import team.klover.server.domain.tour.review.entity.ReviewTourPost;
 import team.klover.server.domain.tour.review.repository.ReviewRepository;
+import team.klover.server.domain.tour.review.repository.ReviewTourPostRepository;
 import team.klover.server.domain.tour.review.service.ReviewService;
+import team.klover.server.domain.tour.tourPost.entity.TourPost;
 import team.klover.server.domain.tour.tourPost.entity.TourPostSave;
 import team.klover.server.domain.tour.tourPost.repository.TourPostSaveRepository;
 import team.klover.server.domain.tour.tourPost.service.TourPostService;
@@ -43,6 +47,8 @@ import team.klover.server.global.elasticsearch.commpost.rabbitmq.event.CommPostD
 import team.klover.server.global.elasticsearch.commpost.rabbitmq.event.CommentCountEvent;
 import team.klover.server.global.elasticsearch.commpost.rabbitmq.event.LikeCountEvent;
 import team.klover.server.global.elasticsearch.commpost.rabbitmq.event.NicknameUpdateEvent;
+import team.klover.server.global.elasticsearch.tourpost.rabbitmq.event.ReviewCountEvent;
+import team.klover.server.global.elasticsearch.tourpost.rabbitmq.event.ReviewRatingEvent;
 import team.klover.server.global.exception.KloverException;
 import team.klover.server.global.exception.KloverLogicException;
 import team.klover.server.global.exception.KloverRequestException;
@@ -50,10 +56,8 @@ import team.klover.server.global.exception.ReturnCode;
 import team.klover.server.global.s3.S3Service;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -74,8 +78,8 @@ public class MemberV1Service {
     private final ReviewService reviewService;
     private final TourPostSaveRepository tourPostSaveRepository;
     private final TourPostService tourPostService;
+    private final ReviewTourPostRepository reviewTourPostRepository;
 
-    private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomService chatRoomService;
 
     private final ChatRoomMemberRepository chatRoomMemberRepository;
@@ -198,10 +202,32 @@ public class MemberV1Service {
         //관광 정보 관련(리뷰, 저장) 처리
         List<Review> reviews = reviewRepository.findAllByMember(member);
         List<TourPostSave> tourPostSaves = tourPostSaveRepository.findAllByMember(member);
+        Map<Long, List<TourPost>> placeTourPostMap = new HashMap<>();
+        Set<ReviewTourPost> tourPostsRelated = new HashSet<>();
         reviews.forEach(review -> {
+            tourPostsRelated.addAll(reviewTourPostRepository.findAllByReview(review));
             reviewService.deleteReview(memberId, review.getId());
         });
+
+        if(!tourPostsRelated.isEmpty()) {
+            placeTourPostMap = tourPostsRelated.stream()
+                    .map(ReviewTourPost::getTourPost)
+                    .collect(Collectors.groupingBy(TourPost::getCommonPlaceId));
+
+            placeTourPostMap.forEach(
+                    (commonPlaceId, tourposts) -> {
+                        long reviewCount = reviewRepository.countTourPostReview(commonPlaceId);
+                        double ratingAverage = reviewRepository.getTourPostAvgRating(commonPlaceId);
+                        tourposts.forEach(tourpost -> {
+                            publisher.publishEvent(new ReviewCountEvent(this, tourpost, reviewCount));
+                            publisher.publishEvent(new ReviewRatingEvent(this, tourpost, ratingAverage));
+                        });
+                    }
+            );
+        }
+
         tourPostSaves.forEach(tourPostSave -> tourPostService.deleteCollectionTourPost(memberId, tourPostSave.getTourPost().getContentId()));
+
 
         if(member.getProfileUrl()!=null) {
             s3Service.deleteFile(member.getProfileUrl());
