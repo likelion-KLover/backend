@@ -90,15 +90,15 @@ public class CommPostDocService {
         String index;
         double minScore;
         switch (language) {
-            case KorService1 -> {
+            case KO -> {
                 index="commpostkor";
                 minScore=!keyword.isBlank()?13.0:0;
             }
-            case JpnService1 -> {
+            case JA -> {
                 index = "commpostjpn";
                 minScore=!keyword.isBlank()?10.0:0;
             }
-            case ChsService1 -> {
+            case ZH -> {
                 index="commpostchs";
                 minScore=!keyword.isBlank()?20.0:0;
             }

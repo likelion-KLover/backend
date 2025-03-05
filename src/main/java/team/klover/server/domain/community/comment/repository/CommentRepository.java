@@ -26,7 +26,7 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     @Query("""
 select count(c) from Comment c
-where c.commPost.id = :commPostId
+where c.commPost.id = :commpostId
 """)
     long countCommPostComment(Long commpostId);
 }

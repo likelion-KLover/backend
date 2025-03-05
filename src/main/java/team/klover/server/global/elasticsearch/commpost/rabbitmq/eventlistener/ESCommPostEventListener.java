@@ -8,7 +8,7 @@ import team.klover.server.global.rabbitMQ.producer.RabbitMQProducer;
 
 @Component
 @RequiredArgsConstructor
-public class CommPostEventListener {
+public class ESCommPostEventListener {
     private final RabbitMQProducer producer;
 
     @EventListener

@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
+import team.klover.server.domain.member.v1.enums.Country;
 import team.klover.server.domain.tour.tourPost.entity.TourPost;
 
 @Getter
@@ -11,10 +12,12 @@ import team.klover.server.domain.tour.tourPost.entity.TourPost;
 @Builder
 public class ReviewCountMessage {
     private final Long content_id;
+    private final String language;
     private final Long review_count;
 
     public ReviewCountMessage(TourPost tourPost, long review_count){
         content_id = tourPost.getContentId();
+        language = tourPost.getLanguage();
         this.review_count = review_count;
     }
 

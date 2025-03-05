@@ -91,7 +91,7 @@ public class NotProd {
 //                }
 
 
-
+*/
 
 
                 for(int i=0;i<50;i++){
@@ -241,19 +241,19 @@ public class NotProd {
                     switch (randomIdx){
                         case 0 -> {
                             nickname=new Faker(Locale.of("zh","CN")).name().fullName();
-                            country= Country.ChsService1;
+                            country= Country.ZH;
                         }
                         case 1 -> {
                             nickname= new Faker(Locale.of("ja","JP")).name().fullName();
-                            country=Country.JpnService1;
+                            country=Country.JA;
                         }
                         case 2 -> {
                             nickname=new Faker(Locale.of("ko","KR")).name().fullName();
-                            country=Country.KorService1;
+                            country=Country.KO;
                         }
                         default -> {
                             nickname=new Faker(Locale.of("en","US")).name().fullName();
-                            country=Country.EngService1;
+                            country=Country.EN;
                         }
                     }
                     MemberUpdateParam memberUpdateParam = MemberUpdateParam.builder()
@@ -262,7 +262,7 @@ public class NotProd {
                             .build();
                     memberV1Service.updateMember(memberId,memberUpdateParam,null);
                 }
-                */
+
             }
 
         };
