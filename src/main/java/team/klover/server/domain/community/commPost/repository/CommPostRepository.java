@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import team.klover.server.domain.community.commPost.entity.CommPost;
+import team.klover.server.domain.member.v1.entity.Member;
 
 import java.util.List;
 
@@ -32,4 +33,5 @@ public interface CommPostRepository extends JpaRepository<CommPost, Long> {
     @Query("SELECT c FROM CommPost c WHERE c.member.nickname LIKE %:keyword% OR c.content LIKE %:keyword%")
     Page<CommPost> searchByKeyword(@Param("keyword") String keyword, Pageable pageable);
 
+    List<CommPost> findAllByMember(Member member);
 }

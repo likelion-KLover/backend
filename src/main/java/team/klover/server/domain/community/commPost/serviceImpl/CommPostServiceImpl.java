@@ -16,6 +16,7 @@ import team.klover.server.domain.community.commPost.dto.res.CommPostDto;
 import team.klover.server.domain.community.commPost.dto.res.DetailCommPostDto;
 import team.klover.server.domain.community.commPost.entity.*;
 import team.klover.server.domain.community.commPost.event.CommPostLikedEvent;
+import team.klover.server.domain.community.commPost.repository.CommPostLikeRepository;
 import team.klover.server.domain.community.commPost.repository.CommPostRepository;
 import team.klover.server.domain.community.commPost.service.CommPostService;
 import team.klover.server.domain.community.comment.service.CommentService;
@@ -24,6 +25,9 @@ import team.klover.server.domain.member.v1.enums.Country;
 import team.klover.server.domain.member.v1.repository.MemberV1Repository;
 import team.klover.server.domain.tour.tourPost.dto.res.TourPostDto;
 import team.klover.server.domain.tour.tourPost.service.TourPostService;
+import team.klover.server.global.elasticsearch.commpost.rabbitmq.event.CommPostDeleteEvent;
+import team.klover.server.global.elasticsearch.commpost.rabbitmq.event.CommPostUpdateEvent;
+import team.klover.server.global.elasticsearch.commpost.rabbitmq.event.LikeCountEvent;
 import team.klover.server.global.exception.KloverException;
 import team.klover.server.global.exception.KloverRequestException;
 import team.klover.server.global.exception.ReturnCode;
@@ -45,6 +49,7 @@ public class CommPostServiceImpl implements CommPostService {
     private final ApplicationEventPublisher publisher;
     private final CommentService commentService;
     private final S3Service s3Service;
+    private final CommPostLikeRepository commPostLikeRepository;
 
     // 사용자 위치 주변 게시글(관광지&사용자) 조회
     public CombinedPostResponse findPostsWithinRadius(@Valid XYForm xyForm, Pageable pageable){
@@ -108,7 +113,6 @@ public class CommPostServiceImpl implements CommPostService {
         }
         CommPostSave commPostSave = new CommPostSave(member, commPost);
         commPost.getSavedMembers().add(commPostSave);
-        member.addSavedCommPost(commPostSave);
     }
 
     // 해당 게시글 저장 취소
@@ -123,7 +127,6 @@ public class CommPostServiceImpl implements CommPostService {
                 .findFirst()
                 .orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
         commPost.getSavedMembers().remove(commPostSave);
-        member.removeSavedCommPost(commPostSave);
     }
 
     // 게시글 좋아요
@@ -141,10 +144,12 @@ public class CommPostServiceImpl implements CommPostService {
         }
         CommPostLike commPostLike = new CommPostLike(member, commPost);
         commPost.getLikedMembers().add(commPostLike);
-        member.addLikedCommPost(commPostLike);
 
-        // 이벤트 발행 및 생성
+        // 이벤트 발행 및 생성(알림 + 엘라스틱서치)
         publisher.publishEvent(new CommPostLikedEvent(this, commPost, member));
+
+        long likeCount = commPostLikeRepository.countCommPostLike(id);
+        publisher.publishEvent(new LikeCountEvent(this, commPost, likeCount ));
     }
 
     // 게시글 좋아요 취소
@@ -159,7 +164,10 @@ public class CommPostServiceImpl implements CommPostService {
                 .findFirst()
                 .orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
         commPost.getLikedMembers().remove(commPostLike);
-        member.removeLikedCommPost(commPostLike);
+
+        //좋아요 변동 이벤트 발생
+        long likeCount = commPostLikeRepository.countCommPostLike(commPostId);
+        publisher.publishEvent(new LikeCountEvent(this, commPost, likeCount ));
     }
 
     // 게시글 생성
@@ -193,7 +201,6 @@ public class CommPostServiceImpl implements CommPostService {
                 .language(country)
                 .build();
         CommPost post = commPostRepository.save(commPost);
-        member.addCommPost(post);
     }
 
     // 해당 게시글 수정
@@ -226,6 +233,9 @@ public class CommPostServiceImpl implements CommPostService {
         commPost.setImageUrls(imageUrls);
         //language는 작성 당시의 language만을 따라갑니다.
         commPostRepository.save(commPost);
+
+        //게시글 수정 이벤트
+        publisher.publishEvent(new CommPostUpdateEvent(this,commPost));
     }
 
     // 해당 게시글 삭제
@@ -243,7 +253,9 @@ public class CommPostServiceImpl implements CommPostService {
         commentService.deleteAllComments(commPostId);
         s3Service.deleteAllFile(commPost.getImageUrls());
         commPostRepository.delete(commPost);
-        member.removeCommPost(commPost);
+
+        //커뮤니티 게시글 삭제 이벤트
+        publisher.publishEvent(new CommPostDeleteEvent(this, commPost));
     }
 
     // 요청 페이지 수 제한

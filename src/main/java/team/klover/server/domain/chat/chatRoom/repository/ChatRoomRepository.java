@@ -9,6 +9,8 @@ import org.springframework.stereotype.Repository;
 import team.klover.server.domain.chat.chatRoom.entity.ChatRoom;
 import team.klover.server.domain.member.v1.entity.Member;
 
+import java.util.List;
+
 @Repository
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
     // 사용자가 참여 중인 채팅방 목록 조회
@@ -39,4 +41,6 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
     ORDER BY COALESCE(MAX(cm.createDate), cr.createDate) DESC
     """)
     Page<ChatRoom> findChatRoomsByMemberOrderByLatestMessage(@Param("member") Member member, Pageable pageable);
+
+    List<ChatRoom> findAllByMember(Member member);
 }

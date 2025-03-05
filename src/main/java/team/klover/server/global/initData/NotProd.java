@@ -6,7 +6,9 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import team.klover.server.domain.auth.dto.SignupRequestDto;
 import team.klover.server.domain.auth.service.AuthV1Service;
 import team.klover.server.domain.community.commPost.dto.req.CommPostForm;
@@ -29,7 +31,12 @@ import team.klover.server.domain.tour.tourPost.entity.TourPost;
 import team.klover.server.domain.tour.tourPost.repository.TourPostRepository;
 import team.klover.server.global.util.ChineseLoremGenerator;
 
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.*;
 import java.util.*;
+import java.util.List;
 
 @Configuration
 @Profile("!prod")
@@ -63,8 +70,9 @@ public class NotProd {
                 //
                 //
 
+                /*
 
-//                apisScheduler.getApisApiData();
+                apisScheduler.getApisApiData();
 
 
                 // 테스트용 회원 생성
@@ -83,7 +91,7 @@ public class NotProd {
 //                }
 
 
-                /*
+
 
 
                 for(int i=0;i<50;i++){
@@ -98,6 +106,62 @@ public class NotProd {
                 long start = System.currentTimeMillis();
                 List<Member> members = MemberRepository.findAll();
                 Locale[] locales = {Locale.of("ko", "KR"), Locale.of("en", "US"), Locale.of("ja", "JP"), Locale.of("zh", "CN")};
+
+                // 1. 10x10 흑백 이미지 생성
+                BufferedImage image = new BufferedImage(10, 10, BufferedImage.TYPE_BYTE_GRAY);
+
+                // 2. 바이트 배열로 변환
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                ImageIO.write(image, "jpeg", baos);
+
+                byte[] imageBytes = baos.toByteArray();
+                MultipartFile imageFile = new MultipartFile() {
+                    @Override
+                    public String getName() {
+                        return "dummy";
+                    }
+
+                    @Override
+                    public String getOriginalFilename() {
+                        return "dummy.jpeg";
+                    }
+
+                    @Override
+                    public String getContentType() {
+                        return MediaType.IMAGE_JPEG_VALUE;
+                    }
+
+                    @Override
+                    public boolean isEmpty() {
+                        return imageBytes.length==0;
+                    }
+
+                    @Override
+                    public long getSize() {
+                        return imageBytes.length;
+                    }
+
+                    @Override
+                    public byte[] getBytes() throws IOException {
+                        return imageBytes;
+                    }
+
+                    @Override
+                    public InputStream getInputStream() throws IOException {
+                        return new ByteArrayInputStream(imageBytes);
+                    }
+
+                    @Override
+                    public void transferTo(File dest) throws IOException, IllegalStateException {
+                        try (FileOutputStream fos = new FileOutputStream(dest)) {
+                            fos.write(imageBytes);
+                        }
+                    }
+                };
+
+                List<MultipartFile> dummy = new ArrayList<>();
+                dummy.add(imageFile);
+
                 for (int i = 0; i < 200; i++) {
                     String content = "";
                     for (int j = 0; j < 5; j++) {
@@ -114,11 +178,15 @@ public class NotProd {
                             .content(content)
                             .build();
                     Member member = members.get((i % members.size()));
-                    CommPost post = commPostService.addCommPost(member.getId(), commPostForm);
+                    commPostService.addCommPost(member.getId(), commPostForm, dummy);
 
+                }
+
+                List<CommPost> commPosts = commPostRepository.findAll();
+                for(CommPost post:commPosts) {
                     int randomCount = new Random(System.currentTimeMillis()).nextInt(1, members.size());
                     for (int j = 0; j <= randomCount; j++) {
-                        int memberIdx = j%members.size();
+                        int memberIdx = j % members.size();
                         commPostService.addCommPostLike(members.get(memberIdx).getId(), post.getId());
                         CommentForm commentForm = CommentForm.builder()
                                 .content("테에스트으으")
@@ -126,6 +194,7 @@ public class NotProd {
                         commentService.addComment(members.get(memberIdx).getId(), post.getId(), commentForm);
                     }
                 }
+
                 long elapsed = System.currentTimeMillis() - start;
                 System.out.println("elapsed time(ms):" + elapsed);
 
@@ -156,11 +225,10 @@ public class NotProd {
                     Double newMapY = new Random(System.currentTimeMillis()).nextDouble(33,38);
                     CommPostForm commPostForm= CommPostForm.builder()
                             .content(commPost.getContent())
-                            .imageUrl(commPost.getImageUrl())
                             .mapX(newMapX)
                             .mapY(newMapY)
                             .build();
-                    commPostService.updateCommPost(member.getId(),commPost.getId(),commPostForm);
+                    commPostService.updateCommPost(member.getId(),commPost.getId(),commPostForm,dummy);
                 }
 
 
@@ -194,9 +262,7 @@ public class NotProd {
                             .build();
                     memberV1Service.updateMember(memberId,memberUpdateParam,null);
                 }
-
-                 */
-
+                */
             }
 
         };

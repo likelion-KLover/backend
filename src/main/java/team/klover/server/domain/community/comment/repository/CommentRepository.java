@@ -3,9 +3,11 @@ package team.klover.server.domain.community.comment.repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import team.klover.server.domain.community.commPost.entity.CommPost;
 import team.klover.server.domain.community.comment.entity.Comment;
+import team.klover.server.domain.member.v1.entity.Member;
 
 import java.util.List;
 
@@ -19,4 +21,12 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     // 해당 게시글에 작성된 모든 댓글 리스트 조회
     List<Comment> findByCommPost(CommPost commPost);
+
+    List<Comment> findAllByMember(Member member);
+
+    @Query("""
+select count(c) from Comment c
+where c.commPost.id = :commPostId
+""")
+    long countCommPostComment(Long commpostId);
 }

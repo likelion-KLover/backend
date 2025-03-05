@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.Type;
+import team.klover.server.domain.community.comment.entity.Comment;
 import team.klover.server.domain.member.v1.entity.Member;
 import team.klover.server.domain.member.v1.enums.Country;
 import team.klover.server.global.jpa.BaseEntity;
@@ -32,6 +33,10 @@ public class CommPost extends BaseEntity {
     @Builder.Default
     private List<CommPostSave> savedMembers = new ArrayList<>();
 
+    @OneToMany(mappedBy = "commPost", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<Comment> comments = new ArrayList<>();
+
     @Column(length = 3000)
     @Size(max = 3000)
     private String content;
@@ -45,4 +50,5 @@ public class CommPost extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private Country language;
+
 }
