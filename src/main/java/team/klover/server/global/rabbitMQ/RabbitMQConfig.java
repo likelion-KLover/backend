@@ -31,6 +31,6 @@ public class RabbitMQConfig {
     public Queue esCommPostDeleteQueue() { return new Queue(QueueNames.ES_COMMPOST_DELETE.name(), true);}
 
     @Bean
-    public Queue esTourPostUpdateQueue() { return new Queue(QueueNames.ES_COMMPOST_UPDATE.name(), true);}
+    public Queue esTourPostUpdateQueue() { return new Queue(QueueNames.ES_TOURPOST_UPDATE.name(), true);}
 
 }
