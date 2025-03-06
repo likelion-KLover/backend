@@ -38,20 +38,4 @@ public class RabbitMQConfig {
 
     @Bean
     public Queue esTourPostUpdateQueue() { return new Queue(QueueNames.ES_TOURPOST_UPDATE.name(), true);}
-
-    @Bean
-    public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(CachingConnectionFactory cachingConnectionFactory) {
-        var containerFactory = new SimpleRabbitListenerContainerFactory();
-        containerFactory.setConnectionFactory(cachingConnectionFactory);
-
-        containerFactory.setAdviceChain(
-                RetryInterceptorBuilder.stateless()
-                        .maxAttempts(3)
-                        .backOffOptions(Duration.ofSeconds(3L).toMillis(), 2, Duration.ofSeconds(10L).toMillis())
-                        .recoverer(new RejectAndDontRequeueRecoverer())
-                        .build()
-        );
-
-        return containerFactory;
-    }
 }
