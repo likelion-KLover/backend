@@ -22,7 +22,13 @@ public class RabbitMQConfig {
     public Queue esCommPostUpdateQueue() { return new Queue(QueueNames.ES_COMMPOST_UPDATE.name(), true);}
 
     @Bean
-    public Queue esCommPostDeleteQueue() { return new Queue(QueueNames.ES_COMMPOST_UPDATE.name(), true);}
+    public Queue esCommPostCountQueue() { return new Queue(QueueNames.ES_COMMPOST_COUNT.name(), true);}
+
+    @Bean
+    public Queue esMemberUpdateQueue() { return new Queue(QueueNames.ES_MEMBER_UPDATE.name(), true);}
+
+    @Bean
+    public Queue esCommPostDeleteQueue() { return new Queue(QueueNames.ES_COMMPOST_DELETE.name(), true);}
 
     @Bean
     public Queue esTourPostUpdateQueue() { return new Queue(QueueNames.ES_COMMPOST_UPDATE.name(), true);}
