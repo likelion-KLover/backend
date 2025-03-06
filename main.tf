@@ -199,6 +199,7 @@ services:
   app:
     image: junhui9789/my-app:latest
     container_name: my-app
+    restart: always
     ports:
       - "8080:8080"
     environment:
@@ -209,6 +210,7 @@ services:
   redis:
     image: redis:latest
     container_name: my-redis
+    restart: always
     ports:
       - "6379:6379"
     volumes:

@@ -196,7 +196,6 @@ public class NotProd {
                             .build();
                     Member member = members.get((i % members.size()));
                     commPostService.addCommPost(member.getId(), commPostForm, dummy);
-
                 }
 
                 List<CommPost> commPosts = commPostRepository.findAll();
