@@ -5,10 +5,10 @@
 #- pipeline.id: commpost_count_update_pipeline
 #  path.config: "/usr/share/logstash/pipeline/commpost/updatecount/commpostcountupdatepipeline.conf"
 
-- pipeline.id: commpost_update_pipeline
-  path.config: "/usr/share/logstash/pipeline/commpost/updaterow/commpostupdaterabbitmq.conf"
-- pipeline.id: commpost_delete_pipeline
-  path.config: "/usr/share/logstash/pipeline/commpost/updaterow/commpostdeleterabbitmq.conf"
+#- pipeline.id: commpost_update_pipeline
+#  path.config: "/usr/share/logstash/pipeline/commpost/updaterow/commpostupdaterabbitmq.conf"
+#- pipeline.id: commpost_delete_pipeline
+#  path.config: "/usr/share/logstash/pipeline/commpost/updaterow/commpostdeleterabbitmq.conf"
 
 - pipeline.id: tourpost_pipeline
   path.config: "/usr/share/logstash/pipeline/tourpost/loadrow/tourpostpipeline.conf"
@@ -17,5 +17,5 @@
 #- pipeline.id: tourpost_review_pipeline
 #  path.config: "/usr/share/logstash/pipeline/tourpost/updatereview/tourpostreviewpipeline.conf"
 
-- pipeline.id: tourpost_update_pipeline
-  path.config: "/usr/share/logstash/pipeline/tourpost/updaterow/tourpostupdaterabbitmq.conf"
+#- pipeline.id: tourpost_update_pipeline
+#  path.config: "/usr/share/logstash/pipeline/tourpost/updaterow/tourpostupdaterabbitmq.conf"

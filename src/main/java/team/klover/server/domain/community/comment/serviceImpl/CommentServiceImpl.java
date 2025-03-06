@@ -21,7 +21,7 @@ import team.klover.server.domain.community.comment.repository.CommentRepository;
 import team.klover.server.domain.community.comment.service.CommentService;
 import team.klover.server.domain.member.v1.entity.Member;
 import team.klover.server.domain.member.v1.repository.MemberV1Repository;
-import team.klover.server.global.elasticsearch.commpost.rabbitmq.event.CommentCountEvent;
+import team.klover.server.global.elasticsearch.commpost.rabbitmq.event.CommPostCountEvent;
 import team.klover.server.global.exception.KloverRequestException;
 import team.klover.server.global.exception.ReturnCode;
 
@@ -98,8 +98,7 @@ public class CommentServiceImpl implements CommentService {
         // 이벤트 생성 및 발행 (알림 + 엘라스틱서치)
         publisher.publishEvent(new CommentCreatedEvent(this, commPost, comment));
 
-        long commentCount = commentRepository.countCommPostComment(commPostId);
-        publisher.publishEvent(new CommentCountEvent(this, commPost,commentCount));
+        publisher.publishEvent(new CommPostCountEvent(this, commPost));
     }
 
     // 해당 댓글 수정
@@ -133,8 +132,7 @@ public class CommentServiceImpl implements CommentService {
         commentRepository.save(comment); // 답글 삭제 후 더티 체킹
         commentRepository.delete(comment);
         //댓글 삭제 이벤트(갯수 정산은 삭제 종료 후 발생해도 되므로)
-        long commentCount = commentRepository.countCommPostComment(comment.getCommPost().getId());
-        publisher.publishEvent(new CommentCountEvent(this, comment.getCommPost(), commentCount));
+        publisher.publishEvent(new CommPostCountEvent(this, comment.getCommPost()));
     }
 
     // 해당 게시글의 모든 댓글 삭제
@@ -146,8 +144,7 @@ public class CommentServiceImpl implements CommentService {
         //댓글 삭제 이벤트
         commentRepository.deleteAll(comments);
 
-        long commentCount = commentRepository.countCommPostComment(commPostId);
-        publisher.publishEvent(new CommentCountEvent(this, commPost, commentCount));
+        publisher.publishEvent(new CommPostCountEvent(this, commPost));
     }
 
     // 해당 댓글의 모든 하위 댓글 삭제

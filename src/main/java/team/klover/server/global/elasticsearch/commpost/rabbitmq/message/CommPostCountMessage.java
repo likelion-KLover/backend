@@ -3,20 +3,20 @@ package team.klover.server.global.elasticsearch.commpost.rabbitmq.message;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import team.klover.server.domain.community.commPost.entity.CommPost;
 import team.klover.server.domain.member.v1.enums.Country;
 
 @Getter
 @AllArgsConstructor
 @Builder
-public class CommentCountMessage {
-    private final Long id;
-    private final Country language;
-    private final long comment_count;
+@NoArgsConstructor
+public class CommPostCountMessage {
+    private Long id;
+    private String language;
 
-    public CommentCountMessage(CommPost commPost, long comment_count){
+    public CommPostCountMessage(CommPost commPost){
         id = commPost.getId();
-        language = commPost.getLanguage();
-        this.comment_count = comment_count;
+        language = commPost.getLanguage().name();
     }
 }

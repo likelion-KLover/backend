@@ -22,14 +22,10 @@ public class ESCommPostEventListener {
     }
 
     @EventListener
-    public void handleCommentCount(CommentCountEvent event){
-        producer.notifyCommentCount(event);
+    public void handleCommentCount(CommPostCountEvent event){
+        producer.notifyCommPostCount(event);
     }
 
-    @EventListener
-    public void handleLikeCount(LikeCountEvent event){
-        producer.notifyLikeCount(event);
-    }
 
     @EventListener
     public void handleNicknameModification(NicknameUpdateEvent event){

@@ -1,6 +1,5 @@
 package team.klover.server.domain.member.v1.service;
 
-import co.elastic.clients.elasticsearch.rollup.Groupings;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.Authentication;
@@ -11,10 +10,8 @@ import org.springframework.web.multipart.MultipartFile;
 import team.klover.server.domain.chat.chatMessage.entity.ChatMessage;
 import team.klover.server.domain.chat.chatMessage.repository.ChatMessageRepository;
 import team.klover.server.domain.chat.chatMessage.service.ChatMessageService;
-import team.klover.server.domain.chat.chatRoom.entity.ChatRoom;
 import team.klover.server.domain.chat.chatRoom.entity.ChatRoomMember;
 import team.klover.server.domain.chat.chatRoom.repository.ChatRoomMemberRepository;
-import team.klover.server.domain.chat.chatRoom.repository.ChatRoomRepository;
 import team.klover.server.domain.chat.chatRoom.service.ChatRoomService;
 import team.klover.server.domain.community.commPost.entity.CommPost;
 import team.klover.server.domain.community.commPost.entity.CommPostLike;
@@ -44,11 +41,9 @@ import team.klover.server.domain.tour.tourPost.entity.TourPostSave;
 import team.klover.server.domain.tour.tourPost.repository.TourPostSaveRepository;
 import team.klover.server.domain.tour.tourPost.service.TourPostService;
 import team.klover.server.global.elasticsearch.commpost.rabbitmq.event.CommPostDeleteEvent;
-import team.klover.server.global.elasticsearch.commpost.rabbitmq.event.CommentCountEvent;
-import team.klover.server.global.elasticsearch.commpost.rabbitmq.event.LikeCountEvent;
+import team.klover.server.global.elasticsearch.commpost.rabbitmq.event.CommPostCountEvent;
 import team.klover.server.global.elasticsearch.commpost.rabbitmq.event.NicknameUpdateEvent;
-import team.klover.server.global.elasticsearch.tourpost.rabbitmq.event.ReviewCountEvent;
-import team.klover.server.global.elasticsearch.tourpost.rabbitmq.event.ReviewRatingEvent;
+import team.klover.server.global.elasticsearch.tourpost.rabbitmq.event.TourPostCountEvent;
 import team.klover.server.global.exception.KloverException;
 import team.klover.server.global.exception.KloverLogicException;
 import team.klover.server.global.exception.KloverRequestException;
@@ -114,8 +109,7 @@ public class MemberV1Service {
         String curNickname = member.getNickname();
 
         if(!prevNickname.equals(curNickname)) {
-            List<CommPost> commPosts = commPostRepository.findAllByMember(member);
-            commPosts.forEach(commPost -> publisher.publishEvent(new NicknameUpdateEvent(this, commPost, curNickname)));
+            publisher.publishEvent(new NicknameUpdateEvent(this, member));
         }
     }
 
@@ -171,8 +165,7 @@ public class MemberV1Service {
 
         if(!updateList.isEmpty()){
             updateList.forEach(commPost -> {
-                long count = commentRepository.countCommPostComment(commPost.getId());
-                publisher.publishEvent(new CommentCountEvent(this, commPost,count));
+                publisher.publishEvent(new CommPostCountEvent(this, commPost));
             });
         }
 
@@ -189,8 +182,7 @@ public class MemberV1Service {
 
         if(!likeUpdateList.isEmpty()){
             likeUpdateList.forEach(commPost -> {
-                long count = commPostLikeRepository.countCommPostLike(commPost.getId());
-                publisher.publishEvent(new LikeCountEvent(this, commPost, count));
+                publisher.publishEvent(new CommPostCountEvent(this, commPost));
             });
         }
         commPostSaves.forEach(commPostSave -> commPostService.deleteCollectionCommPost(memberId, commPostSave.getCommPost().getId()));
@@ -219,8 +211,7 @@ public class MemberV1Service {
                         long reviewCount = reviewRepository.countTourPostReview(commonPlaceId);
                         double ratingAverage = reviewRepository.getTourPostAvgRating(commonPlaceId);
                         tourposts.forEach(tourpost -> {
-                            publisher.publishEvent(new ReviewCountEvent(this, tourpost, reviewCount));
-                            publisher.publishEvent(new ReviewRatingEvent(this, tourpost, ratingAverage));
+                            publisher.publishEvent(new TourPostCountEvent(this, tourpost));
                         });
                     }
             );

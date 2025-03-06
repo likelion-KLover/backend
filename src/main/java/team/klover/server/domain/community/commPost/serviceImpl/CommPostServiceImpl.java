@@ -25,10 +25,9 @@ import team.klover.server.domain.member.v1.enums.Country;
 import team.klover.server.domain.member.v1.repository.MemberV1Repository;
 import team.klover.server.domain.tour.tourPost.dto.res.TourPostDto;
 import team.klover.server.domain.tour.tourPost.service.TourPostService;
+import team.klover.server.global.elasticsearch.commpost.rabbitmq.event.CommPostCountEvent;
 import team.klover.server.global.elasticsearch.commpost.rabbitmq.event.CommPostDeleteEvent;
 import team.klover.server.global.elasticsearch.commpost.rabbitmq.event.CommPostUpdateEvent;
-import team.klover.server.global.elasticsearch.commpost.rabbitmq.event.LikeCountEvent;
-import team.klover.server.global.exception.KloverException;
 import team.klover.server.global.exception.KloverRequestException;
 import team.klover.server.global.exception.ReturnCode;
 import team.klover.server.global.s3.S3Service;
@@ -149,7 +148,7 @@ public class CommPostServiceImpl implements CommPostService {
         publisher.publishEvent(new CommPostLikedEvent(this, commPost, member));
 
         long likeCount = commPostLikeRepository.countCommPostLike(id);
-        publisher.publishEvent(new LikeCountEvent(this, commPost, likeCount ));
+        publisher.publishEvent(new CommPostCountEvent(this, commPost));
     }
 
     // 게시글 좋아요 취소
@@ -167,7 +166,7 @@ public class CommPostServiceImpl implements CommPostService {
 
         //좋아요 변동 이벤트 발생
         long likeCount = commPostLikeRepository.countCommPostLike(commPostId);
-        publisher.publishEvent(new LikeCountEvent(this, commPost, likeCount ));
+        publisher.publishEvent(new CommPostCountEvent(this, commPost ));
     }
 
     // 게시글 생성
@@ -217,20 +216,25 @@ public class CommPostServiceImpl implements CommPostService {
         }
 
         // 기존 이미지들 삭제 후 입력 받은 이미지들 S3에 저장
-        s3Service.deleteAllFile(commPost.getImageUrls());
         List<String> imageUrls = new ArrayList<>();
-        for (MultipartFile imageFile : imageFiles) {
-            try {
-                String imageUrl = s3Service.uploadFile(imageFile, "commPost-images");
-                imageUrls.add(imageUrl);
-            } catch (IOException e) {
-                throw new KloverRequestException(ReturnCode.INTERNAL_ERROR);
+        if(imageFiles != null && !imageFiles.isEmpty()) {
+            s3Service.deleteAllFile(commPost.getImageUrls());
+            imageUrls = new ArrayList<>();
+            for (MultipartFile imageFile : imageFiles) {
+                try {
+                    String imageUrl = s3Service.uploadFile(imageFile, "commPost-images");
+                    imageUrls.add(imageUrl);
+                } catch (IOException e) {
+                    throw new KloverRequestException(ReturnCode.INTERNAL_ERROR);
+                }
             }
         }
         commPost.setMapX(commPostForm.getMapX());
         commPost.setMapY(commPostForm.getMapY());
         commPost.setContent(commPostForm.getContent());
-        commPost.setImageUrls(imageUrls);
+        if(!imageUrls.isEmpty()) {
+            commPost.setImageUrls(imageUrls);
+        }
         //language는 작성 당시의 language만을 따라갑니다.
         commPostRepository.save(commPost);
 
