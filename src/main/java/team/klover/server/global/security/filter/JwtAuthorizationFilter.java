@@ -53,12 +53,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 || (path.startsWith("/api/v1/comm-post/surroundings") && method.equals("GET"))
                 || (path.startsWith("/api/v1/comm-post/detail") && method.equals("GET"))
                 || (path.equals("/api/v1/comm-post") && method.equals("GET"))
-                || (path.startsWith("/api/v1/tour-post/review") && method.equals("GET"))
-                || (path.startsWith("/api/v1/tour-post/KorService1") && method.equals("GET"))
-                || (path.startsWith("/api/v1/tour-post/EngService1") && method.equals("GET"))
-                || (path.startsWith("/api/v1/tour-post/JpnService1") && method.equals("GET"))
-                || (path.startsWith("/api/v1/tour-post/ChsService1") && method.equals("GET"))
-                || (path.startsWith("/api/v1/tour-post/detail") && method.equals("GET"));
+                || (path.startsWith("/api/v1/tour-post") && method.equals("GET"));
     }
 
     @Override
