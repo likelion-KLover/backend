@@ -1,3 +1,4 @@
+# application-prod.yml
 spring:
   datasource:
     url: jdbc:postgresql://43.203.244.12:5432/meta_db
@@ -58,3 +59,5 @@ logging:
       file-name-pattern: logs/app-%d{yyyy-MM-dd}.log
       max-history: 7
       total-size-cap: 100MB
+es:
+  host: "es.tmdgjsdl1.site"

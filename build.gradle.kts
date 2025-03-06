@@ -79,6 +79,8 @@ dependencies {
 
 	// FCM (Firebase CLoud Messaging)
 	implementation("com.google.firebase:firebase-admin:9.4.3")
+
+	implementation("org.redisson:redisson-spring-boot-starter:3.44.0")
 }
 
 tasks.withType<Test> {

@@ -3,22 +3,22 @@ package team.klover.server.global.elasticsearch.tourpost.rabbitmq.message;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import org.springframework.context.ApplicationEvent;
+import lombok.NoArgsConstructor;
 import team.klover.server.domain.tour.tourPost.entity.TourPost;
 
 @Getter
 @AllArgsConstructor
 @Builder
-public class ReviewRatingMessage {
-    private final Long content_id;
+@NoArgsConstructor
+public class TourPostCountMessage {
+    private Long content_id;
     private String language;
-    private final double rating_average;
+    private Long common_place_id;
 
-    public ReviewRatingMessage(TourPost tourPost, Double rating_average){
+    public TourPostCountMessage(TourPost tourPost){
         content_id = tourPost.getContentId();
         language = tourPost.getLanguage();
-        this.rating_average = rating_average;
+        common_place_id = tourPost.getCommonPlaceId();
     }
-
 
 }
