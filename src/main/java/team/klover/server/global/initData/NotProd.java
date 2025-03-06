@@ -190,8 +190,8 @@ public class NotProd {
                     }
                     System.out.println("content:" + content);
                     CommPostForm commPostForm = CommPostForm.builder()
-                            .mapX(0.0)
-                            .mapY(0.0)
+                            .mapX(Double.valueOf(0.0))
+                            .mapY(Double.valueOf(0.0))
                             .content(content)
                             .build();
                     Member member = members.get((i % members.size()));
@@ -235,8 +235,8 @@ public class NotProd {
                 List<CommPost> forUpdate = commPostRepository.findAll();
                 for(CommPost commPost : forUpdate){
                     Member member = commPost.getMember();
-                    Double newMapX = new Random(System.currentTimeMillis()).nextDouble(126, 130);
-                    Double newMapY = new Random(System.currentTimeMillis()).nextDouble(33,38);
+                    Double newMapX = (Double) new Random(System.currentTimeMillis()).nextDouble(126, 130);
+                    Double newMapY = (Double) new Random(System.currentTimeMillis()).nextDouble(33,38);
                     CommPostForm commPostForm= CommPostForm.builder()
                             .content(commPost.getContent())
                             .mapX(newMapX)
