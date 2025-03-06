@@ -46,15 +46,14 @@ public class RabbitMQConsumer {
     private final CommentRepository commentRepository;
     private final CommPostLikeRepository commPostLikeRepository;
     private final ReviewRepository reviewRepository;
-
-    //@RabbitListener(queues = "COMMENT_NOTIFICATION")
+    @RabbitListener(queues = "COMMENT_NOTIFICATION")
     public void consumeCommentMessage(String message) throws JsonProcessingException {
         NotificationMessage converted = objectMapper.readValue(message, NotificationMessage.class);
         Long receiverID = safeMemberIdConverter(converted.getCustomField().get(CustomFieldKey.RECEIVER_ID.getKeyName()));
         fcmService.sendPushNotification(receiverID, converted);
     }
 
-    //@RabbitListener(queues = "COMMPOST_NOTIFICATION")
+    @RabbitListener(queues = "COMMPOST_NOTIFICATION")
     public void consumeCommPostMessage(String message) throws JsonProcessingException {
         NotificationMessage converted = objectMapper.readValue(message, NotificationMessage.class);
         Long receiverID = safeMemberIdConverter(converted.getCustomField().get(CustomFieldKey.RECEIVER_ID.getKeyName()));
