@@ -24,6 +24,17 @@ spring:
     port: 5672
     username: admin
     password: admin
+  messaging:
+    stomp:
+      broker-relay:
+        host: localhost  # RabbitMQ 서버 IP
+        port: 61613           # STOMP 기본 포트
+        system-login: admin   # RabbitMQ 로그인 계정
+        system-passcode: admin
+        relay-host: localhost
+        relay-port: 61613
+        client-login: admin
+        client-passcode: admin
 
 # Swagger 설정 추가
 springdoc:

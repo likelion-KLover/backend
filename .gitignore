@@ -52,4 +52,8 @@ src/main/resources/application-secret.yml
 **/.terraform/*
 .terraform.*
 
+# GCP
+src/main/resources/firebase/kloverFirebaseKey.json
+kloverFirebaseKey*
+
 kloverFirebaseKey.json
