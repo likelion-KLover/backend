@@ -11,32 +11,28 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import team.klover.server.domain.community.commPost.dto.res.CommPostDto;
-import team.klover.server.domain.community.commPost.enums.CommPostSort;
 import team.klover.server.domain.member.v1.enums.Country;
 import team.klover.server.domain.tour.enums.Area;
 import team.klover.server.domain.tour.enums.ContentType;
-import team.klover.server.domain.tour.enums.Theme;
 import team.klover.server.domain.tour.enums.TourPostSort;
 import team.klover.server.domain.tour.tourPost.dto.res.TourPostDto;
 import team.klover.server.global.common.constant.SearchConstant;
-import team.klover.server.global.elasticsearch.commpost.doc.CommPostDoc;
 import team.klover.server.global.elasticsearch.tourpost.doc.TourPostDoc;
-import team.klover.server.global.util.ElasticSearchClientBuilder;
-import team.klover.server.global.util.LanguageDetect;
 
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class TourPostDocService {
     private static final int RADIUS = 5;
     private static final String PERCENTAGE = "75%";
+    private final ElasticsearchClient client;
 
 
     //mapX: longitude(경도, lon), mapY: latitude(위도, lat)
     @SneakyThrows
     public Page<TourPostDto> search(String keyword, Pageable pageable, Double mapX, Double mapY, Country language, Area area, ContentType contentType, boolean hasExotic, boolean hasHealing, boolean hasTraditional, boolean hasActive, boolean searchByTitle, boolean searchByOverview, TourPostSort sort){
-        ElasticsearchClient client = ElasticSearchClientBuilder.build();
+        //ElasticsearchClient client = ElasticSearchClientBuilder.build();
 
         BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
         List<SortOptions> sortOptions = new ArrayList<>();

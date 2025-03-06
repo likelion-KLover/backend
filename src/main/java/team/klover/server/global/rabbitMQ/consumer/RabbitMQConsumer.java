@@ -2,15 +2,12 @@ package team.klover.server.global.rabbitMQ.consumer;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch.core.*;
-import co.elastic.clients.elasticsearch.core.bulk.UpdateOperation;
-import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.data.elasticsearch.core.geo.GeoPoint;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import team.klover.server.domain.community.commPost.repository.CommPostLikeRepository;
@@ -24,9 +21,7 @@ import team.klover.server.global.elasticsearch.commpost.rabbitmq.message.CommPos
 import team.klover.server.global.elasticsearch.commpost.rabbitmq.message.NicknameModificationMessage;
 import team.klover.server.global.elasticsearch.tourpost.rabbitmq.message.TourPostCountMessage;
 import team.klover.server.global.fcm.service.FCMService;
-import team.klover.server.global.rabbitMQ.queueNames.QueueNames;
 import team.klover.server.global.redis.RedisService;
-import team.klover.server.global.util.ElasticSearchClientBuilder;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -34,7 +29,6 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -46,6 +40,8 @@ public class RabbitMQConsumer {
     private final CommentRepository commentRepository;
     private final CommPostLikeRepository commPostLikeRepository;
     private final ReviewRepository reviewRepository;
+    private final ElasticsearchClient client;
+
     @RabbitListener(queues = "COMMENT_NOTIFICATION")
     public void consumeCommentMessage(String message) throws JsonProcessingException {
         NotificationMessage converted = objectMapper.readValue(message, NotificationMessage.class);
@@ -110,7 +106,7 @@ public class RabbitMQConsumer {
         boolean haveToBulk = !(commPostCountTarget.isEmpty() && commPostModificationTarget.isEmpty() && nicknameModificationTarget.isEmpty() && commPostDeletionTarget.isEmpty() && tourPostCountTarget.isEmpty());
         if(!haveToBulk) return;
 
-        ElasticsearchClient client = ElasticSearchClientBuilder.build();
+        //ElasticsearchClient client = ElasticSearchClientBuilder.build();
 
         //수정사항이 있었으나 지워진 게시글이 있으면 수정 요청을 못 하도록 없애버림
         commPostDeletionTarget.forEach(

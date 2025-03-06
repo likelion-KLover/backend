@@ -3,38 +3,35 @@ package team.klover.server.global.elasticsearch.commpost.service;
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.*;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.GeoDistanceQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.Operator;
-import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch.core.SearchRequest;
 import co.elastic.clients.elasticsearch.core.SearchResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import team.klover.server.domain.community.commPost.dto.res.CommPostDto;
 import team.klover.server.domain.community.commPost.enums.CommPostSort;
 import team.klover.server.domain.member.v1.enums.Country;
 import team.klover.server.global.elasticsearch.commpost.doc.CommPostDoc;
-import team.klover.server.global.util.ElasticSearchClientBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class CommPostDocService {
 
     private static final int RADIUS = 5;
     private static final String PERCENTAGE = "50%";
+    private final ElasticsearchClient client;
 
     //mapX: longitude(경도, lon), mapY: latitude(위도, lat)
     @SneakyThrows
     public Page<CommPostDto> search(String keyword, Pageable pageable, Double mapX, Double mapY, Country language, boolean searchByContent, boolean searchByNickname, CommPostSort sort){
-        ElasticsearchClient client = ElasticSearchClientBuilder.build();
+//        ElasticsearchClient client = ElasticSearchClientBuilder.build();
 
         BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
         List<SortOptions> sortOptions = new ArrayList<>();
