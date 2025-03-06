@@ -1,4 +1,4 @@
-package team.klover.server.global.util;
+package team.klover.server.global.elasticsearch.config;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.json.JsonpMapper;
@@ -10,15 +10,19 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 
 //Repository가 아니라 REST API로 호출을 시도해야할 상황이라면
-public class ElasticSearchClientBuilder {
+@Configuration
+public class ElasticSearchClientConfig {
 
     @Value("${es.host}")
     private String host;
 
-    public static ElasticsearchClient build() {
+    @Bean
+    public ElasticsearchClient esClient() {
 
         // JacksonJsonpMapper 생성 (ObjectMapper 포함)
         ObjectMapper objectMapper = new ObjectMapper();
@@ -31,7 +35,7 @@ public class ElasticSearchClientBuilder {
 
 
         // 1. RestClient 생성 (Elasticsearch 8.x에서 HTTP 요청을 보내는 클라이언트)
-        RestClient restClient = RestClient.builder(new HttpHost("localhost", 9200, "http")).build();
+        RestClient restClient = RestClient.builder(new HttpHost(host, 9200, "http")).build();
 
         // 2. ElasticsearchTransport 생성 (Jackson JSON Mapper 사용)
         ElasticsearchTransport transport = new RestClientTransport(restClient, jsonpMapper);

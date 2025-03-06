@@ -29,7 +29,7 @@
             ],
             "filter": [
               "cjk_width",
-              "my_pinyin",
+              "content_pinyin",
               "asciifolding"
             ]
           },
@@ -43,7 +43,7 @@
             "filter": [
               "cjk_width",
               "ngram_filter",
-              "my_pinyin",
+              "word_pinyin",
               "asciifolding",
               "unique"
             ]
@@ -68,6 +68,26 @@
             "max_gram": 4
           },
           "my_pinyin": {
+            "type": "pinyin",
+            "keep_first_letter": false,
+            "keep_separate_first_letter": false,
+            "keep_full_pinyin": true,
+            "keep_original": false,
+            "keep_joined_full_pinyin": false,
+            "limit_first_letter_length": 0,
+            "lowercase": true
+          },
+          "content_pinyin": {
+            "type": "pinyin",
+            "keep_first_letter": false,
+            "keep_separate_first_letter": false,
+            "keep_full_pinyin": false,
+            "keep_original": false,
+            "keep_joined_full_pinyin": true,
+            "limit_first_letter_length": 0,
+            "lowercase": true
+          },
+          "word_pinyin": {
             "type": "pinyin",
             "keep_first_letter": false,
             "keep_separate_first_letter": false,

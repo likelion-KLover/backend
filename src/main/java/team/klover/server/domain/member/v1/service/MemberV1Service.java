@@ -208,8 +208,6 @@ public class MemberV1Service {
 
             placeTourPostMap.forEach(
                     (commonPlaceId, tourposts) -> {
-                        long reviewCount = reviewRepository.countTourPostReview(commonPlaceId);
-                        double ratingAverage = reviewRepository.getTourPostAvgRating(commonPlaceId);
                         tourposts.forEach(tourpost -> {
                             publisher.publishEvent(new TourPostCountEvent(this, tourpost));
                         });

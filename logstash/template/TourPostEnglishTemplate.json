@@ -8,6 +8,13 @@
         "max_ngram_diff": 10
       },
       "analysis": {
+        "tokenizer": {
+          "fixed_length_tokenizer": {
+            "type": "pattern",
+            "pattern": ".{1,3}",
+            "group": 0
+          }
+        },
         "char_filter": {
           "remove_korean": {
             "type": "pattern_replace",
@@ -52,9 +59,10 @@
           },
           "normal_analyzer": {
             "type": "custom",
-            "tokenizer": "standard",
+            "tokenizer": "fixed_length_tokenizer",
             "char_filter": [
-              "remove_korean"
+              "remove_korean",
+              "remove_symbols"
             ],
             "filter": [
               "lowercase",
