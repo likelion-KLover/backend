@@ -80,13 +80,44 @@ public class NotProd {
                 /*
 
 
-                for(int i=0;i<50;i++){
+                for(int i=0;i<10;i++){
                     authV1Service.signup(SignupRequestDto.builder()
                             .email("test"+(i+1)+"@test.com")
                             .nickname("test"+(i+1))
                             .password("1234")
                             .build()
                     );
+                }
+
+                List<Member> memberForUpdate = MemberRepository.findAll();
+                for(Member member:memberForUpdate){
+                    Long memberId = member.getId();
+                    String nickname;
+                    Country country;
+                    int randomIdx = new Random(System.currentTimeMillis()).nextInt(0,4);
+                    switch (randomIdx){
+                        case 0 -> {
+                            nickname=new Faker(Locale.of("zh","CN")).name().fullName();
+                            country= Country.ZH;
+                        }
+                        case 1 -> {
+                            nickname= new Faker(Locale.of("ja","JP")).name().fullName();
+                            country=Country.JA;
+                        }
+                        case 2 -> {
+                            nickname=new Faker(Locale.of("ko","KR")).name().fullName();
+                            country=Country.KO;
+                        }
+                        default -> {
+                            nickname=new Faker(Locale.of("en","US")).name().fullName();
+                            country=Country.EN;
+                        }
+                    }
+                    MemberUpdateParam memberUpdateParam = MemberUpdateParam.builder()
+                            .nickname(nickname)
+                            .country(country)
+                            .build();
+                    memberV1Service.updateMember(memberId,memberUpdateParam,null);
                 }
 
                 long start = System.currentTimeMillis();
@@ -148,7 +179,7 @@ public class NotProd {
                 List<MultipartFile> dummy = new ArrayList<>();
                 dummy.add(imageFile);
 
-                for (int i = 0; i < 200; i++) {
+                for (int i = 0; i < 20; i++) {
                     String content = "";
                     for (int j = 0; j < 5; j++) {
                         if ((i % 4) != 3) {
@@ -184,7 +215,6 @@ public class NotProd {
                 long elapsed = System.currentTimeMillis() - start;
                 System.out.println("elapsed time(ms):" + elapsed);
 
-
                 List<TourPost> tourPostList = tourPostRepository.findAll();
                 Set<Long> commonPlaceList = new HashSet<>();
                 for(TourPost tourPost : tourPostList){
@@ -202,8 +232,6 @@ public class NotProd {
                     }
                 }
 
-
-
                 List<CommPost> forUpdate = commPostRepository.findAll();
                 for(CommPost commPost : forUpdate){
                     Member member = commPost.getMember();
@@ -218,43 +246,9 @@ public class NotProd {
                 }
 
 
-                List<Member> memberForUpdate = MemberRepository.findAll();
-                for(Member member:memberForUpdate){
-                    Long memberId = member.getId();
-                    String nickname;
-                    Country country;
-                    int randomIdx = new Random(System.currentTimeMillis()).nextInt(0,4);
-                    switch (randomIdx){
-                        case 0 -> {
-                            nickname=new Faker(Locale.of("zh","CN")).name().fullName();
-                            country= Country.ZH;
-                        }
-                        case 1 -> {
-                            nickname= new Faker(Locale.of("ja","JP")).name().fullName();
-                            country=Country.JA;
-                        }
-                        case 2 -> {
-                            nickname=new Faker(Locale.of("ko","KR")).name().fullName();
-                            country=Country.KO;
-                        }
-                        default -> {
-                            nickname=new Faker(Locale.of("en","US")).name().fullName();
-                            country=Country.EN;
-                        }
-                    }
-                    MemberUpdateParam memberUpdateParam = MemberUpdateParam.builder()
-                            .nickname(nickname)
-                            .country(country)
-                            .build();
-                    memberV1Service.updateMember(memberId,memberUpdateParam,null);
-                }
-
-
                  */
 
             }
-
         };
-
     }
 }
