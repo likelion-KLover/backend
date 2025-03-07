@@ -11,10 +11,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import team.klover.server.domain.notification.entity.NotificationMessage;
 import team.klover.server.domain.notification.enums.CustomFieldKey;
-import team.klover.server.domain.notification.enums.EventType;
 import team.klover.server.global.redis.RedisService;
 
 import java.util.Optional;
+
+import static team.klover.server.global.util.Util.safeMemberIdConverter;
 
 @Service
 @RequiredArgsConstructor
@@ -25,31 +26,13 @@ public class FCMService {
     private final RedisService redisService;
     private final ObjectMapper objectMapper;
 
-    public void sendPushNotification(Long receiverId, NotificationMessage message) throws JsonProcessingException {
+    public void sendPushNotification(NotificationMessage message) throws JsonProcessingException {
+        Long receiverId = safeMemberIdConverter(message.getCustomField().get(CustomFieldKey.RECEIVER_ID.getKeyName()));
 
 //        String fcmToken = redisService.getFCMToken(receiverId);
         String fcmToken = "tmptmptmptmp";
         // rabbitMQListener Exception 방지용 임시 토큰 프론트 측에서 fcm 토큰 발급 후 백에 넘겨주는 것 구현해야 함
-        // rabbitMQ 무한 재시도 (cunsume 재시도) 방지 로직 구현 필요
-        EventType eventType = message.getEventType();
-        NotificationMessage convertedMessage = null;
-
-        String userLanguage = (String) message.getCustomField().get(CustomFieldKey.RECEIVER_COUNTRY.getKeyName());
-
-        switch (eventType) {
-            case COMMENT_CREATE: {
-                convertedMessage = messageBuildService.buildCommentCreateMessage(message, userLanguage);
-                break;
-            }
-            case COMMENT_LIKE: {
-                convertedMessage = messageBuildService.buildCommentLikeMessage(message, userLanguage);
-                break;
-            }
-            case COMMPOST_LIKE: {
-                convertedMessage = messageBuildService.buildCommPostLikeMessage(message, userLanguage);
-                break;
-            }
-        }
+        NotificationMessage convertedMessage = messageBuildService.buildMessage(message, receiverId);
 
         assert convertedMessage != null;
         Notification notification = Notification.builder()

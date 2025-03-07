@@ -3,6 +3,8 @@ package team.klover.server.domain.notification.eventListener;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 import team.klover.server.domain.community.commPost.event.CommPostLikedEvent;
 import team.klover.server.domain.notification.entity.NotificationMessage;
 import team.klover.server.domain.notification.enums.CustomFieldKey;
@@ -20,6 +22,7 @@ public class CommPostEventListener {
     private final RabbitMQProducer producer;
 
     @EventListener
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleCommPostLikedEvent(CommPostLikedEvent event) {
         NotificationMessage message = createCommPostLikedMessage(event);
         producer.sendNotification(QueueNames.COMMPOST_NOTIFICATION.name(), message);
@@ -38,7 +41,6 @@ public class CommPostEventListener {
         message.addCustomField(CustomFieldKey.RECEIVER_NICKNAME, event.getCommPost().getMember().getNickname());
         message.addCustomField(CustomFieldKey.RECEIVER_ID, event.getCommPost().getMember().getId());
         message.addCustomField(CustomFieldKey.ACTOR_NICKNAME, event.getMember().getNickname());
-        message.addCustomField(CustomFieldKey.RECEIVER_COUNTRY, event.getCommPost().getMember().getCountry().name());
         return message;
     }
 }

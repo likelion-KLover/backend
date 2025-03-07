@@ -3,6 +3,8 @@ package team.klover.server.domain.notification.eventListener;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionPhase;
+import org.springframework.transaction.event.TransactionalEventListener;
 import team.klover.server.domain.community.comment.event.CommentCreatedEvent;
 import team.klover.server.domain.community.comment.event.CommentLikedEvent;
 import team.klover.server.domain.notification.entity.NotificationMessage;
@@ -21,12 +23,14 @@ public class CommentEventListener {
     private final RabbitMQProducer producer;
 
     @EventListener
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleCommentCreatedEvent(CommentCreatedEvent event) {
         NotificationMessage message = createCommentCreatedMessage(event);
         producer.sendNotification(QueueNames.COMMENT_NOTIFICATION.name(), message);
     }
 
     @EventListener
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleCommentLikedEvent(CommentLikedEvent event) {
         NotificationMessage message = createCommentLikedMessage(event);
         producer.sendNotification(QueueNames.COMMENT_NOTIFICATION.name(), message);
@@ -45,7 +49,6 @@ public class CommentEventListener {
         message.addCustomField(CustomFieldKey.RECEIVER_NICKNAME, event.getCommPost().getMember().getNickname());
         message.addCustomField(CustomFieldKey.RECEIVER_ID, event.getCommPost().getMember().getId());
         message.addCustomField(CustomFieldKey.ACTOR_NICKNAME, event.getComment().getMember().getNickname());
-        message.addCustomField(CustomFieldKey.RECEIVER_COUNTRY, event.getCommPost().getMember().getCountry().name());
         return message;
     }
 
@@ -62,7 +65,6 @@ public class CommentEventListener {
         message.addCustomField(CustomFieldKey.RECEIVER_NICKNAME, event.getComment().getMember().getNickname());
         message.addCustomField(CustomFieldKey.RECEIVER_ID, event.getComment().getMember().getId());
         message.addCustomField(CustomFieldKey.ACTOR_NICKNAME, event.getMember().getNickname());
-        message.addCustomField(CustomFieldKey.RECEIVER_COUNTRY, event.getComment().getMember().getCountry().name());
         return message;
     }
 }
