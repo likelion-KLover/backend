@@ -9,6 +9,7 @@ import team.klover.server.domain.auth.dto.SignupRequestDto;
 import team.klover.server.domain.member.v1.dto.MemberDto;
 import team.klover.server.domain.auth.dto.MobileSocialLoginParam;
 import team.klover.server.domain.member.v1.entity.Member;
+import team.klover.server.domain.member.v1.enums.Country;
 import team.klover.server.domain.member.v1.enums.MemberRole;
 import team.klover.server.domain.member.v1.enums.SocialProvider;
 import team.klover.server.domain.member.v1.repository.MemberV1Repository;
@@ -38,6 +39,7 @@ public class AuthV1Service {
                 .nickname(requestDto.getNickname())
                 .role(MemberRole.USER)
                 .socialProvider(SocialProvider.SERVER)
+                .country(Country.EN)
                 .build();
 
         try {
@@ -93,6 +95,7 @@ public class AuthV1Service {
                     .role(MemberRole.USER)
                     .socialProvider(param.getProvider())
                     .nickname(nickname)
+                    .country(Country.EN)
                     .build();
 
             memberRepository.save(member);
