@@ -7,4 +7,9 @@ public class Util {
         }
         return content;
     }
+
+    public static Long safeMemberIdConverter(Object memberId) {
+        Integer safety = (Integer) memberId;
+        return Long.valueOf(safety);
+    }
 }

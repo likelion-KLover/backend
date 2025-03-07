@@ -3,16 +3,9 @@ package team.klover.server.global.rabbitMQ.consumer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 import team.klover.server.domain.notification.entity.NotificationMessage;
-import team.klover.server.domain.notification.enums.CustomFieldKey;
-import team.klover.server.global.elasticsearch.commpost.springevent.message.CommPostCountMessage;
-import team.klover.server.global.elasticsearch.commpost.springevent.message.CommPostDeletionMessage;
-import team.klover.server.global.elasticsearch.commpost.springevent.message.CommPostModificationMessage;
-import team.klover.server.global.elasticsearch.commpost.springevent.message.NicknameModificationMessage;
-import team.klover.server.global.elasticsearch.tourpost.springevent.message.TourPostCountMessage;
 import team.klover.server.global.fcm.service.FCMService;
 
 @Component
@@ -25,20 +18,15 @@ public class RabbitMQConsumer {
     @RabbitListener(queues = "COMMENT_NOTIFICATION")
     public void consumeCommentMessage(String message) throws JsonProcessingException {
         NotificationMessage converted = objectMapper.readValue(message, NotificationMessage.class);
-        Long receiverID = safeMemberIdConverter(converted.getCustomField().get(CustomFieldKey.RECEIVER_ID.getKeyName()));
-        fcmService.sendPushNotification(receiverID, converted);
+        fcmService.sendPushNotification(converted);
     }
 
     @RabbitListener(queues = "COMMPOST_NOTIFICATION")
     public void consumeCommPostMessage(String message) throws JsonProcessingException {
         NotificationMessage converted = objectMapper.readValue(message, NotificationMessage.class);
-        Long receiverID = safeMemberIdConverter(converted.getCustomField().get(CustomFieldKey.RECEIVER_ID.getKeyName()));
-        fcmService.sendPushNotification(receiverID, converted);
+        fcmService.sendPushNotification(converted);
     }
 
-    private Long safeMemberIdConverter(Object memberId) {
-        Integer safety = (Integer) memberId;
-        return Long.valueOf(safety);
-    }
+
 
 }
