@@ -9,8 +9,8 @@ import com.google.firebase.messaging.Notification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import team.klover.server.domain.member.v1.service.MemberV1Service;
 import team.klover.server.domain.notification.entity.NotificationMessage;
+import team.klover.server.domain.notification.enums.CustomFieldKey;
 import team.klover.server.domain.notification.enums.EventType;
 import team.klover.server.global.redis.RedisService;
 
@@ -24,7 +24,6 @@ public class FCMService {
     private final MessageBuildService messageBuildService;
     private final RedisService redisService;
     private final ObjectMapper objectMapper;
-    private final MemberV1Service memberV1Service;
 
     public void sendPushNotification(Long receiverId, NotificationMessage message) throws JsonProcessingException {
 
@@ -35,7 +34,7 @@ public class FCMService {
         EventType eventType = message.getEventType();
         NotificationMessage convertedMessage = null;
 
-        String userLanguage = memberV1Service.getMemberById(receiverId).getCountry().name();
+        String userLanguage = (String) message.getCustomField().get(CustomFieldKey.RECEIVER_COUNTRY.getKeyName());
 
         switch (eventType) {
             case COMMENT_CREATE: {

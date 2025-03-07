@@ -19,12 +19,13 @@ import team.klover.server.global.redis.RedisService;
 import java.util.List;
 
 @RestController
-@Tag(name="ApiV1CommentController",description = "Comment API")
+@Tag(name = "ApiV1CommentController", description = "Comment API")
 @RequestMapping("/api/v1/notification")
 @RequiredArgsConstructor
 public class ApiV1NotificationController {
 
     private RedisService redisService;
+
     @Data
     private static class NotificationRequest {
         private int page = 0;
@@ -33,7 +34,7 @@ public class ApiV1NotificationController {
 
     @GetMapping("/{memberId}")
     @Operation(summary = "알림 전체 조회")
-    public ApiResponse<?> findAllNotificationsByMemberId(@ModelAttribute NotificationRequest request, @PathVariable("memberId") Long memberId){
+    public ApiResponse<?> findAllNotificationsByMemberId(@ModelAttribute NotificationRequest request, @PathVariable("memberId") Long memberId) {
         Pageable pageable = PageRequest.of(request.getPage(), request.getLimit());
 
         // 전체 메시지 가져오기

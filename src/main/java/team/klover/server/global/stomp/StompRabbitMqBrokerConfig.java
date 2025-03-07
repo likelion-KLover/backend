@@ -1,8 +1,5 @@
 package team.klover.server.global.stomp;
 
-import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
-import org.springframework.amqp.support.converter.MessageConverter;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -30,10 +27,4 @@ public class StompRabbitMqBrokerConfig implements WebSocketMessageBrokerConfigur
                 .setSystemLogin("admin")
                 .setSystemPasscode("admin");
     }
-
-    @Bean
-    public MessageConverter messageConverter() {
-        return new Jackson2JsonMessageConverter();
-    }
-
 }

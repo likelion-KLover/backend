@@ -1,6 +1,5 @@
 package team.klover.server.domain.notification.eventListener;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -21,7 +20,7 @@ public class CommPostEventListener {
     private final RabbitMQProducer producer;
 
     @EventListener
-    public void handleCommPostLikedEvent(CommPostLikedEvent event) throws JsonProcessingException {
+    public void handleCommPostLikedEvent(CommPostLikedEvent event) {
         NotificationMessage message = createCommPostLikedMessage(event);
         producer.sendNotification(QueueNames.COMMPOST_NOTIFICATION.name(), message);
     }
@@ -39,7 +38,7 @@ public class CommPostEventListener {
         message.addCustomField(CustomFieldKey.RECEIVER_NICKNAME, event.getCommPost().getMember().getNickname());
         message.addCustomField(CustomFieldKey.RECEIVER_ID, event.getCommPost().getMember().getId());
         message.addCustomField(CustomFieldKey.ACTOR_NICKNAME, event.getMember().getNickname());
-
+        message.addCustomField(CustomFieldKey.RECEIVER_COUNTRY, event.getCommPost().getMember().getCountry().name());
         return message;
     }
 }

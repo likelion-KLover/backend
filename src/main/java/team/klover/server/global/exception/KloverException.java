@@ -1,6 +1,7 @@
 package team.klover.server.global.exception;
 
 import lombok.Getter;
+import team.klover.server.global.i18n.service.LocaleMessageService;
 
 @Getter
 public class KloverException extends RuntimeException {
@@ -11,6 +12,6 @@ public class KloverException extends RuntimeException {
   public KloverException(ReturnCode returnCode) {
     super(returnCode.getReturnMessage());
     this.returnCode = returnCode;
-    this.returnMessage = returnCode.getReturnMessage();
+    this.returnMessage = LocaleMessageService.getMessage(returnCode.getReturnMessage());
   }
 }
