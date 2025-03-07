@@ -1,11 +1,10 @@
-package team.klover.server.global.elasticsearch.commpost.rabbitmq.message;
+package team.klover.server.global.elasticsearch.commpost.springevent.message;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import team.klover.server.domain.community.commPost.entity.CommPost;
-import team.klover.server.domain.member.v1.enums.Country;
 
 import java.time.LocalDateTime;
 import java.util.List;

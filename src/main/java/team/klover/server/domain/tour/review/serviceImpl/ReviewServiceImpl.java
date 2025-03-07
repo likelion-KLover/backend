@@ -20,7 +20,7 @@ import team.klover.server.domain.tour.review.repository.ReviewTourPostRepository
 import team.klover.server.domain.tour.review.service.ReviewService;
 import team.klover.server.domain.tour.tourPost.entity.TourPost;
 import team.klover.server.domain.tour.tourPost.repository.TourPostRepository;
-import team.klover.server.global.elasticsearch.tourpost.rabbitmq.event.TourPostCountEvent;
+import team.klover.server.global.elasticsearch.tourpost.springevent.event.TourPostCountEvent;
 import team.klover.server.global.exception.KloverRequestException;
 import team.klover.server.global.exception.ReturnCode;
 

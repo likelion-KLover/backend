@@ -1,4 +1,4 @@
-package team.klover.server.global.elasticsearch.commpost.rabbitmq.event;
+package team.klover.server.global.elasticsearch.commpost.springevent.event;
 
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;

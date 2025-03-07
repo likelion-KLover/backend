@@ -1,23 +1,18 @@
 package team.klover.server.global.redis;
 
 import lombok.RequiredArgsConstructor;
-import org.redisson.api.RKeys;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
-import org.redisson.api.options.KeysOptions;
 import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.stereotype.Service;
-import team.klover.server.domain.member.v1.enums.Country;
 import team.klover.server.domain.notification.dto.FCMTokenParam;
-import team.klover.server.domain.tour.tourPost.entity.TourPost;
-import team.klover.server.global.elasticsearch.commpost.rabbitmq.message.CommPostCountMessage;
-import team.klover.server.global.elasticsearch.commpost.rabbitmq.message.CommPostDeletionMessage;
-import team.klover.server.global.elasticsearch.commpost.rabbitmq.message.CommPostModificationMessage;
-import team.klover.server.global.elasticsearch.commpost.rabbitmq.message.NicknameModificationMessage;
-import team.klover.server.global.elasticsearch.tourpost.rabbitmq.event.TourPostCountEvent;
-import team.klover.server.global.elasticsearch.tourpost.rabbitmq.message.TourPostCountMessage;
+import team.klover.server.global.elasticsearch.commpost.springevent.message.CommPostCountMessage;
+import team.klover.server.global.elasticsearch.commpost.springevent.message.CommPostDeletionMessage;
+import team.klover.server.global.elasticsearch.commpost.springevent.message.CommPostModificationMessage;
+import team.klover.server.global.elasticsearch.commpost.springevent.message.NicknameModificationMessage;
+import team.klover.server.global.elasticsearch.tourpost.springevent.message.TourPostCountMessage;
 
 import java.time.Duration;
 import java.util.*;

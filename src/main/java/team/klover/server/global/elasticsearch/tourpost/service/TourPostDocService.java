@@ -32,7 +32,6 @@ public class TourPostDocService {
     //mapX: longitude(경도, lon), mapY: latitude(위도, lat)
     @SneakyThrows
     public Page<TourPostDto> search(String keyword, Pageable pageable, Double mapX, Double mapY, Country language, Area area, ContentType contentType, boolean hasExotic, boolean hasHealing, boolean hasTraditional, boolean hasActive, boolean searchByTitle, boolean searchByOverview, TourPostSort sort){
-        //ElasticsearchClient client = ElasticSearchClientBuilder.build();
 
         BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
         List<SortOptions> sortOptions = new ArrayList<>();
