@@ -1,4 +1,4 @@
-package team.klover.server.global.elasticsearch.tourpost.rabbitmq.message;
+package team.klover.server.global.elasticsearch.tourpost.springevent.message;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

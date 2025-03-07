@@ -31,7 +31,6 @@ public class CommPostDocService {
     //mapX: longitude(경도, lon), mapY: latitude(위도, lat)
     @SneakyThrows
     public Page<CommPostDto> search(String keyword, Pageable pageable, Double mapX, Double mapY, Country language, boolean searchByContent, boolean searchByNickname, CommPostSort sort){
-//        ElasticsearchClient client = ElasticSearchClientBuilder.build();
 
         BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
         List<SortOptions> sortOptions = new ArrayList<>();
