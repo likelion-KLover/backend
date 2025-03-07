@@ -1,6 +1,5 @@
 package team.klover.server.domain.notification.eventListener;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
@@ -22,13 +21,13 @@ public class CommentEventListener {
     private final RabbitMQProducer producer;
 
     @EventListener
-    public void handleCommentCreatedEvent(CommentCreatedEvent event) throws JsonProcessingException {
+    public void handleCommentCreatedEvent(CommentCreatedEvent event) {
         NotificationMessage message = createCommentCreatedMessage(event);
         producer.sendNotification(QueueNames.COMMENT_NOTIFICATION.name(), message);
     }
 
     @EventListener
-    public void handleCommentLikedEvent(CommentLikedEvent event) throws JsonProcessingException {
+    public void handleCommentLikedEvent(CommentLikedEvent event) {
         NotificationMessage message = createCommentLikedMessage(event);
         producer.sendNotification(QueueNames.COMMENT_NOTIFICATION.name(), message);
     }
@@ -46,7 +45,7 @@ public class CommentEventListener {
         message.addCustomField(CustomFieldKey.RECEIVER_NICKNAME, event.getCommPost().getMember().getNickname());
         message.addCustomField(CustomFieldKey.RECEIVER_ID, event.getCommPost().getMember().getId());
         message.addCustomField(CustomFieldKey.ACTOR_NICKNAME, event.getComment().getMember().getNickname());
-
+        message.addCustomField(CustomFieldKey.RECEIVER_COUNTRY, event.getCommPost().getMember().getCountry().name());
         return message;
     }
 
@@ -63,7 +62,7 @@ public class CommentEventListener {
         message.addCustomField(CustomFieldKey.RECEIVER_NICKNAME, event.getComment().getMember().getNickname());
         message.addCustomField(CustomFieldKey.RECEIVER_ID, event.getComment().getMember().getId());
         message.addCustomField(CustomFieldKey.ACTOR_NICKNAME, event.getMember().getNickname());
-
+        message.addCustomField(CustomFieldKey.RECEIVER_COUNTRY, event.getComment().getMember().getCountry().name());
         return message;
     }
 }
