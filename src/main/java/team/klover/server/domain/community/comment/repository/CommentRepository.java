@@ -30,4 +30,10 @@ select count(c) from Comment c
 where c.commPost.id = :commPostId
 """)
     long countCommPostComment(@Param("commPostId")Long commPostId);
+
+    @Query("""
+select c.commPost from Comment c
+where c.id in :commentsId
+""")
+    List<CommPost> getAllCommPostIdsInComments(@Param("commentsId") List<Long> commentsId);
 }

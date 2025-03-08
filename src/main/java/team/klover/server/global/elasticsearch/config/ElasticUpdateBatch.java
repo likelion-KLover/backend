@@ -34,7 +34,7 @@ public class ElasticUpdateBatch {
     private final ElasticsearchClient client;
 
     @SneakyThrows
-    @Scheduled(fixedRate = 10000)
+    @Scheduled(fixedRate = 30*1000)
     public void bulkUpdate(){
 
         Map<Long, Object> commPostDeletionTarget = redisService.getALLCommPostDeletion();
@@ -112,9 +112,6 @@ public class ElasticUpdateBatch {
                     v.remove("mapx");
                     v.remove("mapy");
 
-                    v.forEach((field,value)->{
-                        System.out.println("게시글 수정 키:"+field+", 값:"+value);
-                    });
 
                     String finalIndex = index;
                     bqb.operations(bo->
@@ -163,7 +160,7 @@ public class ElasticUpdateBatch {
                                         .source(src->src.filter(f->f.includes("language")))   // _source 필드 제외
                                         .storedFields("_id")
                         );
-                        System.out.println("search query:"+sq);
+
                         SearchResponse<JsonData> korResp = client.search(
                                 SearchRequest.of(
                                         s->s.index("commpostkor")
@@ -206,7 +203,6 @@ public class ElasticUpdateBatch {
                                 hit-> {
                                     String id = hit.id();
                                     Object language = Objects.requireNonNull(hit.source()).toJson().asJsonObject().get("language").toString();
-                                    System.out.println("language:"+language);
                                     ids.put(id, language);
                                 }
                         );
@@ -284,7 +280,6 @@ public class ElasticUpdateBatch {
 
 
         BulkRequest bq = bqb.build();
-        System.out.println(bq.toString());
         BulkResponse bulkResponse = client.bulk(bq);
 
 
