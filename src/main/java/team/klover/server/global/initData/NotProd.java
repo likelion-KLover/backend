@@ -76,6 +76,15 @@ public class NotProd {
 
 
 
+                for(int i=0;i<3;i++){
+                    authV1Service.signup(SignupRequestDto.builder()
+                            .email("test"+(i+1)+"@test.com")
+                            .nickname("test"+(i+1))
+                            .password("1234")
+                            .build()
+                    );
+                }
+
 
                 /*
 
@@ -247,6 +256,9 @@ public class NotProd {
 
                  */
 
+
+//                ****** 개발중에는 사용 비추천(TourPost상세정보를 가져오기 위해 하루 약 1천건(최대치)의 API요청을 보내는 메서드) *****
+//                apisScheduler.getDetailApisApiData();
             }
         };
     }

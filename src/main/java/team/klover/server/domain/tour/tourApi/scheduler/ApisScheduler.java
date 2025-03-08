@@ -31,6 +31,7 @@ public class ApisScheduler {
     @Value("${apis.api.service-key}")
     private String serviceKeyForApis;
 
+    // TourApi 기본 데이터 요청 및 저장
     @Scheduled(cron = "${schedule.cron_for_apis}")
     public void getApisApiData() {
         if(useSchedule) {
@@ -109,55 +110,82 @@ public class ApisScheduler {
                 log.error("Apis 관광지 ASC 정렬 중 에러 발생", e);
             }
             log.info("기본 관광지 데이터 정렬 완료");
-
-//            // 관광지별 개요 데이터 추가를 위해 관광지별 고유 ID 가져오기
-//            List<Long> contentIdList = tourApiService.getAllContentIds();
-//
-//            // 관광지별 개요&홈페이지 데이터 추가 및 저장
-//            for(Long contentId : contentIdList) {
-//                for(String language : languageList) {
-//                    try {
-//                        String apiUrl = String.format(
-//                                "https://apis.data.go.kr/B551011/%s/detailCommon1?pageNo=%d&numOfRows=%d&MobileOS=%s" +
-//                                        "&MobileApp=%s&contentId=%s&serviceKey=%s&_type=json&defaultYN=Y&firstImageYN=N" +
-//                                        "&areacodeYN=N&catcodeYN=N&addrinfoYN=N&mapinfoYN=N&overviewYN=Y&transGuideYN=N",
-//                                language, pageNo, numOfRows, mobileOS, mobileApp, contentId, serviceKeyForApis
-//                        );
-//
-//                        URL url = new URL(apiUrl);
-//                        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-//                        connection.setRequestMethod("GET");
-//                        connection.setRequestProperty("Content-Type", "application/json");
-//                        connection.setRequestProperty("Accept", "application/json");
-//
-//                        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
-//                        StringBuilder responseBuilder = new StringBuilder();
-//                        String line;
-//                        while ((line = reader.readLine()) != null) {
-//                            responseBuilder.append(line);
-//                        }
-//                        reader.close();
-//                        String response = responseBuilder.toString();
-//
-//                        if (response.trim().startsWith("<?xml")) {
-//                            response = response.replaceAll("<\\?xml[^>]*>", "").trim();
-//                        }
-//
-//                        if (response.startsWith("{")) {
-//                            try {
-//                                apiService.addOverview(response);
-//                            } catch (Exception e) {
-//                                log.error("Apis Scheduler 개요 데이터 저장 중 에러 발생", e);
-//                            }
-//                        } else {
-//                            log.error("예상치 못한 응답 형식(개요 데이터): {}", response);
-//                        }
-//                    } catch (Exception e) {
-//                        log.error("Apis API 개요 데이터 호출 중 에러 발생", e);
-//                    }
-//                }
-//            }
             log.info("Apis스케쥴러 종료");
+        }
+    }
+
+    // TourApi 상세 데이터 요청 및 저장
+    public void getDetailApisApiData() {
+        if(useSchedule){
+            int pageNo = 1;
+            int numOfRows = 60000;
+            String mobileOS = "ETC";   // OS구분
+            String mobileApp = "Klover";// 서비스명
+            List<String> languageList = Arrays.asList("KorService1", "EngService1", "JpnService1", "ChsService1"); // 언어 선택
+
+            // 관광지별 개요 데이터 추가를 위해 관광지별 고유 ID 가져오기
+            List<Long> contentIdList = tourApiService.getAllContentIds();
+
+            // 최대 1500개의 요청만 수행
+            int maxRequests = Math.min(1100, contentIdList.size());
+            int requestCount = 0;
+
+            // 관광지별 개요&홈페이지 데이터 추가 및 저장
+            for(Long contentId : contentIdList) {
+                if (requestCount >= maxRequests) {
+                    break; // 1500개 요청을 초과하면 종료
+                }
+
+                for(String language : languageList) {
+                    try {
+                        String apiUrl = String.format(
+                                "https://apis.data.go.kr/B551011/%s/detailCommon1?pageNo=%d&numOfRows=%d&MobileOS=%s" +
+                                        "&MobileApp=%s&contentId=%s&serviceKey=%s&_type=json&defaultYN=Y&firstImageYN=N" +
+                                        "&areacodeYN=N&catcodeYN=N&addrinfoYN=N&mapinfoYN=N&overviewYN=Y",
+                                language, pageNo, numOfRows, mobileOS, mobileApp, contentId, serviceKeyForApis
+                        );
+
+                        URL url = new URL(apiUrl);
+                        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                        connection.setRequestMethod("GET");
+                        connection.setRequestProperty("Content-Type", "application/json");
+                        connection.setRequestProperty("Accept", "application/json");
+
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
+                        StringBuilder responseBuilder = new StringBuilder();
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+                            responseBuilder.append(line);
+                        }
+                        reader.close();
+                        String response = responseBuilder.toString();
+
+                        if (response.trim().startsWith("<?xml")) {
+                            response = response.replaceAll("<\\?xml[^>]*>", "").trim();
+                        }
+
+                        if (response.startsWith("{")) {
+                            try {
+                                tourApiService.addOverview(response);
+                            } catch (Exception e) {
+                                log.error("Apis Scheduler 개요 데이터 저장 중 에러 발생", e);
+                            }
+                        } else {
+                            log.error("예상치 못한 응답 형식(개요 데이터): {}", response);
+                        }
+                    } catch (Exception e) {
+                        log.error("Apis API 개요 데이터 호출 중 에러 발생", e);
+                    }
+                }
+                requestCount++; // 요청 개수 증가
+            }
+            log.info("Fetched contentIdList (size: {})", maxRequests);
+            try {
+                tourApiService.sortAsc();
+            } catch (Exception e) {
+                log.error("Apis 관광지 ASC 정렬 중 에러 발생", e);
+            }
+            log.info("DetailApis스케쥴러 종료");
         }
     }
 }

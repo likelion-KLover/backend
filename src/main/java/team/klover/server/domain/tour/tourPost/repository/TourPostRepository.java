@@ -18,7 +18,7 @@ public interface TourPostRepository extends JpaRepository<TourPost, Long> {
     void deleteByCat3NotIn(List<String> cat3List);
 
     // 관광지별 개요 데이터 추가를 위해 관광지별 고유 ID 가져오기
-    @Query("SELECT p.contentId FROM TourPost p")
+    @Query("SELECT p.contentId FROM TourPost p WHERE (p.homepage IS NULL OR p.homepage = '') AND (p.overview IS NULL OR p.overview = '')")
     List<Long> findAllContentIds();
 
     // 관광지별 고유 ID로 해당 관광지 데이터 가져오기

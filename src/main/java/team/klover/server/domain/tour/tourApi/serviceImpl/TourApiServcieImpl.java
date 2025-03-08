@@ -135,24 +135,25 @@ public class TourApiServcieImpl implements TourApiService {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode root = objectMapper.readTree(jsonResponse);
-            JsonNode item = root.path("response").path("body").path("items").path("item");
+            JsonNode items = root.path("response").path("body").path("items").path("item");
 
-            // JSON 응답에서 contentId, overview, homepage 추출
-            Long contentId = item.path("contentid").asLong();
-            String overview = item.path("overview").asText();
-            String homepage = item.path("homepage").asText();
+            for (JsonNode item : items) {
+                // JSON 응답에서 contentId, overview, homepage 추출
+                Long contentId = item.path("contentid").asLong();
+                String overview = item.path("overview").asText();
+                String homepage = item.path("homepage").asText();
 
-            // 해당 contentId를 가진 Post 엔터티 조회
-            TourPost tourPost = tourPostRepository.findByContentId(contentId);
-            if (tourPost != null) {
-                // overview, homepage 필드 업데이트
-                tourPost.setOverview(overview);
-                tourPost.setHomepage(homepage);
-                // 변경 사항 저장
-                tourPostRepository.save(tourPost);
-                log.info("contentId = {} 개요를 업데이트했습니다. 개요: {}", contentId, overview);
-            } else {
-                log.warn("contentId = {} 에 해당하는 게시물을 찾을 수 없습니다.", contentId);
+                // 해당 contentId를 가진 Post 엔터티 조회
+                TourPost tourPost = tourPostRepository.findByContentId(contentId);
+                if (tourPost != null) {
+                    tourPost.setOverview(overview);
+                    tourPost.setHomepage(homepage);
+                    tourPostRepository.save(tourPost);
+                    log.info("contentId = {} 개요를 업데이트했습니다.", contentId);
+                    log.info("contentId = {} 홈페이지를 업데이트했습니다.", contentId);
+                } else {
+                    log.warn("contentId = {} 에 해당하는 게시물을 찾을 수 없습니다.", contentId);
+                }
             }
         } catch (Exception e) {
             log.error("addOverview 처리 중 오류 발생", e);
