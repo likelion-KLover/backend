@@ -24,7 +24,6 @@ import team.klover.server.domain.member.v1.repository.MemberV1Repository;
 import team.klover.server.global.elasticsearch.commpost.springevent.event.CommPostCountEvent;
 import team.klover.server.global.exception.KloverRequestException;
 import team.klover.server.global.exception.ReturnCode;
-
 import java.util.List;
 
 @Slf4j

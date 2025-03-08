@@ -48,6 +48,7 @@ import team.klover.server.global.exception.KloverException;
 import team.klover.server.global.exception.KloverLogicException;
 import team.klover.server.global.exception.KloverRequestException;
 import team.klover.server.global.exception.ReturnCode;
+import team.klover.server.global.jpa.BaseEntity;
 import team.klover.server.global.s3.S3Service;
 
 import java.io.IOException;
@@ -154,14 +155,14 @@ public class MemberV1Service {
         enteredChatRoom.forEach(chatRoomMember -> chatRoomService.leaveChatRoomMember(chatRoomMember.getChatRoom().getId(),memberId));
 
         //댓글 처리
-        Set<CommPost> updateList = new HashSet<>();
         List<CommentLike> commentLikes = commentLikeRepository.findAllByMember(member);
-        List<Comment> comments = commentRepository.findAllByMember(member);
         commentLikes.forEach(commentLike -> commentService.deleteCommentLike(memberId,commentLike.getId()));
-        comments.forEach(comment -> {
-            updateList.add(comment.getCommPost());
-            commentService.deleteComment(memberId,comment.getId());
-        });
+
+        List<Comment> comments = commentRepository.findAllByMember(member);
+        List<Long> commentsId = comments.stream().map(BaseEntity::getId).toList();
+        List<CommPost> updateList = commentRepository.getAllCommPostIdsInComments(commentsId);
+
+        comments.forEach(comment -> commentService.deleteComment(memberId, comment.getId()));
 
         if(!updateList.isEmpty()){
             updateList.forEach(commPost -> {
@@ -221,6 +222,7 @@ public class MemberV1Service {
         if(member.getProfileUrl()!=null) {
             s3Service.deleteFile(member.getProfileUrl());
         }
+
         memberRepository.deleteById(memberId);
     }
 

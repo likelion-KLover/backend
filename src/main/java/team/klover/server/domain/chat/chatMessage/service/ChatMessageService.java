@@ -1,12 +1,10 @@
 package team.klover.server.domain.chat.chatMessage.service;
 
-import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 import team.klover.server.domain.chat.chatMessage.dto.req.ChatMessageForm;
 import team.klover.server.domain.chat.chatMessage.dto.res.ChatMessageDto;
-
 import java.util.List;
 
 public interface ChatMessageService {
@@ -27,4 +25,5 @@ public interface ChatMessageService {
 
     // 해당 채팅방의 메시지 실시간 조회 중단
     void updateLastReadMessage(Long currentMemberId, Long chatRoomId);
+
 }

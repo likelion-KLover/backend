@@ -74,7 +74,6 @@ public class RedisService {
 
     public void saveCommPostCountMessage(CommPostCountMessage message) {
         String key = ES_COMMPOST_PREFIX+message.getId()+ES_COMMPOST_COUNT_POSTFIX;
-        System.out.println("저장한 키:"+key);
         String lockKey = key+":lock";
         RLock lock = redissonClient.getLock(lockKey); // Redisson의 분산 락
 
@@ -110,7 +109,6 @@ public class RedisService {
         keys.forEach(
                 key -> {
                     String idStr = key.split(":")[1];
-                    System.out.println("카운트 이벤트 키:"+key);
                     result.put(Long.parseLong(idStr),getCommPostCountLanguage(key));
                 }
         );
@@ -193,7 +191,6 @@ public class RedisService {
         keys.forEach(
                 key -> {
                     String idStr = key.split(":")[1];
-                    System.out.println("count key:"+key);
                     result.put(Long.parseLong(idStr),getCommPostModification(key));
                 }
         );
