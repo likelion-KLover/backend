@@ -1,6 +1,7 @@
 package team.klover.server.domain.tour.tourPost.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.CreatedDate;
@@ -27,14 +28,22 @@ public class TourPost {
     private String sigungucode;
     private String addr1;
     private String firstImage;
+
+    @Column(length = 3000)
+    @Size(max = 3000)
     private String homepage;
+
     private String contentTypeId;
     private Double mapX;
     private Double mapY;
     private String cat1;
     private String cat2;
     private String cat3;
+
+    @Column(length = 3000)
+    @Size(max = 3000)
     private String overview;
+
     private String cpyrhtDivCd;
     private String language;
 

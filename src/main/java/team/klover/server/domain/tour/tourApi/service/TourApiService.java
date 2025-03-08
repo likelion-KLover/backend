@@ -15,7 +15,7 @@ public interface TourApiService {
     // contentId 기준으로 오름차순 정렬
     void sortAsc();
 
-    // 관광지별 개요 데이터 추가를 위해 관광지별 고유 ID 가져오기
+    // 관광지별 개요 데이터 추가를 위해 관광지별 고유 ID 가져오기(홈패이지주소&개요 모두 없는 데이터만)
     List<Long> getAllContentIds();
 
     // 관광지별 개요 데이터 추가 및 저장

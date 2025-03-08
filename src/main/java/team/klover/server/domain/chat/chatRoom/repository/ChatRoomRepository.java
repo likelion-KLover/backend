@@ -33,13 +33,18 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
 
     // 사용자가 참여 중인 채팅방 목록을 최신 메시지 순으로 조회
     @Query("""
-    SELECT cr FROM ChatRoom cr
+    SELECT cr 
+    FROM ChatRoom cr
     JOIN cr.chatRoomMembers crm
     LEFT JOIN ChatMessage cm ON cm.chatRoom = cr
     WHERE crm.member = :member
+    AND (
+        (SELECT COUNT(c) FROM ChatRoomMember c WHERE c.chatRoom = cr) > 2 
+        OR (SELECT COUNT(cm2) FROM ChatMessage cm2 WHERE cm2.chatRoom = cr) > 0
+    )
     GROUP BY cr, crm
     ORDER BY COALESCE(MAX(cm.createDate), cr.createDate) DESC
-    """)
+""")
     Page<ChatRoom> findChatRoomsByMemberOrderByLatestMessage(@Param("member") Member member, Pageable pageable);
 
     List<ChatRoom> findAllByMember(Member member);
