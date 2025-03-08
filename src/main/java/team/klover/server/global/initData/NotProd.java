@@ -76,14 +76,14 @@ public class NotProd {
 
 
 
-                for(int i=0;i<3;i++){
-                    authV1Service.signup(SignupRequestDto.builder()
-                            .email("test"+(i+1)+"@test.com")
-                            .nickname("test"+(i+1))
-                            .password("1234")
-                            .build()
-                    );
-                }
+//                for(int i=0;i<3;i++){
+//                    authV1Service.signup(SignupRequestDto.builder()
+//                            .email("test"+(i+1)+"@test.com")
+//                            .nickname("test"+(i+1))
+//                            .password("1234")
+//                            .build()
+//                    );
+//                }
 
 
                 /*

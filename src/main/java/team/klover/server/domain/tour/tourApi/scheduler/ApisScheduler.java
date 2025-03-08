@@ -123,10 +123,16 @@ public class ApisScheduler {
             String mobileApp = "Klover";// 서비스명
             List<String> languageList = Arrays.asList("KorService1", "EngService1", "JpnService1", "ChsService1"); // 언어 선택
 
-            // 관광지별 개요 데이터 추가를 위해 관광지별 고유 ID 가져오기
+            // 관광지별 개요 데이터 추가를 위해 관광지별 고유 ID 가져오기(홈패이지주소&개요 모두 없는 데이터만)
             List<Long> contentIdList = tourApiService.getAllContentIds();
 
-            // 최대 1500개의 요청만 수행
+            // contentIdList가 비어 있으면 메서드 종료
+            if (contentIdList.isEmpty()) {
+                log.info("No content IDs found. Exiting method.");
+                return;
+            }
+
+            // 최대 1100개의 요청만 수행
             int maxRequests = Math.min(1100, contentIdList.size());
             int requestCount = 0;
 
