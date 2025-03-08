@@ -5,7 +5,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import team.klover.server.domain.chat.chatRoom.dto.req.ChatRoomForm;
 import team.klover.server.domain.chat.chatRoom.dto.res.ChatRoomDto;
-import team.klover.server.domain.member.v1.entity.Member;
 
 public interface ChatRoomService {
     // 채팅방 목록 조회(DM/그룹)

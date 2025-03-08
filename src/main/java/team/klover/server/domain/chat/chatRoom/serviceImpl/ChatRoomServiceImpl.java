@@ -14,7 +14,6 @@ import team.klover.server.domain.chat.chatRoom.dto.res.MemberInfoDto;
 import team.klover.server.domain.chat.chatRoom.entity.ChatRoom;
 import team.klover.server.domain.chat.chatRoom.entity.ChatRoomMember;
 import team.klover.server.domain.chat.chatRoom.entity.ChatRoomPage;
-import team.klover.server.domain.chat.chatRoom.repository.ChatRoomMemberRepository;
 import team.klover.server.domain.chat.chatRoom.repository.ChatRoomRepository;
 import team.klover.server.domain.chat.chatRoom.service.ChatRoomService;
 import team.klover.server.domain.member.v1.entity.Member;
@@ -35,7 +34,6 @@ public class ChatRoomServiceImpl implements ChatRoomService {
     private final ChatRoomRepository chatRoomRepository;
     private final MemberV1Repository memberV1Repository;
     private final ChatMessageService chatMessageService;
-    private final ChatRoomMemberRepository chatRoomMemberRepository;
 
     // 채팅방 목록 조회(DM/그룹)
     @Override
