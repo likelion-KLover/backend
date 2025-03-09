@@ -32,7 +32,7 @@ public class ApisScheduler {
     private String serviceKeyForApis;
 
     // TourApi 기본 데이터 요청 및 저장
-    @Scheduled(cron = "${schedule.cron_for_apis}")
+//    @Scheduled(cron = "${schedule.cron_for_apis}")
     public void getApisApiData() {
         if(useSchedule) {
             log.info("Apis스케쥴러 실행");
@@ -115,6 +115,7 @@ public class ApisScheduler {
     }
 
     // TourApi 상세 데이터 요청 및 저장
+//    @Scheduled(cron = "${schedule.cron_for_apis}")
     public void getDetailApisApiData() {
         if(useSchedule){
             int pageNo = 1;
