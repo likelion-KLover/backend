@@ -57,7 +57,7 @@ public class AuthV1Controller {
 ///api/v1/auth/signup
     @PostMapping("/signup")
     @Operation(summary="백엔드 서버 자체 회원가입")
-            public ApiResponse<LoginResponse> signup(@RequestBody SignupRequestDto requestDto) {
+    public ApiResponse signup(@RequestBody SignupRequestDto requestDto) {
         Member member = authService.signup(requestDto);
         return ApiResponse.of(ReturnCode.SUCCESS);
 
@@ -91,19 +91,17 @@ public class AuthV1Controller {
     @PostMapping("/logout")
     @Operation(summary="로그아웃")
     public ApiResponse logout(HttpServletRequest request,
-                                 HttpServletResponse response,
-                                 @RequestBody RefreshRequest refreshRequest) {
+                                 HttpServletResponse response) {
         // 1. Spring Security Context Logout 처리
 
         Authentication authentication = AuthUtil.getAuthentication();
-        if (authentication == null) {
-            throw new KloverRequestException(ReturnCode.NOT_AUTHORIZED);
+        if (authentication != null) {
+            new SecurityContextLogoutHandler().logout(request, response, authentication);
         }
 
-        new SecurityContextLogoutHandler().logout(request, response, authentication);
 
         //3. RefreshToken 삭제 - 앱
-        String refreshToken = refreshRequest.getRefreshToken();
+        String refreshToken = request.getHeader("X-Refresh-Token");
         if (refreshToken == null) {
             throw new KloverRequestException(ReturnCode.INVALID_REQUEST);
         }
@@ -115,13 +113,13 @@ public class AuthV1Controller {
         }
 
         String redisToken = redisService.getRefreshToken(emailFromToken);
-        redisService.deleteRefreshToken(emailFromToken);
 
-        //어쨌든 변조된 걸 지운 후에 이상하다고 오류를 내야하기 때문
+        //엄한 회원의 리프레시 토큰을 삭제할 우려가 있으므로
         if(!redisToken.equals(refreshToken)) {
             throw new KloverRequestException(ReturnCode.INVALID_REQUEST);
         }
 
+        redisService.deleteRefreshToken(emailFromToken);
 
         return ApiResponse.of(ReturnCode.SUCCESS);
     }
@@ -135,9 +133,9 @@ public class AuthV1Controller {
 
     @PostMapping("/refresh")
     @Operation(summary="엑세스토큰 재발급")
-    public ApiResponse<RefreshResponse> refresh(@RequestBody RefreshRequest refreshRequest) {
+    public ApiResponse<RefreshResponse> refresh(HttpServletRequest request) {
 
-        String refreshToken = refreshRequest.getRefreshToken();
+        String refreshToken = request.getHeader("X-Refresh-Token");
         if (refreshToken == null) {
             throw new KloverRequestException(ReturnCode.INVALID_REQUEST);
         }

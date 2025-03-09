@@ -43,7 +43,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 || path.startsWith("/oauth2/")
                 || path.startsWith("/api/v1/auth/google")
                 || path.startsWith("/api/v1/auth/line")
-                || path.startsWith("/api/v1/auth/logout")
                 || path.startsWith("/api/v1/auth/refresh")
                 || path.startsWith("/v1/api-docs")
                 || path.startsWith("/v1/api-docs/swagger-config")

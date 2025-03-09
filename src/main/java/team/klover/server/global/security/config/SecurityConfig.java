@@ -54,7 +54,6 @@ public class SecurityConfig {
                                 "/h2-console",
                                 "/h2-console/**",
                                 "/api/v1/auth/google",
-                                "/api/v1/auth/logout",
                                 "/api/v1/auth/refresh",
                                 "/api/v1/auth/line",
                                 "/api/v1/tour-post/**",
