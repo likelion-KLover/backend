@@ -1,6 +1,5 @@
 server:
   port: 8080
-  timezone: Asia/Seoul
 spring:
   messages:
     basename: locales/messages
