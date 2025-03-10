@@ -172,7 +172,7 @@ public class ApiV1CommPostController {
             throw new KloverRequestException(ReturnCode.WRONG_PARAMETER);
         }
 
-        if(sort.equals(CommPostSort.DISTANCE) && (mapX ==null || mapY==null)){
+        if(sort!=null && sort.equals(CommPostSort.DISTANCE) && (mapX ==null || mapY==null)){
             throw new KloverRequestException(ReturnCode.WRONG_PARAMETER);
         }
 

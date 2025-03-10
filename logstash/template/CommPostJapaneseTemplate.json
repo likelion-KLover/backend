@@ -1,6 +1,6 @@
 {
   "index_patterns": [
-    "commpostjpn*"
+    "commpostjpn"
   ],
   "template": {
     "settings": {

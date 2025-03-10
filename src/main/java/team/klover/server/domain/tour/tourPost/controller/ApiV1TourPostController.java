@@ -113,7 +113,7 @@ public class ApiV1TourPostController {
                                          @RequestParam(value = "mapY", required = false) Double mapY){
         if(page<0 || size<=0) throw new KloverRequestException(ReturnCode.WRONG_PARAMETER);
 
-        if(sort.equals(TourPostSort.DISTANCE) && (mapX == null || mapY == null)){
+        if(sort!=null && sort.equals(TourPostSort.DISTANCE) && (mapX == null || mapY == null)){
             throw new KloverRequestException(ReturnCode.WRONG_PARAMETER);
         }
 
