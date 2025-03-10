@@ -166,8 +166,8 @@ public class ApiV1CommPostController {
                                                @RequestParam(value = "language")Country language,
                                                @RequestParam(value = "content", defaultValue = "false") boolean searchByContent,
                                                @RequestParam(value = "nickname", defaultValue = "false") boolean searchByNickname,
-                                               @RequestParam(value = "mapX") Double mapX,
-                                               @RequestParam(value = "mapY") Double mapY){
+                                               @RequestParam(value = "mapX", required = false) Double mapX,
+                                               @RequestParam(value = "mapY", required = false) Double mapY){
         if(page < 0 || size <= 0){
             throw new KloverRequestException(ReturnCode.WRONG_PARAMETER);
         }
