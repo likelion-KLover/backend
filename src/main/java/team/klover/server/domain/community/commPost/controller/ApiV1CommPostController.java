@@ -172,6 +172,10 @@ public class ApiV1CommPostController {
             throw new KloverRequestException(ReturnCode.WRONG_PARAMETER);
         }
 
+        if(sort.equals(CommPostSort.DISTANCE) && (mapX ==null || mapY==null)){
+            throw new KloverRequestException(ReturnCode.WRONG_PARAMETER);
+        }
+
         Pageable pageable = PageRequest.of(page, size);
         //둘 중 하나라도 true가 아니고 keyword가 안 비었다면
         if(!(searchByContent || searchByNickname) && keyword !=null && !keyword.isBlank()) searchByContent = true;
