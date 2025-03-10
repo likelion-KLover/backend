@@ -109,9 +109,13 @@ public class ApiV1TourPostController {
                                          @RequestParam(value = "healing", defaultValue = "false") boolean hasHealing,
                                          @RequestParam(value = "active", defaultValue = "false") boolean hasActive,
                                          @RequestParam(value = "traditional", defaultValue = "false") boolean hasTraditional,
-                                         @RequestParam(value = "mapX") Double mapX,
-                                         @RequestParam(value = "mapY") Double mapY){
+                                         @RequestParam(value = "mapX", required = false) Double mapX,
+                                         @RequestParam(value = "mapY", required = false) Double mapY){
         if(page<0 || size<=0) throw new KloverRequestException(ReturnCode.WRONG_PARAMETER);
+
+        if(sort.equals(TourPostSort.DISTANCE) && (mapX == null || mapY == null)){
+            throw new KloverRequestException(ReturnCode.WRONG_PARAMETER);
+        }
 
         //둘 중 하나라도 true가 아니고 keyword가 안 비었다면
         if(!(searchByTitle || searchByOverview) && keyword !=null && !keyword.isBlank()) searchByTitle = true;
