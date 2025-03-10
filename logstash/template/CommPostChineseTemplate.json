@@ -1,11 +1,11 @@
 {
   "index_patterns": [
-    "commpostchs*"
+    "commpostchs"
   ],
   "template": {
     "settings": {
       "index" : {
-        "max_ngram_diff": 4
+        "max_ngram_diff": 10
       },
       "analysis": {
         "char_filter": {

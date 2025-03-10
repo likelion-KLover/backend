@@ -1,5 +1,5 @@
 {
-  "index_patterns": ["tourpostchs*"],
+  "index_patterns": ["tourpostchs"],
   "template": {
     "settings": {
       "index" : {

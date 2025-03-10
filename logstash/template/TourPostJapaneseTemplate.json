@@ -1,5 +1,5 @@
 {
-  "index_patterns": ["tourpostjpn*"],
+  "index_patterns": ["tourpostjpn"],
   "template": {
     "settings": {
       "index" : {
