@@ -150,19 +150,19 @@ public class TourPostDocService {
         switch (language) {
             case KO -> {
                 index="tourpostkor";
-                minScore=!keyword.isBlank()?13.0:0;
+                minScore=!keyword.isBlank()?6.5:0;
             }
             case JA -> {
                 index="tourpostjpn";
-                minScore=!keyword.isBlank()?10.0:0;
+                minScore=!keyword.isBlank()?5.0:0;
             }
             case ZH -> {
                 index="tourpostchs";
-                minScore=!keyword.isBlank()?20.0:0;
+                minScore=!keyword.isBlank()?10.0:0;
             }
             default -> {
                 index="tourposteng";
-                minScore=!keyword.isBlank()?8.0:0;
+                minScore=!keyword.isBlank()?4.0:0;
             }
         }
 
