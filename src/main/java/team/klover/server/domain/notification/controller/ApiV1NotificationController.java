@@ -19,7 +19,7 @@ import team.klover.server.global.redis.RedisService;
 import java.util.List;
 
 @RestController
-@Tag(name = "ApiV1CommentController", description = "Comment API")
+@Tag(name = "ApiV1NotificationController", description = "Notification API")
 @RequestMapping("/api/v1/notification")
 @RequiredArgsConstructor
 public class ApiV1NotificationController {
