@@ -48,6 +48,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 || path.startsWith("/v1/api-docs/swagger-config")
                 || path.startsWith("/swagger-ui")
                 || path.startsWith("/api/v1/translate")
+                || (path.startsWith("/api/v1/notification"))
                 || (path.startsWith("/api/v1/comm-post/comment") && method.equals("GET"))
                 || (path.startsWith("/api/v1/comm-post/surroundings") && method.equals("GET"))
                 || (path.startsWith("/api/v1/comm-post/detail") && method.equals("GET"))
@@ -70,9 +71,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             return;
         }
 
-        try{
+        try {
             jwtTokenProvider.decodeToken(token);
-        } catch (JwtException jwtException){
+        } catch (JwtException jwtException) {
             log.warn("유효하지 않은 Access Token 토큰입니다.");
 
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);

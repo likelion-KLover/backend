@@ -7,6 +7,7 @@ import org.springframework.data.redis.core.Cursor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ScanOptions;
 import org.springframework.stereotype.Service;
+import team.klover.server.domain.member.v1.service.MemberV1Service;
 import team.klover.server.domain.notification.dto.FCMTokenParam;
 import team.klover.server.global.elasticsearch.commpost.springevent.message.CommPostCountMessage;
 import team.klover.server.global.elasticsearch.commpost.springevent.message.CommPostDeletionMessage;
@@ -15,7 +16,10 @@ import team.klover.server.global.elasticsearch.commpost.springevent.message.Nick
 import team.klover.server.global.elasticsearch.tourpost.springevent.message.TourPostCountMessage;
 
 import java.time.Duration;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -27,6 +31,7 @@ public class RedisService {
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final RedissonClient redissonClient;
+    private final MemberV1Service memberV1Service;
 
     public void saveRefreshToken(String email, String refreshToken) {
         redisTemplate.opsForValue().set(email, refreshToken, 7, TimeUnit.DAYS); // RefreshToken 만료 시간과 동일하게 설정
@@ -41,16 +46,19 @@ public class RedisService {
     }
 
     public void saveOrUpdateFCMToken(FCMTokenParam param) {
+        memberV1Service.getMemberById(param.getMemberId());
         String key = TOKEN_KEY_PREFIX + param.getMemberId();
         redisTemplate.opsForValue().set(key, param.getFcmToken(), TOKEN_TIMEOUT, TimeUnit.DAYS); // refreshToken과 맞춤
     }
 
     public String getFCMToken(Long memberId) {
+        memberV1Service.getMemberById(memberId);
         String key = TOKEN_KEY_PREFIX + memberId;
         return (String) redisTemplate.opsForValue().get(key);
     }
 
     public void saveFCMMessage(Long memberId, String serializedNotification) {
+        memberV1Service.getMemberById(memberId);
         String key = MESSAGE_LIST_PREFIX + memberId;
 
         redisTemplate.opsForList().leftPush(key, serializedNotification);
@@ -60,6 +68,7 @@ public class RedisService {
     }
 
     public List<String> getFCMMessages(Long memberId) {
+        memberV1Service.getMemberById(memberId);
         String key = MESSAGE_LIST_PREFIX + memberId;
 
         List<Object> objectList = redisTemplate.opsForList().range(key, 0, -1);

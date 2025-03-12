@@ -24,7 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ApiV1NotificationController {
 
-    private RedisService redisService;
+    private final RedisService redisService;
 
     @Data
     private static class NotificationRequest {
