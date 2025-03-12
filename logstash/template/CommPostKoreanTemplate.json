@@ -23,6 +23,11 @@
           "nori_none": {
             "type": "nori_tokenizer",
             "decompound_mode": "none"
+          },
+          "fixed_length_tokenizer": {
+            "type": "pattern",
+            "pattern": ".{1,1}",
+            "group": 0
           }
         },
         "analyzer": {
@@ -36,11 +41,8 @@
           },
           "korean_word": {
             "type": "custom",
-            "tokenizer": "nori_mixed",
-            "filter": [
-              "nori_readingform",
-              "nori_stoptags"
-            ]
+            "tokenizer": "fixed_length_tokenizer",
+            "char_filter": ["remove_symbols"]
           },
           "korean_partial": {
             "type": "custom",

@@ -127,18 +127,18 @@ public class ApiV1CommPostController {
     // http://localhost:8080/api/v1/comm-post
     @PostMapping
     @Operation(summary = "게시글 생성")
-    public ApiResponse<String> addCommPost(@RequestPart(value = "commPostForm") @Valid CommPostForm commPostForm,
+    public ApiResponse<CommPostDto> addCommPost(@RequestPart(value = "commPostForm") @Valid CommPostForm commPostForm,
                                            @RequestPart(value = "imageFile") List<MultipartFile> imageFiles) {
         Long currentMemberId = AuthUtil.getCurrentMemberId();
-        commPostService.addCommPost(currentMemberId, commPostForm, imageFiles);
-        return ApiResponse.of(ReturnCode.SUCCESS);
+        CommPostDto dto = commPostService.addCommPost(currentMemberId, commPostForm, imageFiles);
+        return ApiResponse.of(dto);
     }
 
     // 해당 게시글 수정
     // http://localhost:8080/api/v1/comm-post/1
     @PutMapping("/{commPostId}")
     @Operation(summary = "게시글 수정")
-    public ApiResponse<String> updateCommPost(@PathVariable("commPostId") Long commPostId,
+    public ApiResponse updateCommPost(@PathVariable("commPostId") Long commPostId,
                                               @RequestPart(value = "commPostForm") @Valid CommPostForm commPostForm,
                                               @RequestPart(value = "imageFile", required = false) List<MultipartFile> imageFiles) {
         Long currentMemberId = AuthUtil.getCurrentMemberId();

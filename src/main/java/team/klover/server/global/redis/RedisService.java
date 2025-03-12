@@ -172,7 +172,18 @@ public class RedisService {
             value.put("member_id",message.getMember_id());
             value.put("create_date",message.getCreate_date());
             value.put("modify_date",message.getModify_date());
-            value.put("image_urls",message.getImage_urls());
+
+            List<String> imageUrls = message.getImage_urls();
+            StringBuilder sb = new StringBuilder();
+            sb.append("[\"");
+            for(int i=0;i<imageUrls.size();i++){
+                sb.append(imageUrls.get(i)).append("\"");
+                if(i<imageUrls.size()-1){
+                    sb.append(",\"");
+                }
+            }
+            sb.append("]");
+            value.put("image_urls",sb.toString());
 
             redisTemplate.opsForHash().putAll(key, value);
             redisTemplate.expire(key, Duration.ofMinutes(3)); // 3분 만료

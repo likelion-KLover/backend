@@ -170,7 +170,6 @@ public class CommentServiceImpl implements CommentService {
     // Comment를 CommentDto로 변환
     private CommentDto convertToCommentDto(Comment comment) {
         Long currentMemberId = AuthUtil.getCurrentMemberIdRoughly();
-        System.out.println("current Member Id:"+currentMemberId);
         Boolean isLiked = currentMemberId != null && commentLikeRepository.haveLiked(comment.getId(),currentMemberId).isPresent();
         return CommentDto.builder()
                 .id(comment.getId())
