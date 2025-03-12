@@ -12,6 +12,7 @@ import java.util.List;
 @Getter
 @Builder
 public class CommPostDto {
+    private Long id;
     private Long memberId;
     private String nickname;
     private Double mapX;
@@ -20,11 +21,11 @@ public class CommPostDto {
     private LocalDateTime createDate;
 
     public CommPostDto(CommPostDoc commPostDoc){
+        id = commPostDoc.getId();
         memberId = commPostDoc.getMember_id();
         nickname = commPostDoc.getNickname();
         mapX = commPostDoc.getLocation().getLon();
         mapY = commPostDoc.getLocation().getLat();
-        System.out.println(commPostDoc.getImage_urls());
         createDate = commPostDoc.getCreate_date().toLocalDateTime();
 
         if(commPostDoc.getImage_urls() != null){

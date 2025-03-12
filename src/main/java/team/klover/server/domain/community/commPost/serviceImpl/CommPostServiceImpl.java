@@ -19,6 +19,7 @@ import team.klover.server.domain.community.commPost.event.CommPostLikedEvent;
 import team.klover.server.domain.community.commPost.repository.CommPostLikeRepository;
 import team.klover.server.domain.community.commPost.repository.CommPostRepository;
 import team.klover.server.domain.community.commPost.service.CommPostService;
+import team.klover.server.domain.community.comment.repository.CommentRepository;
 import team.klover.server.domain.community.comment.service.CommentService;
 import team.klover.server.domain.member.v1.entity.Member;
 import team.klover.server.domain.member.v1.enums.Country;
@@ -49,6 +50,7 @@ public class CommPostServiceImpl implements CommPostService {
     private final CommentService commentService;
     private final S3Service s3Service;
     private final CommPostLikeRepository commPostLikeRepository;
+    private final CommentRepository commentRepository;
 
     // 사용자 위치 주변 게시글(관광지&사용자) 조회
     public CombinedPostResponse findPostsWithinRadius(@Valid XYForm xyForm, Pageable pageable){
@@ -147,7 +149,6 @@ public class CommPostServiceImpl implements CommPostService {
         // 이벤트 발행 및 생성(알림 + 엘라스틱서치)
         publisher.publishEvent(new CommPostLikedEvent(this, commPost, member));
 
-        long likeCount = commPostLikeRepository.countCommPostLike(id);
         publisher.publishEvent(new CommPostCountEvent(this, commPost));
     }
 
@@ -273,6 +274,7 @@ public class CommPostServiceImpl implements CommPostService {
     // CommPost를 CommPostDto로 변환
     private CommPostDto convertToCommPostDto(CommPost commPost) {
         return CommPostDto.builder()
+                .id(commPost.getId())
                 .memberId(commPost.getMember().getId())
                 .nickname(commPost.getMember().getNickname())
                 .mapX(commPost.getMapX())
@@ -285,9 +287,12 @@ public class CommPostServiceImpl implements CommPostService {
     // CommPost를 DetailCommPostDto로 변환
     private DetailCommPostDto convertToDetailCommPostDto(CommPost commPost) {
         return DetailCommPostDto.builder()
+                .id(commPost.getId())
                 .memberId(commPost.getMember().getId())
+                .profileImageUrl(commPost.getMember().getProfileUrl())
                 .nickname(commPost.getMember().getNickname())
                 .likeCount(commPost.getLikedMembers().size())
+                .commentCount(commentRepository.countCommPostComment(commPost.getId()))
                 .mapX(commPost.getMapX())
                 .mapY(commPost.getMapY())
                 .content(commPost.getContent())
