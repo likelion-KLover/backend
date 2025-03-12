@@ -31,8 +31,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     private final CustomUserDetailsService customUserDetailsService;
     private final RedisService redisService;
 
-
-
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
@@ -51,6 +49,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 || path.startsWith("/swagger-ui")
                 || path.startsWith("/api/v1/translate")
                 //|| (path.startsWith("/api/v1/comm-post/comment") && method.equals("GET"))
+                || (path.startsWith("/api/v1/notification"))
+                || (path.startsWith("/api/v1/comm-post/comment") && method.equals("GET"))
                 || (path.startsWith("/api/v1/comm-post/surroundings") && method.equals("GET"))
                 //|| (path.startsWith("/api/v1/comm-post/detail") && method.equals("GET"))
                 || (path.startsWith("/api/v1/comm-post/search") && method.equals("GET"));
@@ -94,6 +94,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.setContentType(MediaType.APPLICATION_JSON_VALUE);
                 response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+                response.getWriter().write("{\"message\": \"유효하지 않은 Access Token 입니다.\"}");
                 return;
             }
         }
@@ -124,35 +125,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
-    }
-
-    private String getAccessToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String token = jwtTokenProvider.getJwtFromHeader(request);
-
-        if (!StringUtils.hasText(token)) {
-            log.warn("JWT 토큰이 없습니다.");
-
-            SecurityContextHolder.clearContext();
-            if(response != null) {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-                response.getWriter().write("{\"message\": \"인증 실패\"}");
-            }
-        }
-
-        try{
-            jwtTokenProvider.decodeToken(token);
-        } catch (JwtException jwtException){
-            log.warn("유효하지 않은 Access Token 토큰입니다.");
-
-            if(response!=null) {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-                response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-            }
-        }
-        return token;
     }
 
 }

@@ -29,9 +29,7 @@ public class FCMService {
     public void sendPushNotification(NotificationMessage message) throws JsonProcessingException {
         Long receiverId = safeMemberIdConverter(message.getCustomField().get(CustomFieldKey.RECEIVER_ID.getKeyName()));
 
-//        String fcmToken = redisService.getFCMToken(receiverId);
-        String fcmToken = "tmptmptmptmp";
-        // rabbitMQListener Exception 방지용 임시 토큰 프론트 측에서 fcm 토큰 발급 후 백에 넘겨주는 것 구현해야 함
+        String fcmToken = redisService.getFCMToken(receiverId);
         NotificationMessage convertedMessage = messageBuildService.buildMessage(message, receiverId);
 
         assert convertedMessage != null;

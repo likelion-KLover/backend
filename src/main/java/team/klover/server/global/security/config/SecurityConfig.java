@@ -59,6 +59,7 @@ public class SecurityConfig {
                                 "/api/v1/tour-post/**",
                                 "/api/v1/comm-post/**",
                                 "/api/v1/translate/**",
+                                "/api/v1/notification/**",
                                 // Swagger 관련 URL 추가
                                 "/v1/api-docs/**",
                                 "/swagger-ui/**").permitAll()
