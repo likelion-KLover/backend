@@ -17,9 +17,11 @@ import team.klover.server.domain.tour.tourPost.entity.TourPostSave;
 import team.klover.server.domain.tour.tourPost.entity.TourPost;
 import team.klover.server.domain.tour.tourPost.entity.TourPostPage;
 import team.klover.server.domain.tour.tourPost.repository.TourPostRepository;
+import team.klover.server.domain.tour.tourPost.repository.TourPostSaveRepository;
 import team.klover.server.domain.tour.tourPost.service.TourPostService;
 import team.klover.server.global.exception.KloverRequestException;
 import team.klover.server.global.exception.ReturnCode;
+import team.klover.server.global.util.AuthUtil;
 
 @Slf4j
 @Service
@@ -28,6 +30,7 @@ public class TourPostServiceImpl implements TourPostService {
     private final TourPostRepository tourPostRepository;
     private final MemberV1Repository MemberV1Repository;
     private final ReviewRepository reviewRepository;
+    private final TourPostSaveRepository tourPostSaveRepository;
 
     // 사용자 위치 주변 게시글(관광지&사용자) 조회
     public Page<TourPostDto> findPostsWithinRadius(@Valid XYForm xyForm, Pageable pageable) {
@@ -113,7 +116,8 @@ public class TourPostServiceImpl implements TourPostService {
 
     // TourPost를 TourPostDto로 변환
     private TourPostDto convertToTourPostDto(TourPost tourPost) {
-        Double avgRating = reviewRepository.findAverageRatingByTourPostId(tourPost.getContentId());
+        Double avgRating = reviewRepository.getTourPostAvgRating(tourPost.getCommonPlaceId());
+        Long reviewCount = reviewRepository.countTourPostReview(tourPost.getCommonPlaceId());
         return TourPostDto.builder()
                 .contentId(tourPost.getContentId())
                 .commonPlaceId(tourPost.getCommonPlaceId())
@@ -123,12 +127,17 @@ public class TourPostServiceImpl implements TourPostService {
                 .firstImage(tourPost.getFirstImage())
                 .mapX(tourPost.getMapX())
                 .mapY(tourPost.getMapY())
+                .reviewCount(reviewCount)
                 .build();
     }
 
     // TourPost를 DetailTourPostDto로 변환
     private DetailTourPostDto convertToDetailTourPostDto(TourPost tourPost) {
-        Double avgRating = reviewRepository.findAverageRatingByTourPostId(tourPost.getContentId());
+        Double avgRating = reviewRepository.getTourPostAvgRating(tourPost.getCommonPlaceId());
+        Long reviewCount = reviewRepository.countTourPostReview(tourPost.getCommonPlaceId());
+
+        Long currentMemberId = AuthUtil.getCurrentMemberIdRoughly();
+        Boolean isSaved = currentMemberId != null && tourPostSaveRepository.haveSaved(tourPost.getCommonPlaceId(), currentMemberId).isPresent();
         return DetailTourPostDto.builder()
                 .contentId(tourPost.getContentId())
                 .commonPlaceId(tourPost.getCommonPlaceId())
@@ -140,6 +149,8 @@ public class TourPostServiceImpl implements TourPostService {
                 .mapX(tourPost.getMapX())
                 .mapY(tourPost.getMapY())
                 .overview(tourPost.getOverview())
+                .reviewCount(reviewCount)
+                .isSaved(isSaved)
                 .build();
     }
 }

@@ -37,6 +37,7 @@ public class AuthUtil {
         }
 
         Object userDetails =  authentication.getPrincipal();
+        System.out.println(userDetails);
         if (userDetails == null || userDetails instanceof String) {
             return null;
         }

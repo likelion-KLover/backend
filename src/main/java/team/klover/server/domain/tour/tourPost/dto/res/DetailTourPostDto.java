@@ -9,6 +9,7 @@ public class DetailTourPostDto {
     private Long contentId;
     private Long commonPlaceId;
     private Double avgRating;
+    private Long reviewCount;
     private String title;
     private String addr1;
     private String firstImage;
@@ -16,4 +17,5 @@ public class DetailTourPostDto {
     private Double mapX;
     private Double mapY;
     private String overview;
+    private Boolean isSaved;
 }
