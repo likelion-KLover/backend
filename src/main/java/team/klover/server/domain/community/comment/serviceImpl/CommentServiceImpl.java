@@ -17,6 +17,7 @@ import team.klover.server.domain.community.comment.entity.CommentLike;
 import team.klover.server.domain.community.comment.entity.CommentPage;
 import team.klover.server.domain.community.comment.event.CommentCreatedEvent;
 import team.klover.server.domain.community.comment.event.CommentLikedEvent;
+import team.klover.server.domain.community.comment.repository.CommentLikeRepository;
 import team.klover.server.domain.community.comment.repository.CommentRepository;
 import team.klover.server.domain.community.comment.service.CommentService;
 import team.klover.server.domain.member.v1.entity.Member;
@@ -24,6 +25,8 @@ import team.klover.server.domain.member.v1.repository.MemberV1Repository;
 import team.klover.server.global.elasticsearch.commpost.springevent.event.CommPostCountEvent;
 import team.klover.server.global.exception.KloverRequestException;
 import team.klover.server.global.exception.ReturnCode;
+import team.klover.server.global.util.AuthUtil;
+
 import java.util.List;
 
 @Slf4j
@@ -34,6 +37,7 @@ public class CommentServiceImpl implements CommentService {
     private final CommPostRepository commPostRepository;
     private final MemberV1Repository memberV1Repository;
     private final ApplicationEventPublisher publisher;
+    private final CommentLikeRepository commentLikeRepository;
 
     // 해당 게시글에 작성된 모든 댓글 조회
     @Override
@@ -165,6 +169,9 @@ public class CommentServiceImpl implements CommentService {
 
     // Comment를 CommentDto로 변환
     private CommentDto convertToCommentDto(Comment comment) {
+        Long currentMemberId = AuthUtil.getCurrentMemberIdRoughly();
+        Boolean isLiked = currentMemberId != null && commentLikeRepository.haveLiked(comment.getId(),currentMemberId).isPresent();
+
         return CommentDto.builder()
                 .id(comment.getId())
                 .memberId(comment.getMember().getId())
@@ -172,6 +179,7 @@ public class CommentServiceImpl implements CommentService {
                 .profileImageUrl(comment.getMember().getProfileUrl())
                 .likeCount(comment.getLikedMembers().size())
                 .content(comment.getContent())
+                .isLiked(isLiked)
                 .superCommentId(comment.getSuperCommentId())
                 .createDate(comment.getCreateDate())
                 .build();

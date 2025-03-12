@@ -30,15 +30,28 @@ public class AuthUtil {
         return getUserDetails().getMember().getId();
     }
 
+    public static Long getCurrentMemberIdRoughly(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return null;
+        }
+
+        Object userDetails =  authentication.getPrincipal();
+        if (userDetails == null || userDetails instanceof String) {
+            return null;
+        }
+
+        return ((CustomUserDetails)userDetails).getMember().getId();
+    }
     public static Authentication getAuthentication(){return SecurityContextHolder.getContext().getAuthentication();}
 
     private static CustomUserDetails getUserDetails() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) throw new KloverLogicException(ReturnCode.NOT_AUTHORIZED);
 
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        if (userDetails == null) throw new KloverLogicException(ReturnCode.NOT_FOUND_ENTITY);
+        Object userDetails =  authentication.getPrincipal();
+        if (userDetails == null || userDetails instanceof String) throw new KloverLogicException(ReturnCode.NOT_FOUND_ENTITY);
 
-        return userDetails;
+        return (CustomUserDetails)userDetails;
     }
 }

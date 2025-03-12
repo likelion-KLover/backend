@@ -16,4 +16,5 @@ public class CommentDto {
     private String content;
     private Long superCommentId;
     private LocalDateTime createDate;
+    private Boolean isLiked;
 }
