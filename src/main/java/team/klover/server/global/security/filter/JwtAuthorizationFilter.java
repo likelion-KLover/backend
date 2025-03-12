@@ -48,19 +48,31 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 || path.startsWith("/v1/api-docs/swagger-config")
                 || path.startsWith("/swagger-ui")
                 || path.startsWith("/api/v1/translate")
+                //|| (path.startsWith("/api/v1/comm-post/comment") && method.equals("GET"))
                 || (path.startsWith("/api/v1/notification"))
                 || (path.startsWith("/api/v1/comm-post/comment") && method.equals("GET"))
                 || (path.startsWith("/api/v1/comm-post/surroundings") && method.equals("GET"))
-                || (path.startsWith("/api/v1/comm-post/detail") && method.equals("GET"))
-                || (path.startsWith("/api/v1/comm-post/search") && method.equals("GET"))
-                || (path.startsWith("/api/v1/tour-post") && method.equals("GET"));
+                //|| (path.startsWith("/api/v1/comm-post/detail") && method.equals("GET"))
+                || (path.startsWith("/api/v1/comm-post/search") && method.equals("GET"));
+                //|| (path.startsWith("/api/v1/tour-post") && method.equals("GET"));
+
+
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String token = jwtTokenProvider.getJwtFromHeader(request);
 
-        if (!StringUtils.hasText(token)) {
+        String path = request.getRequestURI();
+        String method = request.getMethod();
+
+        // 인증이 필요 없는 URL 리스트
+        boolean isPublicApi =
+                 (path.startsWith("/api/v1/comm-post/comment") && method.equals("GET"))
+                || (path.startsWith("/api/v1/comm-post/detail") && method.equals("GET"))
+                || (path.startsWith("/api/v1/tour-post") && method.equals("GET"));
+
+        if (!isPublicApi && !StringUtils.hasText(token)) {
             log.warn("JWT 토큰이 없습니다.");
 
             SecurityContextHolder.clearContext();
@@ -71,21 +83,27 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             return;
         }
 
-        try {
+        boolean decodingSuccess = false;
+        try{
             jwtTokenProvider.decodeToken(token);
-        } catch (JwtException jwtException) {
+            decodingSuccess = true;
+        } catch (Exception jwtException){
             log.warn("유효하지 않은 Access Token 토큰입니다.");
 
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-            response.getWriter().write("{\"message\": \"유효하지 않은 Access Token 입니다.\"}");
-            return;
+            if(!isPublicApi) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+                response.getWriter().write("{\"message\": \"유효하지 않은 Access Token 입니다.\"}");
+                return;
+            }
         }
 
-
-        String email = jwtTokenProvider.getMemberEmailFromToken(token);
-        log.info("정상적으로 사용자 정보를 토큰으로부터 가져왔습니다. Email: {}", email);
+        String email = "";
+        if(decodingSuccess) {
+            email = jwtTokenProvider.getMemberEmailFromToken(token);
+            log.info("정상적으로 사용자 정보를 토큰으로부터 가져왔습니다. Email: {}", email);
+        }
 
         try {
             UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
@@ -93,15 +111,17 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             log.debug("SecurityContext 에 인증 정보 설정 완료: {}", authentication);
         } catch (Exception e) {
-            log.error("인증 처리 실패: {}", e.getMessage());
+            if(!isPublicApi) {
+                log.error("인증 처리 실패: {}", e.getMessage());
 
-            SecurityContextHolder.clearContext();
-            redisService.deleteRefreshToken(email);
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-            response.getWriter().write("{\"message\": \"인증 실패\"}");
-            return;
+                SecurityContextHolder.clearContext();
+                redisService.deleteRefreshToken(email);
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+                response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+                response.getWriter().write("{\"message\": \"인증 실패\"}");
+                return;
+            }
         }
 
         filterChain.doFilter(request, response);

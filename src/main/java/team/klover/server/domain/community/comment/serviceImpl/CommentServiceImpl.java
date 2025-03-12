@@ -39,6 +39,7 @@ public class CommentServiceImpl implements CommentService {
     private final ApplicationEventPublisher publisher;
     private final CommentLikeRepository commentLikeRepository;
 
+
     // 해당 게시글에 작성된 모든 댓글 조회
     @Override
     @Transactional(readOnly = true)
@@ -170,8 +171,8 @@ public class CommentServiceImpl implements CommentService {
     // Comment를 CommentDto로 변환
     private CommentDto convertToCommentDto(Comment comment) {
         Long currentMemberId = AuthUtil.getCurrentMemberIdRoughly();
+        System.out.println("current Member Id:"+currentMemberId);
         Boolean isLiked = currentMemberId != null && commentLikeRepository.haveLiked(comment.getId(),currentMemberId).isPresent();
-
         return CommentDto.builder()
                 .id(comment.getId())
                 .memberId(comment.getMember().getId())
