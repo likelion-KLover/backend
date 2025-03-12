@@ -85,7 +85,6 @@ public class AuthV1Controller {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         return ApiResponse.of(new LoginResponse(memberDto, accessToken, refreshToken));
-
     }
 
     @PostMapping("/logout")

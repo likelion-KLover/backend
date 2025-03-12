@@ -36,12 +36,11 @@ public class ApiV1ReviewController {
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
         Page<ReviewDto> reviewPage = reviewService.findByCommonPlaceId(commonPlaceId, pageable);
         // 번역 로직 추가
-        reviewPage.getContent().forEach(review -> {
-            if (review.getContent() != null && !review.getContent().isEmpty()) {
-                review.setContent(translationHelper.translateForCurrentLanguage(review.getContent()));
-            }
-        });
-
+//        reviewPage.getContent().forEach(review -> {
+//            if (review.getContent() != null && !review.getContent().isEmpty()) {
+//                review.setContent(translationHelper.translateForCurrentLanguage(review.getContent()));
+//            }
+//        });
         return ApiResponse.of(KloverPage.of(reviewPage));
     }
 

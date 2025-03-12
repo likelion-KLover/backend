@@ -36,12 +36,12 @@ public class ApiV1CommentController {
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
         Page<CommentDto> commentPage = commentService.findByCommPostId(commPostId, pageable);
         // 번역 로직 추가
-        commentPage.getContent().forEach(comment -> {
-            // 댓글 내용 번역
-            if (comment.getContent() != null && !comment.getContent().isEmpty()) {
-                comment.setContent(translationHelper.translateForCurrentLanguage(comment.getContent()));
-            }
-        });
+//        commentPage.getContent().forEach(comment -> {
+//            // 댓글 내용 번역
+//            if (comment.getContent() != null && !comment.getContent().isEmpty()) {
+//                comment.setContent(translationHelper.translateForCurrentLanguage(comment.getContent()));
+//            }
+//        });
         return ApiResponse.of(KloverPage.of(commentPage));
     }
 
