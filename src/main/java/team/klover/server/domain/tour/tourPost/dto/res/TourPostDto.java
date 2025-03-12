@@ -11,6 +11,7 @@ public class TourPostDto {
     private Long contentId;
     private Long commonPlaceId;
     private Double avgRating;
+    private Long reviewCount;
     private String title;
     private String addr1;
     private String firstImage;
@@ -26,5 +27,6 @@ public class TourPostDto {
         this.firstImage = tourPostDoc.getFirst_image();
         this.mapX = tourPostDoc.getLocation().getLon();
         this.mapY = tourPostDoc.getLocation().getLat();
+        this.reviewCount = tourPostDoc.getReview_count();
     }
 }
