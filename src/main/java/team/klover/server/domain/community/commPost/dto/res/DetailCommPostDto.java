@@ -20,4 +20,6 @@ public class DetailCommPostDto {
     private String content;
     private List<String> imageUrls;
     private LocalDateTime createDate;
+    private Boolean isLiked;
+    private Boolean isSaved;
 }

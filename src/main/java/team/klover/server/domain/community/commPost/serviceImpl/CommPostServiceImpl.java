@@ -18,6 +18,7 @@ import team.klover.server.domain.community.commPost.entity.*;
 import team.klover.server.domain.community.commPost.event.CommPostLikedEvent;
 import team.klover.server.domain.community.commPost.repository.CommPostLikeRepository;
 import team.klover.server.domain.community.commPost.repository.CommPostRepository;
+import team.klover.server.domain.community.commPost.repository.CommPostSaveRepository;
 import team.klover.server.domain.community.commPost.service.CommPostService;
 import team.klover.server.domain.community.comment.repository.CommentRepository;
 import team.klover.server.domain.community.comment.service.CommentService;
@@ -32,6 +33,7 @@ import team.klover.server.global.elasticsearch.commpost.springevent.event.CommPo
 import team.klover.server.global.exception.KloverRequestException;
 import team.klover.server.global.exception.ReturnCode;
 import team.klover.server.global.s3.S3Service;
+import team.klover.server.global.util.AuthUtil;
 import team.klover.server.global.util.LanguageDetect;
 
 import java.io.IOException;
@@ -51,6 +53,7 @@ public class CommPostServiceImpl implements CommPostService {
     private final S3Service s3Service;
     private final CommPostLikeRepository commPostLikeRepository;
     private final CommentRepository commentRepository;
+    private final CommPostSaveRepository commPostSaveRepository;
 
     // 사용자 위치 주변 게시글(관광지&사용자) 조회
     public CombinedPostResponse findPostsWithinRadius(@Valid XYForm xyForm, Pageable pageable){
@@ -286,6 +289,10 @@ public class CommPostServiceImpl implements CommPostService {
 
     // CommPost를 DetailCommPostDto로 변환
     private DetailCommPostDto convertToDetailCommPostDto(CommPost commPost) {
+        Long currentMemberId = AuthUtil.getCurrentMemberIdRoughly();
+        Boolean isLiked = currentMemberId != null && commPostLikeRepository.haveLiked(commPost.getId(), currentMemberId).isPresent();
+        Boolean isSaved = currentMemberId != null && commPostSaveRepository.haveSaved(commPost.getId(), currentMemberId).isPresent();
+
         return DetailCommPostDto.builder()
                 .id(commPost.getId())
                 .memberId(commPost.getMember().getId())
@@ -293,6 +300,8 @@ public class CommPostServiceImpl implements CommPostService {
                 .nickname(commPost.getMember().getNickname())
                 .likeCount(commPost.getLikedMembers().size())
                 .commentCount(commentRepository.countCommPostComment(commPost.getId()))
+                .isLiked(isLiked)
+                .isSaved(isSaved)
                 .mapX(commPost.getMapX())
                 .mapY(commPost.getMapY())
                 .content(commPost.getContent())
