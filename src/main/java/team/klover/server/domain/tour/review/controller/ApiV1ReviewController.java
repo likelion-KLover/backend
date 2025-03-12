@@ -33,7 +33,9 @@ public class ApiV1ReviewController {
     @GetMapping("/{commonPlaceId}")
     @Operation(summary="해당 관광지 게시글에 작성된 리뷰 조회")
     public ApiResponse<ReviewDto> findByCommonPlaceId(@ModelAttribute ReviewPage request, @PathVariable("commonPlaceId") String commonPlaceId) {
+        //dd
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
+        // dddd
         Page<ReviewDto> reviewPage = reviewService.findByCommonPlaceId(commonPlaceId, pageable);
         // 번역 로직 추가
 //        reviewPage.getContent().forEach(review -> {
@@ -41,6 +43,7 @@ public class ApiV1ReviewController {
 //                review.setContent(translationHelper.translateForCurrentLanguage(review.getContent()));
 //            }
 //        });
+        //ddd
         return ApiResponse.of(KloverPage.of(reviewPage));
     }
 
