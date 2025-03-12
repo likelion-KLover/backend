@@ -39,7 +39,6 @@ public class CommentServiceImpl implements CommentService {
     private final ApplicationEventPublisher publisher;
     private final CommentLikeRepository commentLikeRepository;
 
-
     // 해당 게시글에 작성된 모든 댓글 조회
     @Override
     @Transactional(readOnly = true)
