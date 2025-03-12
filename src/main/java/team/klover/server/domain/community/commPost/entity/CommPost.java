@@ -33,9 +33,6 @@ public class CommPost extends BaseEntity {
     @Builder.Default
     private List<CommPostSave> savedMembers = new ArrayList<>();
 
-    @OneToMany(mappedBy = "commPost", cascade = CascadeType.ALL, orphanRemoval = true)
-    @Builder.Default
-    private List<Comment> comments = new ArrayList<>();
 
     @Column(length = 3000)
     @Size(max = 3000)

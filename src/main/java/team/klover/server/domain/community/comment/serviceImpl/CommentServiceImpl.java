@@ -169,6 +169,7 @@ public class CommentServiceImpl implements CommentService {
                 .id(comment.getId())
                 .memberId(comment.getMember().getId())
                 .nickname(comment.getMember().getNickname())
+                .profileImageUrl(comment.getMember().getProfileUrl())
                 .likeCount(comment.getLikedMembers().size())
                 .content(comment.getContent())
                 .superCommentId(comment.getSuperCommentId())
