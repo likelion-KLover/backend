@@ -14,7 +14,6 @@ import team.klover.server.domain.community.comment.entity.CommentPage;
 import team.klover.server.domain.community.comment.service.CommentService;
 import team.klover.server.global.common.response.ApiResponse;
 import team.klover.server.global.common.response.KloverPage;
-import team.klover.server.global.exception.KloverRequestException;
 import team.klover.server.global.exception.ReturnCode;
 import team.klover.server.global.translation.service.TranslationHelper;
 import team.klover.server.global.util.AuthUtil;
@@ -33,22 +32,16 @@ public class ApiV1CommentController {
     // http://localhost:8080/api/v1/comm-post/comment/1
     @GetMapping("/{commPostId}")
     @Operation(summary = "댓글 전체 조회")
-    public ApiResponse<CommentDto> findByCommPostId(@RequestParam(value = "page",defaultValue = "0") int page,
-                                                    @RequestParam(value = "size", defaultValue = "10") int size,
-                                                    @PathVariable("commPostId") Long commPostId){
-        if(page < 0 || size <=0 || size > 20) throw new KloverRequestException(ReturnCode.WRONG_PARAMETER);
-        Pageable pageable = PageRequest.of(page,size);
+    public ApiResponse<CommentDto> findByCommPostId(@ModelAttribute CommentPage request, @PathVariable("commPostId") Long commPostId){
+        Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
         Page<CommentDto> commentPage = commentService.findByCommPostId(commPostId, pageable);
-        /*
         // 번역 로직 추가
-        commentPage.getContent().forEach(comment -> {
-            // 댓글 내용 번역
-            if (comment.getContent() != null && !comment.getContent().isEmpty()) {
-                comment.setContent(translationHelper.translateForCurrentLanguage(comment.getContent()));
-            }
-        });
-
-         */
+//        commentPage.getContent().forEach(comment -> {
+//            // 댓글 내용 번역
+//            if (comment.getContent() != null && !comment.getContent().isEmpty()) {
+//                comment.setContent(translationHelper.translateForCurrentLanguage(comment.getContent()));
+//            }
+//        });
         return ApiResponse.of(KloverPage.of(commentPage));
     }
 

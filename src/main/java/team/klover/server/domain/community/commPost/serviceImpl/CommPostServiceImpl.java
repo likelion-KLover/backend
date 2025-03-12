@@ -70,10 +70,10 @@ public class CommPostServiceImpl implements CommPostService {
     // 본인 게시글 조회
     @Override
     @Transactional(readOnly = true)
-    public Page<CommPostDto> findByMemberId(Long currentMemberId, Pageable pageable){
+    public Page<DetailCommPostDto> findByMemberId(Long currentMemberId, Pageable pageable){
         checkPageSize(pageable.getPageSize());
         Page<CommPost> commPosts = commPostRepository.findByMemberId(currentMemberId, pageable);
-        return commPosts.map(this::convertToCommPostDto);
+        return commPosts.map(this::convertToDetailCommPostDto);
     }
 
     // 해당 게시글 상세 조회

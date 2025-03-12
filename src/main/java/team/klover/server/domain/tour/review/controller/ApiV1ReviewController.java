@@ -14,7 +14,6 @@ import team.klover.server.domain.tour.review.entity.ReviewPage;
 import team.klover.server.domain.tour.review.service.ReviewService;
 import team.klover.server.global.common.response.ApiResponse;
 import team.klover.server.global.common.response.KloverPage;
-import team.klover.server.global.exception.KloverRequestException;
 import team.klover.server.global.exception.ReturnCode;
 import team.klover.server.global.translation.service.TranslationHelper;
 import team.klover.server.global.util.AuthUtil;
@@ -33,20 +32,16 @@ public class ApiV1ReviewController {
     // http://localhost:8080/api/v1/tour-post/review/617?page=0&size=10
     @GetMapping("/{commonPlaceId}")
     @Operation(summary="해당 관광지 게시글에 작성된 리뷰 조회")
-    public ApiResponse<ReviewDto> findByCommonPlaceId(
-            @RequestParam(value = "page",defaultValue = "0") int page,
-            @RequestParam(value = "size", defaultValue = "20") int size,
-            @PathVariable("commonPlaceId") String commonPlaceId) {
-        if(page<0 || size<=0 || size > 20) throw new KloverRequestException(ReturnCode.WRONG_PARAMETER);
-        Pageable pageable = PageRequest.of(page,size);
+    public ApiResponse<ReviewDto> findByCommonPlaceId(@ModelAttribute ReviewPage request, @PathVariable("commonPlaceId") String commonPlaceId) {
+        Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
         Page<ReviewDto> reviewPage = reviewService.findByCommonPlaceId(commonPlaceId, pageable);
         // 번역 로직 추가
-        reviewPage.getContent().forEach(review -> {
-            if (review.getContent() != null && !review.getContent().isEmpty()) {
-                review.setContent(translationHelper.translateForCurrentLanguage(review.getContent()));
-            }
-        });
-
+//        reviewPage.getContent().forEach(review -> {
+//            if (review.getContent() != null && !review.getContent().isEmpty()) {
+//                review.setContent(translationHelper.translateForCurrentLanguage(review.getContent()));
+//            }
+//        });
+        //ddd
         return ApiResponse.of(KloverPage.of(reviewPage));
     }
 

@@ -80,5 +80,4 @@ public class MemberV1Controller {
        Long memberId = AuthUtil.getCurrentMemberId();
        return ApiResponse.of(memberService.getMemberInfo(memberId));
     }
-
 }

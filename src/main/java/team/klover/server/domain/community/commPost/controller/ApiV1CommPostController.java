@@ -50,7 +50,7 @@ public class ApiV1CommPostController {
     // http://localhost:8080/api/v1/comm-post/me
     @GetMapping("/me")
     @Operation(summary = "본인 게시글 조회")
-    public ApiResponse<CommPostDto> getMyCommPost(@ModelAttribute CommPostPage request) {
+    public ApiResponse<DetailCommPostDto> getMyCommPost(@ModelAttribute CommPostPage request) {
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
         Long currentMemberId = AuthUtil.getCurrentMemberId();
         return ApiResponse.of(KloverPage.of(commPostService.findByMemberId(currentMemberId, pageable)));

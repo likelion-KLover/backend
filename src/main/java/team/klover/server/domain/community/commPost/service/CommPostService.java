@@ -17,7 +17,7 @@ public interface CommPostService {
     CombinedPostResponse findPostsWithinRadius(@Valid XYForm xyForm, Pageable pageable);
 
     // 본인 게시글 조회
-    Page<CommPostDto> findByMemberId(Long currentMemberId, Pageable pageable);
+    Page<DetailCommPostDto> findByMemberId(Long currentMemberId, Pageable pageable);
 
     // 해당 게시글 상세 조회
     DetailCommPostDto findById(Long commPostId);
