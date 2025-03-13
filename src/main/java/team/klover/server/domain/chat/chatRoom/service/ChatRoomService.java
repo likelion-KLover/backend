@@ -16,22 +16,22 @@ public interface ChatRoomService {
     // 채팅방 생성(DM/그룹)
     void addChatRoom(Long currentMemberId, @Valid ChatRoomForm chatRoomForm);
 
-    ChatRoomDto addChatRoom(Long currentMemberId, @Valid ChatRoomCreateForm chatRoomCreateForm);
+    //void addChatRoom(Long currentMemberId, @Valid ChatRoomCreateForm chatRoomCreateForm);
 
     // 채팅방 이름 수정(그룹)
     void updateChatRoomTitle(Long chatRoomId, Long currentMemberId, @Valid ChatRoomForm chatRoomForm);
 
-    void updateChatRoomTitle(Long chatRoomId, Long currentMemberId, @Valid ChatRoomTitleUpdateForm chatRoomTitleUpdateForm);
+    //void updateChatRoomTitle(Long chatRoomId, Long currentMemberId, @Valid ChatRoomTitleUpdateForm chatRoomTitleUpdateForm);
 
     // 채팅방에 초대(그룹)
     void inviteChatRoomMember(Long chatRoomId, Long currentMemberId, @Valid ChatRoomForm chatRoomForm);
 
-    void inviteChatRoomMember(Long chatRoomId, Long currentMemberId, @Valid ChatRoomBatchActionForm chatRoomBatchActionForm);
+    //void inviteChatRoomMember(Long chatRoomId, Long currentMemberId, @Valid ChatRoomBatchActionForm chatRoomBatchActionForm);
 
     // 채팅방에서 강퇴(그룹) / 방장권한
     void kickOutChatRoomMember(Long chatRoomId, Long currentMemberId, @Valid ChatRoomForm chatRoomForm);
 
-    void kickOutChatRoomMember(Long chatRoomId, Long currentMemberId, @Valid ChatRoomBatchActionForm chatRoomBatchActionForm);
+    //void kickOutChatRoomMember(Long chatRoomId, Long currentMemberId, @Valid ChatRoomBatchActionForm chatRoomBatchActionForm);
 
     // 채팅방 나가기(DM/그룹)
     void leaveChatRoomMember(Long chatRoomId, Long currentMemberId);

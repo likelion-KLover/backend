@@ -29,10 +29,8 @@ import team.klover.server.global.exception.ReturnCode;
 import team.klover.server.global.s3.S3Service;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -81,6 +79,47 @@ public class ChatMessageServiceImpl implements ChatMessageService {
             return convertToChatMessageDto(chatMessage, content);
         });
     }
+
+    /*
+    @Override
+    @Transactional
+    public Page<ChatMessageDto> findByChatRoomId(Long currentMemberId, LocalDateTime pointTime, Long chatRoomId, Pageable pageable) {
+        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
+        checkPageSize(pageable.getPageSize());
+
+        // 채팅방 참여멤버만 메시지 조회 가능
+        boolean memberExists = chatRoom.getChatRoomMembers().stream()
+                .anyMatch(joinedMember -> joinedMember.getMember().getId().equals(currentMemberId));
+        if (!memberExists) {
+            throw new KloverRequestException(ReturnCode.NOT_AUTHORIZED);
+        }
+        // 해당 채팅방 내의 모든 메시지 읽음 처리 & 해당 채팅방 메시지 가져오기
+        readAllChatMessages(currentMemberId, chatRoom, chatRoomId);
+        Page<ChatMessage> chatMessages = chatMessageRepository.findByChatRoomIdAndCreateDateLessThan(chatRoomId,pointTime,pageable);
+        // MongoDB에서 메시지 내용 불러오기
+        List<String> stringMessageIds = chatMessages.stream()
+                .map(chatMessage -> String.valueOf(chatMessage.getId()))
+                .collect(Collectors.toList());
+        Map<Long, String> messageContentMap = messageContentRepository.findByIdIn(stringMessageIds)
+                .stream()
+                .filter(Objects::nonNull) // null 값 필터링
+                .collect(Collectors.toMap(
+                        message -> Long.parseLong(message.getId()),
+                        message -> Objects.requireNonNullElse(message.getContent(), "") // null이면 빈 문자열 처리
+                ));
+
+        Page<ChatMessageDto> origin = chatMessages.map(chatMessage -> {
+            String content = messageContentMap.getOrDefault(chatMessage.getId(), ""); // 없으면 빈 문자열
+            return convertToChatMessageDto(chatMessage, content);
+        });
+
+        List<ChatMessageDto> reversedMessages = new ArrayList<>(origin.getContent());
+        Collections.reverse(reversedMessages); // 메시지 리스트 뒤집기
+
+        return new PageImpl<>(reversedMessages, chatMessages.getPageable(), chatMessages.getTotalElements());
+    }
+
+     */
 
     // 해당 채팅방에서 메시지 검색(닉네임/내용)
     @Override
@@ -176,8 +215,15 @@ public class ChatMessageServiceImpl implements ChatMessageService {
                 .content(content)
                 .build();
         messageContentRepository.save(messageContent);
-        rabbitTemplate.convertAndSend("amq.topic", "chatRoomId: " + chatRoomId + "MessageCreated: ",
+
+        rabbitTemplate.convertAndSend("amq.topic", "chatRoomId: " + chatRoomId + ",MessageCreated: ",
                 convertToChatMessageDto(chatMessage, messageContent.getContent()));
+
+        /*
+        //STOMP 브로커로써 rabbitMQ를 활용하는 방식이라고 합니다. 잘은 모르겠지만.
+        rabbitTemplate.convertAndSend("/topic/chatRoom." + chatRoomId,
+                convertToChatMessageDto(chatMessage, messageContent.getContent()));
+         */
     }
 
     // 해당 메시지 삭제
@@ -276,6 +322,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
                 .id(chatMessage.getId())
                 .memberId(chatMessage.getMember().getId())
                 .nickname(chatMessage.getMember().getNickname())
+                .profileImageUrl(chatMessage.getMember().getProfileUrl())
                 .content(content)
                 .imageUrls(chatMessage.getImageUrls())
                 .readCount(chatMessage.getReadCount())
