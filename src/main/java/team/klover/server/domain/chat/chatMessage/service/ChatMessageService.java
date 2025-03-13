@@ -5,11 +5,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 import team.klover.server.domain.chat.chatMessage.dto.req.ChatMessageForm;
 import team.klover.server.domain.chat.chatMessage.dto.res.ChatMessageDto;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ChatMessageService {
     // 해당 채팅방의 메시지 실시간 조회 시작
     Page<ChatMessageDto> findByChatRoomId(Long currentMemberId, Long chatRoomId, Pageable pageable);
+
+    //Page<ChatMessageDto> findByChatRoomId(Long currentMemberId, LocalDateTime pointTime, Long chatRoomId, Pageable pageable);
 
     // 해당 채팅방에서 메시지 검색(닉네임/내용)
     Page<ChatMessageDto> searchByKeyword(Long currentMemberId, Long chatRoomId, String keyword, Pageable pageable);

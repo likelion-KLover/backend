@@ -8,12 +8,14 @@ import team.klover.server.domain.chat.chatMessage.entity.ChatMessage;
 import team.klover.server.domain.chat.chatRoom.entity.ChatRoom;
 import team.klover.server.domain.member.v1.entity.Member;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
 public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> {
     // 해당 채팅방의 메시지 페이지 조회
     Page<ChatMessage> findByChatRoomId(Long chatRoomId, Pageable pageable);
+    //Page<ChatMessage> findByChatRoomIdAndCreateDateLessThan(Long chatRoomId, LocalDateTime pointTime, Pageable pageable);
 
     // 해당 채팅방의 메시지 리스트 조회
     List<ChatMessage> findByChatRoom(ChatRoom chatRoom);

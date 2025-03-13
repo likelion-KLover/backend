@@ -108,59 +108,57 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         chatRoomRepository.save(chatRoom);
     }
 
-    @Override
-    @Transactional
-    public ChatRoomDto addChatRoom(Long currentMemberId, @Valid ChatRoomCreateForm chatRoomForm){
-        // 현재 로그인한 사용자의 member 객체를 가져오는 메서드
-        Member member = memberV1Repository.findById(currentMemberId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
-        // 제한 인원 초과 여부 확인 (본인 제외)
-        if (chatRoomForm.getMemberIds().size() > ChatRoom.ROOM_MEMBER_LIMIT - 1) {
-            throw new KloverRequestException(ReturnCode.WRONG_PARAMETER);
-        }
-
-        // 1대1 채팅방 중복 방지 로직
-        if (chatRoomForm.getMemberIds().size() == 1) { // 1대1 채팅인지 확인
-            Long otherMemberId = chatRoomForm.getMemberIds().getFirst();
-
-            // 현재 사용자가 otherMember와 이미 1대1 채팅방이 존재하는지 확인
-            boolean exists = chatRoomRepository.existsOneOnOneChatRoom(currentMemberId, otherMemberId);
-            if (exists) {
-                throw new KloverRequestException(ReturnCode.ALREADY_EXIST);
-            }
-        }
-
-        // 새로운 채팅방 생성
-        ChatRoom chatRoom = ChatRoom.builder()
-                .title(chatRoomForm.getTitle())
-                .member(member) // 방장 지정
-                .build();
-        // 본인을 맨 앞에 추가
-        List<ChatRoomMember> chatRoomMembers = new ArrayList<>();
-
-        ChatRoomMember enterChatRoomMyself = ChatRoomMember.builder()
-                .member(member)
-                .chatRoom(chatRoom)
-                .build();
-        chatRoomMembers.add(enterChatRoomMyself);
-
-        // 추가하려는 멤버들 중 중복되지 않는 멤버만 추가
-        Set<Long> addedMemberIds = new HashSet<>();
-        addedMemberIds.add(member.getId()); // 본인 ID 추가
-        addedMemberIds.addAll(chatRoomForm.getMemberIds());
-        for (Long memberId : addedMemberIds) {
-            Member candidate = memberV1Repository.findById(memberId).orElseThrow(()->new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
-            ChatRoomMember memberInChatRoom = ChatRoomMember.builder()
-                    .member(candidate)
-                    .chatRoom(chatRoom)
-                    .build();
-            chatRoomMembers.add(memberInChatRoom);
-
-        }
-        chatRoom.setChatRoomMembers(chatRoomMembers);
-        chatRoomRepository.save(chatRoom);
-
-        return convertToChatRoomDto(chatRoom);
-    }
+//    @Override
+//    @Transactional
+//    public void addChatRoom(Long currentMemberId, @Valid ChatRoomCreateForm chatRoomForm){
+//        // 현재 로그인한 사용자의 member 객체를 가져오는 메서드
+//        Member member = memberV1Repository.findById(currentMemberId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
+//        // 제한 인원 초과 여부 확인 (본인 제외)
+//        if (chatRoomForm.getMemberIds().size() > ChatRoom.ROOM_MEMBER_LIMIT - 1) {
+//            throw new KloverRequestException(ReturnCode.WRONG_PARAMETER);
+//        }
+//
+//        // 1대1 채팅방 중복 방지 로직
+//        if (chatRoomForm.getMemberIds().size() == 1) { // 1대1 채팅인지 확인
+//            Long otherMemberId = chatRoomForm.getMemberIds().getFirst();
+//
+//            // 현재 사용자가 otherMember와 이미 1대1 채팅방이 존재하는지 확인
+//            boolean exists = chatRoomRepository.existsOneOnOneChatRoom(currentMemberId, otherMemberId);
+//            if (exists) {
+//                throw new KloverRequestException(ReturnCode.ALREADY_EXIST);
+//            }
+//        }
+//
+//        // 새로운 채팅방 생성
+//        ChatRoom chatRoom = ChatRoom.builder()
+//                .title(chatRoomForm.getTitle())
+//                .member(member) // 방장 지정
+//                .build();
+//        // 본인을 맨 앞에 추가
+//        List<ChatRoomMember> chatRoomMembers = new ArrayList<>();
+//
+//        ChatRoomMember enterChatRoomMyself = ChatRoomMember.builder()
+//                .member(member)
+//                .chatRoom(chatRoom)
+//                .build();
+//        chatRoomMembers.add(enterChatRoomMyself);
+//
+//        // 추가하려는 멤버들 중 중복되지 않는 멤버만 추가
+//        Set<Long> addedMemberIds = new HashSet<>();
+//        addedMemberIds.add(member.getId()); // 본인 ID 추가
+//        addedMemberIds.addAll(chatRoomForm.getMemberIds());
+//        for (Long memberId : addedMemberIds) {
+//            Member candidate = memberV1Repository.findById(memberId).orElseThrow(()->new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
+//            ChatRoomMember memberInChatRoom = ChatRoomMember.builder()
+//                    .member(candidate)
+//                    .chatRoom(chatRoom)
+//                    .build();
+//            chatRoomMembers.add(memberInChatRoom);
+//
+//        }
+//        chatRoom.setChatRoomMembers(chatRoomMembers);
+//        chatRoomRepository.save(chatRoom);
+//    }
 
     // 채팅방 이름 수정(그룹)
     @Override
@@ -178,20 +176,20 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         chatRoomRepository.save(chatRoom);
     }
 
-    @Override
-    @Transactional
-    public void updateChatRoomTitle(Long chatRoomId, Long currentMemberId, @Valid ChatRoomTitleUpdateForm chatRoomForm){
-        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
-
-        // 채팅방 멤버 누구나 수정 가능함
-        boolean memberExists = chatRoom.getChatRoomMembers().stream()
-                .anyMatch(joinedMember -> joinedMember.getMember().getId().equals(currentMemberId));
-        if (!memberExists) {
-            throw new KloverRequestException(ReturnCode.NOT_AUTHORIZED);
-        }
-        chatRoom.setTitle(chatRoomForm.getTitle());
-        chatRoomRepository.save(chatRoom);
-    }
+//    @Override
+//    @Transactional
+//    public void updateChatRoomTitle(Long chatRoomId, Long currentMemberId, @Valid ChatRoomTitleUpdateForm chatRoomForm){
+//        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
+//
+//        // 채팅방 멤버 누구나 수정 가능함
+//        boolean memberExists = chatRoom.getChatRoomMembers().stream()
+//                .anyMatch(joinedMember -> joinedMember.getMember().getId().equals(currentMemberId));
+//        if (!memberExists) {
+//            throw new KloverRequestException(ReturnCode.NOT_AUTHORIZED);
+//        }
+//        chatRoom.setTitle(chatRoomForm.getTitle());
+//        chatRoomRepository.save(chatRoom);
+//    }
 
     // 채팅방에 초대(그룹)
     @Override
@@ -220,38 +218,38 @@ public class ChatRoomServiceImpl implements ChatRoomService {
 
     }
 
-    @Override
-    @Transactional
-    public void inviteChatRoomMember(Long chatRoomId, Long currentMemberId, @Valid ChatRoomBatchActionForm chatRoomForm){
-        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
-                .orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
-        // 채팅방 멤버 누구나 초대 가능함
-        boolean memberExists = chatRoom.getChatRoomMembers().stream()
-                .anyMatch(joinedMember -> joinedMember.getMember().getId().equals(currentMemberId));
-        if (!memberExists) {
-            throw new KloverRequestException(ReturnCode.NOT_AUTHORIZED);
-        }
-
-        // 제한 인원 초과 여부 확인 (본인 제외)
-        if (chatRoomForm.getMemberIds().size() > ChatRoom.ROOM_MEMBER_LIMIT - 1) {
-            throw new KloverRequestException(ReturnCode.WRONG_PARAMETER);
-        }
-
-        List<Member> memberList = memberV1Repository.findAllById(chatRoomForm.getMemberIds());
-
-        List<Member> memberInRoom = chatRoom.getChatRoomMembers().stream().map(ChatRoomMember::getMember).toList();
-
-        List<Member> filteredList = memberList.stream()
-                .filter(m -> memberInRoom.stream().noneMatch(inRoom -> inRoom.getId().equals(m.getId())))
-                .toList();
-
-        List<ChatRoomMember> newMembers = filteredList.stream().map(
-                member -> ChatRoomMember.builder().member(member).chatRoom(chatRoom).build()
-        ).collect(Collectors.toList());
-
-        chatRoom.getChatRoomMembers().addAll(newMembers);
-
-    }
+//    @Override
+//    @Transactional
+//    public void inviteChatRoomMember(Long chatRoomId, Long currentMemberId, @Valid ChatRoomBatchActionForm chatRoomForm){
+//        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
+//                .orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
+//        // 채팅방 멤버 누구나 초대 가능함
+//        boolean memberExists = chatRoom.getChatRoomMembers().stream()
+//                .anyMatch(joinedMember -> joinedMember.getMember().getId().equals(currentMemberId));
+//        if (!memberExists) {
+//            throw new KloverRequestException(ReturnCode.NOT_AUTHORIZED);
+//        }
+//
+//        // 제한 인원 초과 여부 확인 (본인 제외)
+//        if (chatRoomForm.getMemberIds().size() > ChatRoom.ROOM_MEMBER_LIMIT - 1) {
+//            throw new KloverRequestException(ReturnCode.WRONG_PARAMETER);
+//        }
+//
+//        List<Member> memberList = memberV1Repository.findAllById(chatRoomForm.getMemberIds());
+//
+//        List<Member> memberInRoom = chatRoom.getChatRoomMembers().stream().map(ChatRoomMember::getMember).toList();
+//
+//        List<Member> filteredList = memberList.stream()
+//                .filter(m -> memberInRoom.stream().noneMatch(inRoom -> inRoom.getId().equals(m.getId())))
+//                .toList();
+//
+//        List<ChatRoomMember> newMembers = filteredList.stream().map(
+//                member -> ChatRoomMember.builder().member(member).chatRoom(chatRoom).build()
+//        ).collect(Collectors.toList());
+//
+//        chatRoom.getChatRoomMembers().addAll(newMembers);
+//
+//    }
 
     // 채팅방에서 강퇴(그룹) / 방장권한
     @Override
@@ -285,35 +283,35 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         }
     }
 
-    @Override
-    @Transactional
-    public void kickOutChatRoomMember(Long chatRoomId, Long currentMemberId, @Valid ChatRoomBatchActionForm chatRoomForm){
-        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
-                .orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
-        // 방장인지 확인 (방장만 강퇴 가능)
-        if (!chatRoom.getMember().getId().equals(currentMemberId)) {
-            throw new KloverRequestException(ReturnCode.NOT_AUTHORIZED);
-        }
-
-        // 강퇴할 멤버 목록 가져오기 & 채팅방 참여 목록에서 제거
-        List<Long> kickMemberIds = chatRoomForm.getMemberIds();
-
-        // 방장은 자기자신을 강퇴하지 못함
-        if (kickMemberIds.contains(currentMemberId)) {
-            throw new KloverRequestException(ReturnCode.INVALID_REQUEST);
-        }
-
-        chatRoom.getChatRoomMembers().removeIf(existingMember ->
-                kickMemberIds.contains(existingMember.getMember().getId()));
-
-        // 강퇴 후 남은 인원이 2명 미만이면 채팅방 삭제
-        if (chatRoom.getChatRoomMembers().size() < 2) {
-            chatRoomRepository.delete(chatRoom);
-
-        } else {
-            chatRoomRepository.save(chatRoom);
-        }
-    }
+//    @Override
+//    @Transactional
+//    public void kickOutChatRoomMember(Long chatRoomId, Long currentMemberId, @Valid ChatRoomBatchActionForm chatRoomForm){
+//        ChatRoom chatRoom = chatRoomRepository.findById(chatRoomId)
+//                .orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
+//        // 방장인지 확인 (방장만 강퇴 가능)
+//        if (!chatRoom.getMember().getId().equals(currentMemberId)) {
+//            throw new KloverRequestException(ReturnCode.NOT_AUTHORIZED);
+//        }
+//
+//        // 강퇴할 멤버 목록 가져오기 & 채팅방 참여 목록에서 제거
+//        List<Long> kickMemberIds = chatRoomForm.getMemberIds();
+//
+//        // 방장은 자기자신을 강퇴하지 못함
+//        if (kickMemberIds.contains(currentMemberId)) {
+//            throw new KloverRequestException(ReturnCode.INVALID_REQUEST);
+//        }
+//
+//        chatRoom.getChatRoomMembers().removeIf(existingMember ->
+//                kickMemberIds.contains(existingMember.getMember().getId()));
+//
+//        // 강퇴 후 남은 인원이 2명 미만이면 채팅방 삭제
+//        if (chatRoom.getChatRoomMembers().size() < 2) {
+//            chatRoomRepository.delete(chatRoom);
+//
+//        } else {
+//            chatRoomRepository.save(chatRoom);
+//        }
+//    }
 
 
     // 채팅방 나가기(DM/그룹)
@@ -362,6 +360,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
                 .id(chatRoom.getId())
                 .memberId(chatRoom.getMember().getId())
                 .title(chatRoom.getTitle())
+                .memberCount(chatRoom.getChatRoomMembers().size())
                 .chatRoomMembers(chatRoom.getChatRoomMembers().stream()
                         .map(chatRoomMember -> MemberInfoDto.builder()
                                 .memberId(chatRoomMember.getMember().getId())

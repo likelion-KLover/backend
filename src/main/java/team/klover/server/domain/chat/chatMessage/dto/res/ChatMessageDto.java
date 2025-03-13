@@ -12,6 +12,7 @@ public class ChatMessageDto {
     private Long id;
     private Long memberId;
     private String nickname;
+    private String profileImageUrl;
     private String content;
     private List<String> imageUrls;
     private Long readCount;
