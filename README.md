@@ -355,9 +355,136 @@
 
 
 ## 🗂 프로젝트 구조
+<details>
+  <summary><b>디렉토리 구조<b></summary>
 
-> 디렉토리 구조 들어갈 것
+    server
+      ├── domain
+      │   ├── auth
+      │   │   ├── controller
+      │   │   ├── dto
+      │   │   └── service
+      │   ├── chat
+      │   │   ├── chatMessage
+      │   │   │   ├── controller
+      │   │   │   ├── dto
+      │   │   │   ├── entity
+      │   │   │   ├── repository
+      │   │   │   ├── service
+      │   │   │   └── serviceImpl
+      │   │   └── chatRoom
+      │   │       ├── controller
+      │   │       ├── dto
+      │   │       ├── entity
+      │   │       ├── repository
+      │   │       ├── service
+      │   │       └── serviceImpl
+      │   ├── community
+      │   │   ├── commPost
+      │   │   │   ├── controller
+      │   │   │   ├── dto
+      │   │   │   ├── entity
+      │   │   │   ├── enums
+      │   │   │   ├── event
+      │   │   │   ├── repository
+      │   │   │   ├── service
+      │   │   │   └── serviceImpl
+      │   │   └── comment
+      │   │       ├── controller
+      │   │       ├── dto
+      │   │       ├── entity
+      │   │       ├── event
+      │   │       ├── repository
+      │   │       ├── service
+      │   │       └── serviceImpl
+      │   ├── member
+      │   │   └── v1
+      │   │       ├── controller
+      │   │       ├── dto
+      │   │       ├── entity
+      │   │       ├── enums
+      │   │       ├── repository
+      │   │       └── service
+      │   ├── notification
+      │   │   ├── controller
+      │   │   ├── dto
+      │   │   ├── entity
+      │   │   ├── enums
+      │   │   └── eventListener
+      │   └── tour
+      │       ├── enums
+      │       ├── review
+      │       │   ├── controller
+      │       │   ├── dto
+      │       │   ├── entity
+      │       │   ├── repository
+      │       │   ├── service
+      │       │   └── serviceImpl
+      │       ├── tourApi
+      │       │   ├── scheduler
+      │       │   ├── service
+      │       │   └── serviceImpl
+      │       └── tourPost
+      │           ├── controller
+      │           ├── dto
+      │           ├── entity
+      │           ├── repository
+      │           ├── service
+      │           └── serviceImpl
+      └── global
+          ├── common
+          │   ├── constant
+          │   └── response
+          ├── elasticsearch
+          │   ├── commpost
+          │   │   ├── doc
+          │   │   ├── service
+          │   │   └── springevent
+          │   │       ├── event
+          │   │       ├── eventlistener
+          │   │       └── message
+          │   ├── config
+          │   └── tourpost
+          │       ├── doc
+          │       ├── service
+          │       └── springevent
+          │           ├── event
+          │           ├── eventlistener
+          │           └── message
+          ├── exception
+          │   └── handler
+          ├── fcm
+          │   ├── initiallizer
+          │   └── service
+          ├── i18n
+          │   └── service
+          ├── initData
+          ├── jpa
+          ├── rabbitMQ
+          │   ├── consumer
+          │   ├── producer
+          │   └── queueNames
+          ├── redis
+          ├── s3
+          ├── security
+          │   ├── config
+          │   ├── custom
+          │   ├── filter
+          │   └── provider
+          ├── stomp
+          ├── translation
+          │   ├── client
+          │   │   ├── config
+          │   │   └── controller
+          │   ├── config
+          │   ├── controller
+          │   ├── dto
+          │   ├── interceptor
+          │   └── service
+          └── util
 
+</details>
+    
 <br>
 <br>
 
