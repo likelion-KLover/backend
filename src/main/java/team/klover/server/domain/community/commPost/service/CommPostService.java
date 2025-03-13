@@ -41,7 +41,7 @@ public interface CommPostService {
     void deleteCommPostLike(Long currentMemberId, Long commPostId);
 
     // 게시글 생성
-    CommPostDto addCommPost(Long currentMemberId, @Valid CommPostForm commPostForm, List<MultipartFile> imageFiles);
+    void addCommPost(Long currentMemberId, @Valid CommPostForm commPostForm, List<MultipartFile> imageFiles);
 
     // 해당 게시글 수정
     void updateCommPost(Long currentMemberId, Long commPostId, @Valid CommPostForm commPostForm, List<MultipartFile> imageFiles);
