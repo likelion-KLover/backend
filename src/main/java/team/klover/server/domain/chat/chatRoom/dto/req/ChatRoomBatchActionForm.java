@@ -15,8 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL) // null 값은 직렬화에서 제외
-public class ChatRoomForm {
-    private String title;
+public class ChatRoomBatchActionForm {
     @Builder.Default
-    private List<ChatRoomMember> chatRoomMembers = new ArrayList<>();
+    private List<Long> memberIds = new ArrayList<>();
 }

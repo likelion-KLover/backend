@@ -130,8 +130,8 @@ public class ApiV1CommPostController {
     public ApiResponse<CommPostDto> addCommPost(@RequestPart(value = "commPostForm") @Valid CommPostForm commPostForm,
                                            @RequestPart(value = "imageFile") List<MultipartFile> imageFiles) {
         Long currentMemberId = AuthUtil.getCurrentMemberId();
-        commPostService.addCommPost(currentMemberId, commPostForm, imageFiles);
-        return ApiResponse.of(ReturnCode.SUCCESS);
+        CommPostDto dto = commPostService.addCommPost(currentMemberId, commPostForm, imageFiles);
+        return ApiResponse.of(dto);
     }
 
     // 해당 게시글 수정

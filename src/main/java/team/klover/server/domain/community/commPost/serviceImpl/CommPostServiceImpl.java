@@ -174,7 +174,7 @@ public class CommPostServiceImpl implements CommPostService {
     // 게시글 생성
     @Override
     @Transactional
-    public void addCommPost(Long currentMemberId, @Valid CommPostForm commPostForm, List<MultipartFile> imageFiles) {
+    public CommPostDto addCommPost(Long currentMemberId, @Valid CommPostForm commPostForm, List<MultipartFile> imageFiles) {
         // 현재 로그인한 사용자의 member 객체를 가져오는 메서드
         Member member = memberV1Repository.findById(currentMemberId).orElseThrow(() -> new KloverRequestException(ReturnCode.NOT_FOUND_ENTITY));
 
@@ -202,6 +202,8 @@ public class CommPostServiceImpl implements CommPostService {
                 .language(country)
                 .build();
         CommPost post = commPostRepository.save(commPost);
+
+        return convertToCommPostDto(post);
     }
 
     // 해당 게시글 수정
