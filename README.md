@@ -64,7 +64,13 @@
 
 ## ⚙️ 서비스 아키텍처
 
-> 아키텍처 사진 들어갈 것것
+<details>
+  <summary><b>아키텍처 보기</b></summary>
+  <div>
+    <br>
+    <image src = "https://github.com/user-attachments/assets/ad3a5a37-9607-47d9-b0c4-e33bf01c781b"/>
+  </div>
+</details>
 <div>
   <!-- Spring Boot -->
   <img src="https://img.shields.io/badge/Spring_Boot-6DB33F?style=flat-square&logo=SpringBoot&logoColor=white"/>
@@ -494,7 +500,10 @@
   <summary><b>ERD</b></summary>
   <div markdown="1">
     <ul>
-      <div></div>
+      <div>
+          <br>
+          <image src = "https://github.com/user-attachments/assets/7a687eae-47ac-480c-961b-e34a11048185"/>
+      </div>
     </ul>
   </div>
 </details>
@@ -503,7 +512,10 @@
   <summary><b>API</b></summary>
   <div markdown="1">
     <ul>
-      <div></div>
+      <div>
+        <br>
+        <image src = "https://github.com/user-attachments/assets/a6838145-b290-4efb-90cd-275b7f8d9652"/>
+      </div>
     </ul>
   </div>
 </details>
