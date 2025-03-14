@@ -2,6 +2,9 @@ package team.klover.server.domain.member.v1.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -246,5 +249,17 @@ public class MemberV1Service {
 
         return new MemberInfo(member);
     }
+
+    public Page<MemberDto> searchMemberByNickname(String nickname, Pageable pageable){
+        Page<Member> members = memberRepository.searchMember(nickname, pageable);
+
+        return new PageImpl<>(
+        members.stream().map(MemberDto::new).collect(Collectors.toList()),
+                members.getPageable(),
+                members.getTotalElements()
+        );
+    }
+
+
 
 }

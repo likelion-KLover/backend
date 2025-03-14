@@ -4,14 +4,19 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import team.klover.server.domain.member.v1.dto.MemberDto;
 import team.klover.server.domain.member.v1.dto.MemberInfo;
 import team.klover.server.domain.member.v1.dto.MemberUpdateParam;
 import team.klover.server.domain.member.v1.entity.Member;
 import team.klover.server.domain.member.v1.service.MemberV1Service;
 import team.klover.server.global.common.response.ApiResponse;
+import team.klover.server.global.common.response.KloverPage;
+import team.klover.server.global.exception.KloverRequestException;
 import team.klover.server.global.exception.ReturnCode;
 import team.klover.server.global.redis.RedisService;
 import team.klover.server.global.util.AuthUtil;
@@ -79,5 +84,14 @@ public class MemberV1Controller {
     public ApiResponse<MemberInfo> getMyPage(){
        Long memberId = AuthUtil.getCurrentMemberId();
        return ApiResponse.of(memberService.getMemberInfo(memberId));
+    }
+
+    @GetMapping("/search")
+    public ApiResponse<MemberDto> searchMember(@RequestParam(value = "keyword",defaultValue = "")String keyword,
+                                               @RequestParam(value = "page",defaultValue = "0")int page,
+                                               @RequestParam(value = "size",defaultValue = "10")int size){
+        if(page<0 || size <=0 || size >10) throw new KloverRequestException(ReturnCode.WRONG_PARAMETER);
+        Pageable pageable = PageRequest.of(page,size);
+        return ApiResponse.of(KloverPage.of(memberService.searchMemberByNickname(keyword,pageable)));
     }
 }

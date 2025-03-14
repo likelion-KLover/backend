@@ -33,13 +33,21 @@ public class AuthV1Service {
             throw new KloverRequestException(ReturnCode.ALREADY_EXIST);
         }
 
+
+        Country country = requestDto.getCountry() != null ? switch (requestDto.getCountry()) {
+            case "ko", "KO" -> Country.KO;
+            case "zh", "ZH" -> Country.ZH;
+            case "ja", "JA" -> Country.JA;
+            default -> Country.EN;
+        } : Country.EN;
+
         Member member = Member.builder()
                 .email(requestDto.getEmail())
                 .password(passwordEncoder.encode(requestDto.getPassword()))
                 .nickname(requestDto.getNickname())
                 .role(MemberRole.USER)
                 .socialProvider(SocialProvider.SERVER)
-                .country(Country.EN)
+                .country(country)
                 .build();
 
         try {
