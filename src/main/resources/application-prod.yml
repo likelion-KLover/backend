@@ -2,7 +2,7 @@ spring:
   datasource:
     url: jdbc:postgresql://175.45.192.38:5432/meta_db
     username: postgres
-    password: postgres
+    password: hsol9789!
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
