@@ -87,7 +87,7 @@ public class MemberV1Controller {
     }
 
     @GetMapping("/search")
-    public ApiResponse<MemberDto> searchMember(@RequestParam("keyword")String keyword,
+    public ApiResponse<MemberDto> searchMember(@RequestParam(value = "keyword",defaultValue = "")String keyword,
                                                @RequestParam(value = "page",defaultValue = "0")int page,
                                                @RequestParam(value = "size",defaultValue = "10")int size){
         if(page<0 || size <=0 || size >10) throw new KloverRequestException(ReturnCode.WRONG_PARAMETER);
