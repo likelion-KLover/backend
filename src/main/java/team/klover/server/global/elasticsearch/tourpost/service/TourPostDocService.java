@@ -68,7 +68,7 @@ public class TourPostDocService {
 
         if(searchByTitle){
             boolQueryBuilder.should(s -> s.matchPhrase(mp -> mp.field("title").query(keyword).boost(30f)));
-            boolQueryBuilder.should(s -> s.match(m -> m.field("title.ngram").query(keyword).boost(3f)));
+            boolQueryBuilder.should(s -> s.match(m -> m.field("title.ngram").query(keyword).boost(1f)));
         }
 
         if(searchByOverview){
@@ -150,19 +150,19 @@ public class TourPostDocService {
         switch (language) {
             case KO -> {
                 index="tourpostkor";
-                minScore=!keyword.isBlank()?6.5:0;
+                minScore=!keyword.isBlank()?7.5:0;
             }
             case JA -> {
                 index="tourpostjpn";
-                minScore=!keyword.isBlank()?5.0:0;
+                minScore=!keyword.isBlank()?10:0;
             }
             case ZH -> {
                 index="tourpostchs";
-                minScore=!keyword.isBlank()?10.0:0;
+                minScore=!keyword.isBlank()?7.0:0;
             }
             default -> {
                 index="tourposteng";
-                minScore=!keyword.isBlank()?4.0:0;
+                minScore=!keyword.isBlank()?9:0;
             }
         }
 

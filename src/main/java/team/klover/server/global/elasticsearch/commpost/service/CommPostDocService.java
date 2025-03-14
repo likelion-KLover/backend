@@ -71,7 +71,7 @@ public class CommPostDocService {
 
         if(searchByNickname){
             boolQueryBuilder.should(s -> s.matchPhrase(mp -> mp.field("nickname").query(keyword).boost(30f)));
-            boolQueryBuilder.should(s -> s.match(m -> m.field("nickname.ngram").query(keyword).boost(2f)));
+            boolQueryBuilder.should(s -> s.match(m -> m.field("nickname.ngram").query(keyword).boost(1f)));
         }
 
         if(searchByContent || searchByNickname){
@@ -88,19 +88,19 @@ public class CommPostDocService {
         switch (language) {
             case KO -> {
                 index="commpostkor";
-                minScore=!keyword.isBlank()?3.25:0;
+                minScore=!keyword.isBlank()?4.0:0;
             }
             case JA -> {
                 index = "commpostjpn";
-                minScore=!keyword.isBlank()?2.5:0;
+                minScore=!keyword.isBlank()?6.0:0;
             }
             case ZH -> {
                 index="commpostchs";
-                minScore=!keyword.isBlank()?5.0:0;
+                minScore=!keyword.isBlank()?3.0:0;
             }
             default -> {
                 index="commposteng";
-                minScore=!keyword.isBlank()?2.0:0;
+                minScore=!keyword.isBlank()?6.5:0;
             }
         }
 
