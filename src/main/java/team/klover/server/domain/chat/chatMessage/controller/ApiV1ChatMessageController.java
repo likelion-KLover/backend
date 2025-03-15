@@ -54,8 +54,8 @@ public class ApiV1ChatMessageController {
     // http://localhost:8080/api/v1/chat-room/message/1
     @PostMapping("/{chatRoomId}")
     public ApiResponse<String> writeChatMessage(@PathVariable("chatRoomId") Long chatRoomId,
-                                                @RequestPart(value ="chatMessageForm") ChatMessageForm chatMessageForm,
-                                                @RequestPart(value = "imageFile") List<MultipartFile> imageFiles) {
+                                                @RequestPart(value ="chatMessageForm" ) ChatMessageForm chatMessageForm,
+                                                @RequestPart(value = "imageFile", required = false) List<MultipartFile> imageFiles) {
         Long currentMemberId = AuthUtil.getCurrentMemberId();
         chatMessageService.writeChatMessage(currentMemberId, chatRoomId, chatMessageForm, imageFiles);
         return ApiResponse.of(ReturnCode.SUCCESS);
