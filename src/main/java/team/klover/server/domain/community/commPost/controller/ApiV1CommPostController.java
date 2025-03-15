@@ -46,14 +46,13 @@ public class ApiV1CommPostController {
         return commPostService.findPostsWithinRadius(xyForm, pageable);
     }
 
-    // 본인 게시글 조회
-    // http://localhost:8080/api/v1/comm-post/me
-    @GetMapping("/me")
+    // 해당 사용자가 작성한 게시글 조회
+    // http://localhost:8080/api/v1/comm-post/1
+    @GetMapping("/post/{memberId}")
     @Operation(summary = "본인 게시글 조회")
-    public ApiResponse<DetailCommPostDto> getMyCommPost(@ModelAttribute CommPostPage request) {
+    public ApiResponse<DetailCommPostDto> getMemberCommPost(@ModelAttribute CommPostPage request, @PathVariable("memberId") Long memberId) {
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
-        Long currentMemberId = AuthUtil.getCurrentMemberId();
-        return ApiResponse.of(KloverPage.of(commPostService.findByMemberId(currentMemberId, pageable)));
+        return ApiResponse.of(KloverPage.of(commPostService.findByMemberId(memberId, pageable)));
     }
 
     // 해당 게시글 상세 조회
@@ -64,14 +63,13 @@ public class ApiV1CommPostController {
         return ApiResponse.of(commPostService.findById(commPostId));
     }
 
-    // 사용자가 저장한 게시글 조회
+    // 해당 사용자가 저장한 게시글 조회
     // http://localhost:8080/api/v1/comm-post/collection
-    @GetMapping("/collection")
+    @GetMapping("/collection/{memberId}")
     @Operation(summary = "사용자가 저장한 게시글 조회")
-    public ApiResponse<CommPostDto> getCollectionCommPost(@ModelAttribute CommPostPage request) {
+    public ApiResponse<CommPostDto> getMemberCollectionCommPost(@ModelAttribute CommPostPage request, @PathVariable("memberId") Long memberId) {
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
-        Long currentMemberId = AuthUtil.getCurrentMemberId();
-        return ApiResponse.of(KloverPage.of(commPostService.getSavedCommPostByMember(currentMemberId, pageable)));
+        return ApiResponse.of(KloverPage.of(commPostService.getSavedCommPostByMember(memberId, pageable)));
     }
 
     // 사용자 닉네임 & 게시글 내용 검색

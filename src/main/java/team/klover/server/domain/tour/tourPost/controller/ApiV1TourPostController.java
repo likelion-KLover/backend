@@ -53,14 +53,13 @@ public class ApiV1TourPostController {
         return ApiResponse.of(tourPostService.findByContentId(contentId));
     }
 
-    // 사용자가 저장한 관광지 조회
+    // 해당 사용자가 저장한 관광지 조회
     // http://localhost:8080/api/v1/tour-post/collection?page=0&size=15
-    @GetMapping("/collection")
+    @GetMapping("/collection/{memberId}")
     @Operation(summary = "사용자가 저장한 관광지 조회")
-    public ApiResponse<TourPostDto> getCollectionTourPost(@ModelAttribute TourPostPage request) {
+    public ApiResponse<TourPostDto> getMemberCollectionTourPost(@ModelAttribute TourPostPage request, @PathVariable("memberId") Long memberId) {
         Pageable pageable = PageRequest.of(request.getPage(), request.getSize());
-        Long currentMemberId = AuthUtil.getCurrentMemberId();
-        return ApiResponse.of(KloverPage.of(tourPostService.getSavedTourPostByMember(currentMemberId, pageable)));
+        return ApiResponse.of(KloverPage.of(tourPostService.getSavedTourPostByMember(memberId, pageable)));
     }
 
     // 사용자 언어 & 관광지명/지역명 검색

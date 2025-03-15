@@ -33,6 +33,8 @@ public class TourPostServiceImpl implements TourPostService {
     private final TourPostSaveRepository tourPostSaveRepository;
 
     // 사용자 위치 주변 게시글(관광지&사용자) 조회
+    @Override
+    @Transactional(readOnly = true)
     public Page<TourPostDto> findPostsWithinRadius(@Valid XYForm xyForm, Pageable pageable) {
         Page<TourPost> tourPosts = tourPostRepository.findPostsWithinRadius(
                 xyForm.getMapX(), xyForm.getMapY(), xyForm.getRadius(), pageable);
@@ -56,12 +58,12 @@ public class TourPostServiceImpl implements TourPostService {
         return convertToDetailTourPostDto(tourPost);
     }
 
-    // 사용자가 저장한 관광지 조회
+    // 해당 사용자가 저장한 관광지 조회
     @Override
     @Transactional(readOnly = true)
-    public Page<TourPostDto> getSavedTourPostByMember(Long currentMemberId, Pageable pageable) {
+    public Page<TourPostDto> getSavedTourPostByMember(Long memberId, Pageable pageable) {
         checkPageSize(pageable.getPageSize());
-        Page<TourPost> tourPosts = tourPostRepository.findSavedTourPostsByMemberId(currentMemberId, pageable);
+        Page<TourPost> tourPosts = tourPostRepository.findSavedTourPostsByMemberId(memberId, pageable);
         return tourPosts.map(this::convertToTourPostDto);
     }
 

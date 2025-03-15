@@ -16,14 +16,14 @@ public interface CommPostService {
     // 사용자 위치 주변 게시글(관광지&사용자) 조회
     CombinedPostResponse findPostsWithinRadius(@Valid XYForm xyForm, Pageable pageable);
 
-    // 본인 게시글 조회
-    Page<DetailCommPostDto> findByMemberId(Long currentMemberId, Pageable pageable);
+    // 해당 사용자가 작성한 게시글 조회
+    Page<DetailCommPostDto> findByMemberId(Long memberId, Pageable pageable);
 
     // 해당 게시글 상세 조회
     DetailCommPostDto findById(Long commPostId);
 
-    // 사용자가 저장한 게시글 조회
-    Page<CommPostDto> getSavedCommPostByMember(Long currentMemberId, Pageable pageable);
+    // 해당 사용자가 저장한 게시글 조회
+    Page<CommPostDto> getSavedCommPostByMember(Long memberId, Pageable pageable);
 
     // 사용자 닉네임 & 게시글 내용 검색
     Page<CommPostDto> searchByKeyword(String keyword, Pageable pageable);
