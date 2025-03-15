@@ -17,8 +17,8 @@ public interface TourPostService {
     // 해당 관광지 상세 조회
     DetailTourPostDto findByContentId(Long contentId);
 
-    // 사용자가 저장한 관광지 조회
-    Page<TourPostDto> getSavedTourPostByMember(Long currentMemberId, Pageable pageable);
+    // 해당 사용자가 저장한 관광지 조회
+    Page<TourPostDto> getSavedTourPostByMember(Long memberId, Pageable pageable);
 
     // 사용자 언어 & 관광지명/지역명 검색
     Page<TourPostDto> searchByLanguageAndKeyword(String language, String keyword, Pageable pageable);

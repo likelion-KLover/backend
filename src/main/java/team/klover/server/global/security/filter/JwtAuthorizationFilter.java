@@ -48,9 +48,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 || path.startsWith("/v1/api-docs/swagger-config")
                 || path.startsWith("/swagger-ui")
                 || path.startsWith("/api/v1/translate")
-                || (path.startsWith("/api/v1/notification"))
-                || (path.startsWith("/api/v1/comm-post/surroundings") && method.equals("GET"))
-                || (path.startsWith("/api/v1/comm-post/search") && method.equals("GET"));
+                || (path.startsWith("/api/v1/notification"));
     }
 
     @Override
@@ -62,8 +60,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
         // 인증이 필요 없는 URL 리스트
         boolean isPublicApi =
-                 (path.startsWith("/api/v1/comm-post/comment") && method.equals("GET"))
-                || (path.startsWith("/api/v1/comm-post/detail") && method.equals("GET"))
+                 (path.startsWith("/api/v1/comm-post") && method.equals("GET"))
                 || (path.startsWith("/api/v1/tour-post") && method.equals("GET"));
 
         if (!isPublicApi && !StringUtils.hasText(token)) {

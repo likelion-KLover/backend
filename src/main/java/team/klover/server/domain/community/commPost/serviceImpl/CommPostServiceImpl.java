@@ -56,6 +56,8 @@ public class CommPostServiceImpl implements CommPostService {
     private final CommPostSaveRepository commPostSaveRepository;
 
     // 사용자 위치 주변 게시글(관광지&사용자) 조회
+    @Override
+    @Transactional(readOnly = true)
     public CombinedPostResponse findPostsWithinRadius(@Valid XYForm xyForm, Pageable pageable){
         checkPageSize(pageable.getPageSize());
         Page<CommPostDto> commPosts = commPostRepository.findPostsWithinRadius(
@@ -67,12 +69,12 @@ public class CommPostServiceImpl implements CommPostService {
         return new CombinedPostResponse(commPosts, tourPosts);
     }
 
-    // 본인 게시글 조회
+    // 해당 사용자가 작성한 게시글 조회
     @Override
     @Transactional(readOnly = true)
-    public Page<DetailCommPostDto> findByMemberId(Long currentMemberId, Pageable pageable){
+    public Page<DetailCommPostDto> findByMemberId(Long memberId, Pageable pageable){
         checkPageSize(pageable.getPageSize());
-        Page<CommPost> commPosts = commPostRepository.findByMemberId(currentMemberId, pageable);
+        Page<CommPost> commPosts = commPostRepository.findByMemberId(memberId, pageable);
         return commPosts.map(this::convertToDetailCommPostDto);
     }
 
@@ -84,12 +86,12 @@ public class CommPostServiceImpl implements CommPostService {
         return convertToDetailCommPostDto(commPost);
     }
 
-    // 사용자가 저장한 게시글 조회
+    // 해당 사용자가 저장한 게시글 조회
     @Override
     @Transactional(readOnly = true)
-    public Page<CommPostDto> getSavedCommPostByMember(Long currentMemberId, Pageable pageable){
+    public Page<CommPostDto> getSavedCommPostByMember(Long memberId, Pageable pageable){
         checkPageSize(pageable.getPageSize());
-        Page<CommPost> commPosts = commPostRepository.findSavedCommPostByMemberId(currentMemberId, pageable);
+        Page<CommPost> commPosts = commPostRepository.findSavedCommPostByMemberId(memberId, pageable);
         return commPosts.map(this::convertToCommPostDto);
     }
 
