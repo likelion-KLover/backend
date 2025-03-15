@@ -180,6 +180,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
         }
 
         // 입력 받은 이미지들 S3에 저장
+        if (imageFiles == null) { imageFiles = new ArrayList<>(); }  // imageFiles가 null이면 빈 리스트로 초기화
         List<String> imageUrls = new ArrayList<>();
         if (imageFiles.size() > 4) {
             throw new KloverRequestException(ReturnCode.WRONG_PARAMETER);
@@ -250,7 +251,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
         List<ChatMessage> messages = chatMessageRepository.findByChatRoom(chatRoom);
         messages.forEach(message -> s3Service.deleteAllFile(message.getImageUrls()));
         messages.forEach(message -> messageContentRepository.deleteById(String.valueOf(message.getId())));
-        
+
         chatMessageRepository.deleteAll(messages);
     }
 
@@ -295,7 +296,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
             chatMessageRepository.saveAll(updatedMessages);
         }
         chatRoomMember.setActive(true);
-        
+
         // 마지막으로 읽은 메시지ID 초기화
         ChatMessage lastReadMessage = chatMessageRepository.findTopByChatRoomIdOrderByIdDesc(chatRoomId);
         chatRoomMember.setLastReadMessageId(lastReadMessage != null ? lastReadMessage.getId() : null);
@@ -307,7 +308,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     public Long countInactiveMembers(Long chatRoomId){
         return chatRoomMemberRepository.countInActiveMembers(chatRoomId);
     }
-    
+
     // 요청 메시지 수 제한
     private void checkPageSize(int pageSize) {
         int maxPageSize = ChatMessagePage.getMaxPageSize();
