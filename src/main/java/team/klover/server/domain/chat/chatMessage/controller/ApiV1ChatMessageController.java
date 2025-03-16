@@ -3,6 +3,7 @@ package team.klover.server.domain.chat.chatMessage.controller;
 import lombok.*;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import team.klover.server.domain.chat.chatMessage.dto.req.ChatMessageForm;
@@ -52,7 +53,7 @@ public class ApiV1ChatMessageController {
 
     // 해당 채팅방에서 메시지 생성
     // http://localhost:8080/api/v1/chat-room/message/1
-    @PostMapping("/{chatRoomId}")
+    @MessageMapping("/{chatRoomId}")
     public ApiResponse<String> writeChatMessage(@PathVariable("chatRoomId") Long chatRoomId,
                                                 @RequestPart(value ="chatMessageForm" ) ChatMessageForm chatMessageForm,
                                                 @RequestPart(value = "imageFile", required = false) List<MultipartFile> imageFiles) {
