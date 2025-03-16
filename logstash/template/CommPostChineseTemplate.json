@@ -16,8 +16,15 @@
           },
           "remove_symbols": {
             "type": "pattern_replace",
-            "pattern": "[\\p{P}\\p{S}\\s]",
+            "pattern": "[\\p{P}\\p{S}\\s\\d]",
             "replacement": ""
+          }
+        },
+        "tokenizer": {
+          "fixed_length_tokenizer": {
+            "type": "pattern",
+            "pattern": ".{1,2}",
+            "group": 0
           }
         },
         "analyzer": {
@@ -33,30 +40,33 @@
               "asciifolding"
             ]
           },
-          "chs_word_search_analyzer": {
+          "partial_analyzer": {
             "type": "custom",
-            "tokenizer": "keyword",
-            "char_filter": [
-              "remove_korean",
-              "remove_symbols"
-            ],
+            "tokenizer": "standard",
             "filter": [
-              "cjk_width",
-              "ngram_filter",
-              "word_pinyin",
+              "lowercase",
               "asciifolding",
+              "my_word_delimiter_graph",
+              "ngram_filter",
               "unique"
             ]
           },
-          "chs_word_analyzer": {
+          "normalized_analyzer": {
             "type": "custom",
-            "tokenizer": "ik_smart",
+            "tokenizer": "fixed_length_tokenizer",
             "char_filter": [
-              "remove_korean"
+              "remove_symbols"
             ],
             "filter": [
-              "cjk_width",
-              "my_pinyin",
+              "lowercase",
+              "asciifolding"
+            ]
+          },
+          "original_analyzer": {
+            "type": "custom",
+            "tokenizer": "fixed_length_tokenizer",
+            "filter": [
+              "lowercase",
               "asciifolding"
             ]
           }
@@ -65,29 +75,9 @@
           "ngram_filter": {
             "type": "ngram",
             "min_gram": 2,
-            "max_gram": 4
-          },
-          "my_pinyin": {
-            "type": "pinyin",
-            "keep_first_letter": false,
-            "keep_separate_first_letter": false,
-            "keep_full_pinyin": true,
-            "keep_original": false,
-            "keep_joined_full_pinyin": false,
-            "limit_first_letter_length": 0,
-            "lowercase": true
+            "max_gram": 8
           },
           "content_pinyin": {
-            "type": "pinyin",
-            "keep_first_letter": false,
-            "keep_separate_first_letter": false,
-            "keep_full_pinyin": true,
-            "keep_original": false,
-            "keep_joined_full_pinyin": true,
-            "limit_first_letter_length": 0,
-            "lowercase": true
-          },
-          "word_pinyin": {
             "type": "pinyin",
             "keep_first_letter": false,
             "keep_separate_first_letter": false,
@@ -100,6 +90,10 @@
           "han_to_latin": {
             "type": "icu_transform",
             "id": "Han-Latin"
+          },
+          "my_word_delimiter_graph": {
+            "type": "word_delimiter_graph",
+            "preserve_original": true
           }
         }
       }
@@ -127,13 +121,17 @@
         "location": {
           "type": "geo_point"
         },
-        "nickname": {
+        "nickname":{
           "type": "text",
-          "analyzer": "chs_word_analyzer",
+          "analyzer": "original_analyzer",
           "fields": {
             "ngram": {
               "type": "text",
-              "analyzer": "chs_word_search_analyzer"
+              "analyzer": "partial_analyzer"
+            },
+            "normalized": {
+              "type": "text",
+              "analyzer": "normalized_analyzer"
             }
           }
         },

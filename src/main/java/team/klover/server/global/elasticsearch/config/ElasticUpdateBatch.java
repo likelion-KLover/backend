@@ -23,6 +23,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
@@ -42,8 +43,10 @@ public class ElasticUpdateBatch {
         Map<Long, Object> nicknameModificationTarget = redisService.getAllNickname();
         Map<Long, Object> commPostCountTarget = redisService.getAllCommPostCount();
         Map<Long, Map<Object,Object>> tourPostCountTarget = redisService.getAllTourPostCount();
+        Map<Long, Map<Object,Object>> memberUpdateTarget = redisService.getAllMemberModification();
+        Set<Object> memberDeletionTarget = redisService.getAllMemberDeletion();
 
-        boolean haveToBulk = !(commPostCountTarget.isEmpty() && commPostModificationTarget.isEmpty() && nicknameModificationTarget.isEmpty() && commPostDeletionTarget.isEmpty() && tourPostCountTarget.isEmpty());
+        boolean haveToBulk = !(commPostCountTarget.isEmpty() && commPostModificationTarget.isEmpty() && nicknameModificationTarget.isEmpty() && commPostDeletionTarget.isEmpty() && tourPostCountTarget.isEmpty() && memberDeletionTarget.isEmpty() && memberUpdateTarget.isEmpty());
         if(!haveToBulk) return;
 
         //수정사항이 있었으나 지워진 게시글이 있으면 수정 요청을 못 하도록 없애버림
@@ -63,6 +66,14 @@ public class ElasticUpdateBatch {
                         v.put("like_count",commPostLikeRepository.countCommPostLike(k));
                         commPostCountTarget.remove(k);
                     }
+                }
+        );
+
+
+        memberDeletionTarget.forEach(
+                (k)->{
+                    Long realKey = Long.parseLong((String)k);
+                    memberUpdateTarget.remove(realKey);
                 }
         );
 
@@ -276,6 +287,17 @@ public class ElasticUpdateBatch {
                             )
                     );
                 }
+        );
+
+        memberDeletionTarget.forEach(
+                (k)->
+                    bqb.operations(bo->bo.delete(d->d.index("members").id(String.valueOf(k))))
+
+        );
+
+        memberUpdateTarget.forEach(
+                (k,v)-> bqb.operations(bo->bo.update(u->u.index("members").id(String.valueOf(k))
+                        .action(a->a.doc(v).docAsUpsert(false))))
         );
 
 

@@ -1,6 +1,6 @@
 {
   "index_patterns": [
-    "commposteng"
+    "members"
   ],
   "template": {
     "settings": {
@@ -28,26 +28,9 @@
           }
         },
         "analyzer": {
-          "english_content_analyzer": {
-            "type": "custom",
-            "tokenizer": "standard",
-            "char_filter": [
-              "remove_korean"
-            ],
-            "filter": [
-              "lowercase",
-              "stop",
-              "porter_stem",
-              "asciifolding",
-              "word_delimiter_graph"
-            ]
-          },
           "partial_analyzer": {
             "type": "custom",
             "tokenizer": "standard",
-            "char_filter": [
-              "remove_korean"
-            ],
             "filter": [
               "lowercase",
               "asciifolding",
@@ -70,9 +53,6 @@
           "original_analyzer": {
             "type": "custom",
             "tokenizer": "fixed_length_tokenizer",
-            "char_filter": [
-              "remove_symbols"
-            ],
             "filter": [
               "lowercase",
               "asciifolding"
@@ -94,26 +74,17 @@
     },
     "mappings": {
       "properties": {
-        "id": {
+        "email":{
+          "type": "keyword"
+        },
+        "role": {
+          "type": "keyword"
+        },
+        "social_provider":{
+          "type": "keyword"
+        },
+        "id":{
           "type": "long"
-        },
-        "member_id": {
-          "type": "long"
-        },
-        "content": {
-          "type": "text",
-          "analyzer": "english_content_analyzer"
-        },
-        "create_date": {
-          "type": "date",
-          "format": "strict_date_time"
-        },
-        "modify_date": {
-          "type": "date",
-          "format": "strict_date_time"
-        },
-        "location": {
-          "type": "geo_point"
         },
         "nickname":{
           "type": "text",
@@ -129,16 +100,10 @@
             }
           }
         },
-        "comment_count": {
-          "type": "long"
-        },
-        "like_count": {
-          "type": "long"
-        },
-        "language": {
+        "profile_url":{
           "type": "keyword"
         },
-        "image_urls": {
+        "country":{
           "type": "keyword"
         }
       }

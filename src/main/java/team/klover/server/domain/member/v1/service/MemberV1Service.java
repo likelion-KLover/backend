@@ -46,6 +46,8 @@ import team.klover.server.domain.tour.tourPost.service.TourPostService;
 import team.klover.server.global.elasticsearch.commpost.springevent.event.CommPostDeleteEvent;
 import team.klover.server.global.elasticsearch.commpost.springevent.event.CommPostCountEvent;
 import team.klover.server.global.elasticsearch.commpost.springevent.event.NicknameUpdateEvent;
+import team.klover.server.global.elasticsearch.member.springevent.event.MemberDeleteEvent;
+import team.klover.server.global.elasticsearch.member.springevent.event.MemberUpdateEvent;
 import team.klover.server.global.elasticsearch.tourpost.springevent.event.TourPostCountEvent;
 import team.klover.server.global.exception.KloverException;
 import team.klover.server.global.exception.KloverLogicException;
@@ -115,6 +117,8 @@ public class MemberV1Service {
         if(!prevNickname.equals(curNickname)) {
             publisher.publishEvent(new NicknameUpdateEvent(this, member));
         }
+
+        publisher.publishEvent(new MemberUpdateEvent(this, member));
     }
 
     @Transactional
@@ -125,6 +129,7 @@ public class MemberV1Service {
         if(member.getProfileUrl() != null) s3Service.deleteFile(member.getProfileUrl());
 
         member.setProfileUrl(null);
+        publisher.publishEvent(new MemberUpdateEvent(this, member));
     }
 
     public MemberDto getMyInfo() {
@@ -227,6 +232,7 @@ public class MemberV1Service {
         }
 
         memberRepository.deleteById(memberId);
+        publisher.publishEvent(new MemberDeleteEvent(this, member));
     }
 
     public Member findByEmail(String email) {

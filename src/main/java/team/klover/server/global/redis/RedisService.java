@@ -13,13 +13,12 @@ import team.klover.server.global.elasticsearch.commpost.springevent.message.Comm
 import team.klover.server.global.elasticsearch.commpost.springevent.message.CommPostDeletionMessage;
 import team.klover.server.global.elasticsearch.commpost.springevent.message.CommPostModificationMessage;
 import team.klover.server.global.elasticsearch.commpost.springevent.message.NicknameModificationMessage;
+import team.klover.server.global.elasticsearch.member.springevent.message.MemberDeletionMessage;
+import team.klover.server.global.elasticsearch.member.springevent.message.MemberModificationMessage;
 import team.klover.server.global.elasticsearch.tourpost.springevent.message.TourPostCountMessage;
 
 import java.time.Duration;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -125,29 +124,7 @@ public class RedisService {
         return result;
     }
     private Object getCommPostCountLanguage(String key){
-        String lockKey = key+":lock";
-
-        RLock lock = redissonClient.getLock(lockKey); // Redisson의 분산 락
-
-        try {
-            boolean lockAcquired = lock.tryLock(10, 5, TimeUnit.SECONDS);
-            if (!lockAcquired) {
-                throw new RuntimeException("Failed to acquire lock");
-            }
-
-            // 락을 획득한 상태에서 데이터 조회 및 삭제
-            Object result = redisTemplate.opsForValue().get(key);
-            redisTemplate.delete(key);
-            return result;
-
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException("Thread interrupted while waiting for lock", e);
-        } finally {
-            if (lock.isHeldByCurrentThread()) {
-                lock.unlock(); // 락 해제
-            }
-        }
+        return getValue(key);
     }
 
     public void saveCommPostModificationMessage(CommPostModificationMessage message){
@@ -219,29 +196,7 @@ public class RedisService {
     }
 
     private Map<Object, Object> getCommPostModification(String key){
-        String lockKey = key + ":lock";
-        RLock lock = redissonClient.getLock(lockKey);
-
-        try {
-            boolean lockAcquired = lock.tryLock(10, 5, TimeUnit.SECONDS);
-            if (!lockAcquired) {
-                throw new RuntimeException("Failed to acquire lock");
-            }
-
-
-            // 락을 획득한 상태에서 데이터 조회 및 삭제
-            Map<Object, Object> result = redisTemplate.opsForHash().entries(key);
-            redisTemplate.delete(key);
-            return result;
-
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException("Thread interrupted while waiting for lock", e);
-        } finally {
-            if (lock.isHeldByCurrentThread()) {
-                lock.unlock(); // 락 해제
-            }
-        }
+        return getHashEntries(key);
     }
 
     public void saveCommPostDeletionMessage(CommPostDeletionMessage message){
@@ -291,33 +246,11 @@ public class RedisService {
     }
 
     private Object getCommPostDeletion(String key){
-        String lockKey = key + ":lock";
-
-        RLock lock = redissonClient.getLock(lockKey); // Redisson의 분산 락
-
-        try {
-            boolean lockAcquired = lock.tryLock(10, 5, TimeUnit.SECONDS);
-            if (!lockAcquired) {
-                throw new RuntimeException("Failed to acquire lock");
-            }
-
-            // 락을 획득한 상태에서 데이터 조회 및 삭제
-            Object result = redisTemplate.opsForValue().get(key);
-            redisTemplate.delete(key);
-            return result;
-
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException("Thread interrupted while waiting for lock", e);
-        } finally {
-            if (lock.isHeldByCurrentThread()) {
-                lock.unlock(); // 락 해제
-            }
-        }
+        return getValue(key);
     }
 
     public void saveNicknameModificationMessage(NicknameModificationMessage message){
-        String key = ES_MEMBER_PREFIX+message.getMember_id();
+        String key = ES_MEMBER_PREFIX+message.getMember_id()+ES_NICKNAMEONLY_PREFIX;
         String lockKey = key + ":lock";
 
         RLock lock = redissonClient.getLock(lockKey);
@@ -344,7 +277,7 @@ public class RedisService {
     }
 
     public Map<Long, Object> getAllNickname(){
-        String keyPattern = ES_MEMBER_PREFIX+"*";
+        String keyPattern = ES_MEMBER_PREFIX+"*"+ES_NICKNAMEONLY_PREFIX;
 
         Cursor<String> cursor = redisTemplate.scan(ScanOptions.scanOptions()
                 .match(keyPattern)
@@ -363,30 +296,9 @@ public class RedisService {
     }
 
     private Object getNickname(String key){
-        String lockKey = key + ":lock";
-
-        RLock lock = redissonClient.getLock(lockKey); // Redisson의 분산 락
-
-        try {
-            boolean lockAcquired = lock.tryLock(10, 5, TimeUnit.SECONDS);
-            if (!lockAcquired) {
-                throw new RuntimeException("Failed to acquire lock");
-            }
-
-            // 락을 획득한 상태에서 데이터 조회 및 삭제
-            Object result = redisTemplate.opsForValue().get(key);
-            redisTemplate.delete(key);
-            return result;
-
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException("Thread interrupted while waiting for lock", e);
-        } finally {
-            if (lock.isHeldByCurrentThread()) {
-                lock.unlock(); // 락 해제
-            }
-        }
+        return getValue(key);
     }
+
 
     public void saveTourPostCountMessage(TourPostCountMessage message){
         String key = ES_TOURPOST_PREFIX+message.getContent_id()+ES_TOURPOST_COUNT_PREFIX;
@@ -437,6 +349,154 @@ public class RedisService {
     }
 
     private Map<Object, Object> getTourPostLanguage(String key){
+        return getHashEntries(key);
+    }
+
+    public void saveMemberModification(MemberModificationMessage message){
+        String key = ES_MEMBER_PREFIX+message.getId()+ES_MEMBER_UPDATE_POSTFIX;
+        String lockKey = key + ":lock";
+
+        RLock lock = redissonClient.getLock(lockKey);
+
+        try {
+            // 🔹 최대 10초 동안 락을 기다림, 락을 획득하면 5초 후 자동 해제
+            boolean lockAcquired = lock.tryLock(10, 5, TimeUnit.SECONDS);
+            if (!lockAcquired) {
+                throw new RuntimeException("Failed to acquire lock");
+            }
+
+            // 🔹 데이터 저장
+            Map<String, Object> values = new HashMap<>();
+            values.put("nickname",message.getNickname());
+            values.put("country",message.getCountry());
+            values.put("email",message.getEmail());
+            values.put("profile_url",message.getProfile_url());
+            values.put("role",message.getRole());
+            values.put("social_provider",message.getSocial_provider());
+            redisTemplate.opsForHash().putAll(key, values);
+            redisTemplate.expire(key,Duration.ofMinutes(3));
+
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Thread interrupted while waiting for lock", e);
+        } finally {
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock(); // 락 해제
+            }
+        }
+
+    }
+
+    public Map<Long, Map<Object, Object>> getAllMemberModification(){
+        String keyPattern = ES_MEMBER_PREFIX+"*"+ES_MEMBER_UPDATE_POSTFIX;
+
+        Cursor<String> cursor = redisTemplate.scan(ScanOptions.scanOptions()
+                .match(keyPattern)
+                .build());
+
+        List<String> keys = cursor.stream().toList();
+        Map<Long, Map<Object, Object>> result = new HashMap<>();
+        keys.forEach(
+                key -> {
+                    String idStr = key.split(":")[1];
+                    result.put(Long.parseLong(idStr),getMemberModification(key));
+                }
+        );
+
+        return result;
+    }
+
+    private Map<Object, Object> getMemberModification(String key){
+        return getHashEntries(key);
+    }
+
+
+
+    public void saveMemberDeletion(MemberDeletionMessage message){
+        String key = ES_MEMBER_DELETE;
+        String lockKey = key + ":lock";
+
+        RLock lock = redissonClient.getLock(lockKey);
+
+        try {
+            // 🔹 최대 10초 동안 락을 기다림, 락을 획득하면 5초 후 자동 해제
+            boolean lockAcquired = lock.tryLock(10, 5, TimeUnit.SECONDS);
+            if (!lockAcquired) {
+                throw new RuntimeException("Failed to acquire lock");
+            }
+
+            // 🔹 데이터 저장
+            redisTemplate.opsForSet().add(key,message.getId().toString());
+            redisTemplate.expire(key,Duration.ofMinutes(3));
+
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Thread interrupted while waiting for lock", e);
+        } finally {
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock(); // 락 해제
+            }
+        }
+    }
+
+    public Set<Object> getAllMemberDeletion(){
+        String key = ES_MEMBER_DELETE;
+        String lockKey = key + ":lock";
+
+        RLock lock = redissonClient.getLock(lockKey);
+
+        Set<Object> result;
+
+        try {
+            // 🔹 최대 10초 동안 락을 기다림, 락을 획득하면 5초 후 자동 해제
+            boolean lockAcquired = lock.tryLock(10, 5, TimeUnit.SECONDS);
+            if (!lockAcquired) {
+                throw new RuntimeException("Failed to acquire lock");
+            }
+
+            result = redisTemplate.opsForSet().members(key);
+            redisTemplate.delete(key);
+
+
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Thread interrupted while waiting for lock", e);
+        } finally {
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock(); // 락 해제
+            }
+        }
+
+        return result;
+    }
+
+    private Object getValue(String key) {
+        String lockKey = key + ":lock";
+
+        RLock lock = redissonClient.getLock(lockKey); // Redisson의 분산 락
+
+        try {
+            boolean lockAcquired = lock.tryLock(10, 5, TimeUnit.SECONDS);
+            if (!lockAcquired) {
+                throw new RuntimeException("Failed to acquire lock");
+            }
+
+            // 락을 획득한 상태에서 데이터 조회 및 삭제
+            Object result = redisTemplate.opsForValue().get(key);
+            redisTemplate.delete(key);
+            return result;
+
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Thread interrupted while waiting for lock", e);
+        } finally {
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock(); // 락 해제
+            }
+        }
+    }
+
+    private Map<Object, Object> getHashEntries(String key) {
         String lockKey =  key + ":lock";
 
         RLock lock = redissonClient.getLock(lockKey); // Redisson의 분산 락

@@ -11,7 +11,7 @@
         "char_filter": {
           "remove_symbols": {
             "type": "pattern_replace",
-            "pattern": "[\\p{P}\\p{S}\\s]",
+            "pattern": "[\\p{P}\\p{S}\\s\\d]",
             "replacement": ""
           }
         },
@@ -26,7 +26,7 @@
           },
           "fixed_length_tokenizer": {
             "type": "pattern",
-            "pattern": ".{1,1}",
+            "pattern": ".{1,2}",
             "group": 0
           }
         },
@@ -39,32 +39,50 @@
               "nori_part_of_speech"
             ]
           },
-          "korean_word": {
+          "partial_analyzer": {
+            "type": "custom",
+            "tokenizer": "standard",
+            "filter": [
+              "lowercase",
+              "asciifolding",
+              "my_word_delimiter_graph",
+              "ngram_filter",
+              "unique"
+            ]
+          },
+          "normalized_analyzer": {
             "type": "custom",
             "tokenizer": "fixed_length_tokenizer",
-            "char_filter": ["remove_symbols"]
-          },
-          "korean_partial": {
-            "type": "custom",
-            "tokenizer": "keyword",
             "char_filter": [
               "remove_symbols"
             ],
             "filter": [
-              "ngram_filter",
-              "unique"
+              "lowercase",
+              "asciifolding"
+            ]
+          },
+          "original_analyzer": {
+            "type": "custom",
+            "tokenizer": "fixed_length_tokenizer",
+            "filter": [
+              "lowercase",
+              "asciifolding"
             ]
           }
         },
         "filter": {
-          "ngram_filter":{
+          "ngram_filter": {
             "type": "ngram",
             "min_gram": 2,
-            "max_gram": 5
+            "max_gram": 8
           },
           "nori_stoptags": {
             "type": "nori_part_of_speech",
             "stoptags": ["SP"]
+          },
+          "my_word_delimiter_graph": {
+            "type": "word_delimiter_graph",
+            "preserve_original": true
           }
         }
       }
@@ -92,13 +110,17 @@
         "location": {
           "type": "geo_point"
         },
-        "nickname": {
+        "nickname":{
           "type": "text",
-          "analyzer": "korean_word",
+          "analyzer": "original_analyzer",
           "fields": {
             "ngram": {
               "type": "text",
-              "analyzer": "korean_partial"
+              "analyzer": "partial_analyzer"
+            },
+            "normalized": {
+              "type": "text",
+              "analyzer": "normalized_analyzer"
             }
           }
         },
