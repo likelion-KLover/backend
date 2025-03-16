@@ -219,12 +219,6 @@ public class ChatMessageServiceImpl implements ChatMessageService {
 
         rabbitTemplate.convertAndSend("amq.topic", "chatRoomId: " + chatRoomId + ",MessageCreated: ",
                 convertToChatMessageDto(chatMessage, messageContent.getContent()));
-
-        /*
-        //STOMP 브로커로써 rabbitMQ를 활용하는 방식이라고 합니다. 잘은 모르겠지만.
-        rabbitTemplate.convertAndSend("/topic/chatRoom." + chatRoomId,
-                convertToChatMessageDto(chatMessage, messageContent.getContent()));
-         */
     }
 
     // 해당 메시지 삭제
