@@ -71,6 +71,7 @@ public class CommPostDocService {
 
         if(searchByNickname){
             boolQueryBuilder.should(s -> s.matchPhrase(mp -> mp.field("nickname").query(keyword).boost(30f)));
+            boolQueryBuilder.should(s -> s.matchPhrase(mp -> mp.field("nickname.normalized").query(keyword).boost(15f)));
             boolQueryBuilder.should(s -> s.match(m -> m.field("nickname.ngram").query(keyword).boost(1f)));
         }
 

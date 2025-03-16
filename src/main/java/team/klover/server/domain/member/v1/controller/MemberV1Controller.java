@@ -16,6 +16,7 @@ import team.klover.server.domain.member.v1.entity.Member;
 import team.klover.server.domain.member.v1.service.MemberV1Service;
 import team.klover.server.global.common.response.ApiResponse;
 import team.klover.server.global.common.response.KloverPage;
+import team.klover.server.global.elasticsearch.member.service.MemberDocService;
 import team.klover.server.global.exception.KloverRequestException;
 import team.klover.server.global.exception.ReturnCode;
 import team.klover.server.global.redis.RedisService;
@@ -31,6 +32,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class MemberV1Controller {
     private final MemberV1Service memberService;
     private final RedisService redisService;
+    private final MemberDocService memberDocService;
 
 
     //보통 앱들도 이미지, 닉네임 등 내 정보를 한 번에 바꿀 수 있게 되어있으므로, 그러는 게 좋을 것이라고 사료됨.
@@ -93,5 +95,14 @@ public class MemberV1Controller {
         if(page<0 || size <=0 || size >10) throw new KloverRequestException(ReturnCode.WRONG_PARAMETER);
         Pageable pageable = PageRequest.of(page,size);
         return ApiResponse.of(KloverPage.of(memberService.searchMemberByNickname(keyword,pageable)));
+    }
+
+    @GetMapping("/searchTest")
+    public ApiResponse<MemberDto> searchMemberEs(@RequestParam(value = "keyword",defaultValue = "")String keyword,
+                                                 @RequestParam(value = "page",defaultValue = "0")int page,
+                                                 @RequestParam(value = "size",defaultValue = "10")int size){
+        if(page<0 || size <=0 || size >10) throw new KloverRequestException(ReturnCode.WRONG_PARAMETER);
+        Pageable pageable = PageRequest.of(page,size);
+        return ApiResponse.of(KloverPage.of(memberDocService.search(keyword,pageable)));
     }
 }

@@ -3,3 +3,6 @@
 
 - pipeline.id: tourpost_pipeline
   path.config: "/usr/share/logstash/pipeline/tourpost/loadrow/tourpostpipeline.conf"
+
+- pipeline.id: member_pipeline
+  path.config: "/usr/share/logstash/pipeline/member/loadrow/memberpipeline.conf"

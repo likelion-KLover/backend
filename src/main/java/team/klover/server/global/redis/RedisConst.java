@@ -12,6 +12,11 @@ public class RedisConst {
     public static final String ES_COMMPOST_DELETE_POSTFIX = ":delete";
     public static final String ES_MEMBER_PREFIX = "member:";
 
+    public static final String ES_NICKNAMEONLY_PREFIX=":nickname";
+    public static final String ES_MEMBER_UPDATE_POSTFIX=":update";
+    public static final String ES_MEMBER_DELETE = "memberDelete";
+
     public static final String ES_TOURPOST_PREFIX = "tourpost:";
     public static final String ES_TOURPOST_COUNT_PREFIX = ":count";
+
 }
